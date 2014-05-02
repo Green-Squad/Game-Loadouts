@@ -1,3 +1,6 @@
 [18-Apr-2014 13:16:32 America/Denver] PHP Notice:  Undefined variable: argv in - on line 14
 [18-Apr-2014 13:16:32 America/Denver] PHP Warning:  in_array() expects parameter 2 to be array, null given in - on line 21
 [18-Apr-2014 13:16:32 America/Denver] PHP Warning:  Invalid argument supplied for foreach() in - on line 46
+[02-May-2014 08:00:48 America/Denver] PHP Notice:  Undefined variable: argv in - on line 14
+[02-May-2014 08:00:48 America/Denver] PHP Warning:  in_array() expects parameter 2 to be array, null given in - on line 21
+[02-May-2014 08:00:48 America/Denver] PHP Warning:  Invalid argument supplied for foreach() in - on line 46
