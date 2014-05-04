@@ -43,7 +43,7 @@
                             <ul class="dropdown-menu">
                                 @foreach(GameController::listGames() as $game)
                                 <li class="">
-                                    <a href=""> {{ $game -> id }} </a>
+                                    <a href="{{ route('showGame', $game -> id) }}"> {{ $game -> id }} </a>
                                 </li>
                                 @endforeach
                             </ul>

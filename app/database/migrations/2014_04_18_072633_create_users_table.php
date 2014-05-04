@@ -38,12 +38,75 @@ class CreateUsersTable extends Migration {
             $table -> increments('id');
             $table -> string('name', 128);
             $table -> string('game_id', 128);
+            $table -> string('image_url', 128);
+            $table -> timestamps();
+
+            $table -> foreign('game_id') -> references('id') -> on('games') -> on_update('cascade') -> on_delete('cascade');
+
+            $table -> engine = 'InnoDB';
+
+        });
+
+        Schema::create('attachments', function(Blueprint $table) {
+            $table -> increments('id');
+            $table -> string('name', 128);
+            $table -> integer('slot');
+            $table -> string('game_id', 128);
+            $table -> string('image_url', 128);
             $table -> timestamps();
 
             $table -> foreign('game_id') -> references('id') -> on('games') -> on_update('cascade') -> on_delete('cascade');
 
             $table -> engine = 'InnoDB';
         });
+
+        Schema::create('attachment_weapon', function(Blueprint $table) {
+            $table -> increments('id');
+            $table -> integer('attachment_id') -> unsigned();
+            $table -> integer('weapon_id') -> unsigned();
+            $table -> timestamps();
+
+            $table -> foreign('attachment_id') -> references('id') -> on('attachments') -> on_update('cascade') -> on_delete('cascade');
+            $table -> foreign('weapon_id') -> references('id') -> on('weapons') -> on_update('cascade') -> on_delete('cascade');
+
+            $table -> engine = 'InnoDB';
+        });
+
+        Schema::create('loadouts', function(Blueprint $table) {
+            $table -> increments('id');
+            $table -> integer('weapon_id') -> unsigned();
+            $table -> timestamps();
+
+            $table -> foreign('weapon_id') -> references('id') -> on('weapons') -> on_update('cascade') -> on_delete('cascade');
+
+            $table -> engine = 'InnoDB';
+        });
+
+        Schema::create('attachment_loadout', function(Blueprint $table) {
+            $table -> increments('id');
+            $table -> integer('attachment_id') -> unsigned();
+            $table -> integer('loadout_id') -> unsigned();
+            $table -> timestamps();
+
+            $table -> foreign('attachment_id') -> references('id') -> on('attachments') -> on_update('cascade') -> on_delete('cascade');
+            $table -> foreign('loadout_id') -> references('id') -> on('loadouts') -> on_update('cascade') -> on_delete('cascade');
+
+            $table -> engine = 'InnoDB';
+
+        });
+
+        Schema::create('loadout_user', function(Blueprint $table) {
+            $table -> increments('id');
+            $table -> string('user_id', 128);
+            $table -> integer('loadout_id') -> unsigned();
+            $table -> timestamps();
+
+            $table -> foreign('user_id') -> references('email') -> on('users') -> on_update('cascade') -> on_delete('cascade');
+            $table -> foreign('loadout_id') -> references('id') -> on('loadouts') -> on_update('cascade') -> on_delete('cascade');
+
+            $table -> engine = 'InnoDB';
+        });
+
     }
 
     /**
@@ -55,6 +118,8 @@ class CreateUsersTable extends Migration {
         Schema::drop('users');
         Schema::drop('games');
         Schema::drop('weapons');
+        Schema::drop('attachments');
+        Schema::drop('attachment_weapon');
     }
 
 }

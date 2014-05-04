@@ -26,11 +26,14 @@ class GameController extends BaseController {
         } catch (\Illuminate\Database\QueryException $e) {
             return Redirect::back() -> with(array('alert' => 'Error: Failed to create new game', 'alert-class' => 'alert-danger'));
         }
-        return Redirect::route('adminDashboard') -> with(array('alert' => 'Game has been successfully created.', 'alert-class' => 'alert-success'));
+        return Redirect::route('admin.game.index') -> with(array('alert' => 'Game has been successfully created.', 'alert-class' => 'alert-success'));
     }
 
-    public function show() {
+    public function show(Game $game) {
         // Return a view of a specific game (GET)
+        $weapons = Weapon::where('game_id', $game -> id) -> get();
+        $attachments = Attachment::where('game_id', $game -> id) -> get();
+        return View::make('admin.game.show', array('game' => $game, 'weapons' => $weapons, 'attachments' => $attachments));
     }
 
     public function edit(Game $game) {
@@ -79,6 +82,11 @@ class GameController extends BaseController {
     public static function listGames() {
         $games = Game::where('live', 1) -> get();
         return $games;
+    }
+    
+    public static function listWeapons(Game $game) {
+        $weapons = Weapon::where('game_id', $game -> id) -> get();
+        return View::make('game', compact('game', 'weapons'));
     }
 
 }

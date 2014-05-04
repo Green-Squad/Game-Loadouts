@@ -1,18 +1,18 @@
 @extends('admin.layout')
 
 @section('subtitle')
-Delete Weapon {{ $weapon -> name }}
+Delete Attachment {{ $attachment -> name }}
 @stop
 
 @section('content')
 
 <div class="well">
-    {{ Form::open( array('url' => action('WeaponController@destroy', array('id' => $game -> id, 'weaponID' => $weapon -> id)), 'class' => 'form-horizontal')) }}
+    {{ Form::open( array('url' => action('AttachmentController@destroy', array('id' => $game -> id, 'attachmentID' => $attachment -> id)), 'class' => 'form-horizontal')) }}
     <fieldset>
         <legend>
-            <h2>Delete Weapon</h2>
+            <h2>Delete Attachment</h2>
             <p>
-                Are you sure you want to delete Weapon {{ $weapon -> name }}? This process is irreversible.
+                Are you sure you want to delete Attachment {{ $attachment -> name }}? This process is irreversible.
             </p>
         </legend>
         <div class="form-group">

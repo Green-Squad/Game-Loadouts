@@ -120,21 +120,73 @@ Route::group(array('before' => 'auth'), function() {
                 'as' => 'modUsers',
                 'uses' => 'UserController@listUsers'
             ));
-            
+
             Route::resource('game', 'GameController');
 
             Route::group(array('prefix' => 'game'), function() {
 
-                //Route::resource('/', 'GameController');
-
                 Route::get('{game}/delete', array(
-                    'as' => 'deleteGame',
+                    'as' => 'gameDelete',
                     function(Game $game) {
                         return View::make('admin.game.delete', compact('game'));
                     }
 
                 ));
+
+            });
+
+            Route::group(array('prefix' => '{game}'), function() {
+
+                // WEAPON
+                Route::get('weapon/create', array(
+                    'as' => 'weaponCreate',
+                    'uses' => 'WeaponController@create'
+                ));
+                Route::post('weapon/create', 'WeaponController@store');
+
+                Route::get('{weapon}/edit', array(
+                    'as' => 'weaponEdit',
+                    'uses' => 'WeaponController@edit'
+                ));
+                Route::post('{weapon}/edit', 'WeaponController@update');
+
+                Route::get('{weapon}/delete', array(
+                    'as' => 'weaponDelete',
+                    'uses' => 'WeaponController@delete'
+                ));
+                Route::post('{weapon}/delete', 'WeaponController@destroy');
+
+                // ATTACHMENT
+                Route::get('attachment/create', array(
+                    'as' => 'attachmentCreate',
+                    'uses' => 'AttachmentController@create'
+                ));
+                Route::post('attachment/create', 'AttachmentController@store');
+
+                Route::get('attachment/{attachment}/edit', array(
+                    'as' => 'attachmentEdit',
+                    'uses' => 'AttachmentController@edit'
+                ));
+                Route::post('attachment/{attachment}/edit', 'AttachmentController@update');
+
+                Route::get('attachment/{attachment}/delete', array(
+                    'as' => 'attachmentDelete',
+                    'uses' => 'AttachmentController@delete'
+                ));
+                Route::post('attachment/{attachment}/delete', 'AttachmentController@destroy');
             });
         });
     });
 });
+
+Route::get('{game}', array(
+    'as' => 'showGame',
+    'uses' => 'GameController@listWeapons'
+));
+
+Route::get('{game}/{weapon}', array(
+    'as' => 'showLoadouts',
+    'uses' => 'WeaponController@listLoadouts'
+));
+
+Route::post('{game}/{weapon}', 'LoadoutController@store');

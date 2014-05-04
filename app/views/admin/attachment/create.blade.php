@@ -1,20 +1,20 @@
 @extends('admin.layout')
 
 @section('subtitle')
-Create Weapon
+Create Attachment
 @stop
 
 @section('content')
 
 <div class="row">
     <div class="col-lg-12">
-        <h1>Weapon <small>Create New</small></h1>
+        <h1>Attachment <small>Create New</small></h1>
         <ol class="breadcrumb">
             <li>
                 <i class="fa fa-dashboard"></i> Dashboard
             </li>
             <li>
-                <i class="icon-file-alt"></i> Weapon
+                <i class="icon-file-alt"></i> Attachment
             </li>
             <li class="active">
                 <i class="icon-file-alt"></i> Create
@@ -26,30 +26,21 @@ Create Weapon
 <div class="row">
     <div class="col-lg-7">
         <div class="well">
-            {{ Form::open( array('action' => array('WeaponController@store', $game -> id), 'class' => 'form-horizontal', 'files' => true)) }}
+            {{ Form::open( array('action' => array('AttachmentController@store', $game -> id), 'class' => 'form-horizontal', 'files' => true)) }}
             <fieldset>
                 <legend>
-                    <h2>New Weapon for {{ $game -> id }}</h2>
+                    <h2>New Attachment for {{ $game -> id }}</h2>
                 </legend>
                 <div class="form-group">
                     <div class="col-lg-12">
-                        {{ Form::text('name', '', array('class' => 'form-control input-lg', 'placeholder' => 'Weapon Name', 'required' => '')) }}
+                        {{ Form::text('name', '', array('class' => 'form-control input-lg', 'placeholder' => 'Attachment Name', 'required' => '')) }}
                     </div>
                 </div>
-                @foreach($attachmentsBySlot as $key => $slot)
-                <div class="col-lg-3">
-                    <div>
-                        {{ Form::label('', 'Slot ' . $key, array('class' => 'control-label')) }}
-                    </div>
-                    <div class="btn-group-vertical" data-toggle="buttons">
-                        @foreach($slot as $attachment)
-                        <label class="btn btn-primary">
-                            <input type="checkbox" value="{{ $attachment -> id }}" name="attachments[]">
-                            {{ $attachment -> name }} </label>
-                        @endforeach
+                <div class="form-group">
+                    <div class="col-lg-12">
+                        {{ Form::text('slot', '', array('class' => 'form-control input-lg', 'placeholder' => 'Attachment Slot Number', 'required' => '')) }}
                     </div>
                 </div>
-                @endforeach
                 <div class="form-group">
                     <div class="col-lg-12">
                         {{ Form::label('image', 'Upload Image: ', array('class' => 'control-label'))}}
