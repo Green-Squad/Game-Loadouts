@@ -8,6 +8,10 @@ class Loadout extends Eloquent {
         return $this -> belongsToMany('Attachment');
     }
     
+    public function attachmentIDs() {
+        return $this -> belongsToMany('Attachment');
+    }
+    
     public function users() {
         return $this -> belongsToMany('Users');
     }
