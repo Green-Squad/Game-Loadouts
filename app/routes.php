@@ -13,6 +13,7 @@
 
 Route::model('user', 'User');
 Route::model('game', 'Game');
+Route::model('loadout', 'Loadout');
 
 Route::get('/', array(
     'as' => 'home',
@@ -190,3 +191,13 @@ Route::get('{game}/{weapon}', array(
 ));
 
 Route::post('{game}/{weapon}', 'LoadoutController@store');
+
+Route::get('{game}/{weapon}/{loadout}', array(
+    'as' => 'showLoadout',
+    'uses' => 'LoadoutController@show'
+));
+
+Route::get('{game}/{weapon}/{loadout}/upvote', array(
+    'as' => 'upvoteLoadout',
+    'uses' => 'LoadoutController@upvote'
+));

@@ -10,15 +10,24 @@
     <div class="row">
         <div class="col-lg-12">
             <h2>{{ $game -> id}} <small>Weapons</small></h2>
+            <img src="{{ asset($weapon -> image_url) }}" alt="{{ $weapon -> name }}" />
         </div>
     </div>
     <div class="row">
         <div class="col-lg-6">
             @foreach($loadouts as $loadout)
             <p>
-                @foreach($loadout -> attachments as $attachment)
+                @if ($loadout['upvoted'])
+                Upvote
+                @else
+                <a href="{{ route('upvoteLoadout', array($game -> id, $weapon -> name, $loadout['id'])) }}">Upvote</a>
+                @endif
+                <a href="{{ route('showLoadout', array($game -> id, $weapon -> name, $loadout['id'])) }}">
+                {{ $loadout['count']}}
+                @foreach(Loadout::findOrFail($loadout['id']) -> attachments as $attachment)
                 {{ $attachment -> name }}
                 @endforeach
+            </a>
             </p>
             @endforeach
         </div>
@@ -36,7 +45,7 @@
                     <div class="btn-group-vertical" data-toggle="buttons">
                         @foreach($slot as $attachment)
                         <label class="btn btn-default">
-                            <input type="radio" value="{{ $attachment -> id }}" name="attachment{{ $key }}">
+                            <input type="radio" value="{{ $attachment -> id }}" name="attachment{{ $key }}" required="">
                             {{ $attachment -> name }} </label>
                         @endforeach
                     </div>
@@ -51,6 +60,11 @@
                 </div>
             </div>
             {{ Form::close() }}
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-lg-12">
+            <p>What is the best loadout for {{ $weapon -> name }} in {{ $game -> id }}?</p>
         </div>
     </div>
 </div>
