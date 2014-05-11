@@ -3,28 +3,30 @@
 class LoadoutController extends BaseController {
 
     public function store(Game $game, $weaponName) {
-        $weapon = Weapon::where('game_id', $game -> id, 'AND') -> where('name', $weaponName) -> first();
-        $attachments = Input::except('_token');
 
-        $weapon_loadouts = Loadout::where('weapon_id', $weapon -> id) -> get();
+        if (Auth::check()) {
+            $weapon = Weapon::where('game_id', $game -> id, 'AND') -> where('name', $weaponName) -> first();
+            $attachments = Input::except('_token');
 
-        // all loadouts for specific weapon
-        $existingLoadout = NULL;
+            $weapon_loadouts = Loadout::where('weapon_id', $weapon -> id) -> get();
 
-        foreach ($weapon_loadouts as $weapon_loadout) {
+            // all loadouts for specific weapon
+            $existingLoadout = NULL;
 
-            $weapon_loadout_attachments = $this -> getAttachmentsArray($weapon_loadout -> attachmentIDs -> toArray());
+            foreach ($weapon_loadouts as $weapon_loadout) {
 
-            if ($this -> isExistingLoadout($attachments, $weapon_loadout_attachments)) {
-                ////we have found the matching loadout
-                //we need to save that loadout and break out of this loop
-                $existingLoadout = $weapon_loadout;
-                break;
+                $weapon_loadout_attachments = $this -> getAttachmentsArray($weapon_loadout -> attachmentIDs -> toArray());
+
+                if ($this -> isExistingLoadout($attachments, $weapon_loadout_attachments)) {
+                    ////we have found the matching loadout
+                    //we need to save that loadout and break out of this loop
+                    $existingLoadout = $weapon_loadout;
+                    break;
+                }
             }
-        }
-        if ($existingLoadout) {
-            // we save the submission loadout user
-            if (Auth::check()) {
+            if ($existingLoadout) {
+                // we save the submission loadout user
+
                 $user = Auth::user();
                 if ($this -> userHasLoadout($user -> loadouts, $existingLoadout -> id)) {
                     return Redirect::back() -> with(array('alert' => 'You have already submitted this loadout.', 'alert-class' => 'alert-warning'));
@@ -32,11 +34,10 @@ class LoadoutController extends BaseController {
                     $user -> loadouts() -> save($existingLoadout);
                     $user -> save();
                     return Redirect::back() -> with(array('alert' => 'Your vote for an existing loadout has been recorded.', 'alert-class' => 'alert-success'));
+
                 }
-            }
-        } else {
-            try {
-                if (Auth::check()) {
+            } else {
+                try {
 
                     $loadout = new Loadout;
                     $loadout -> weapon_id = $weapon -> id;
@@ -50,13 +51,14 @@ class LoadoutController extends BaseController {
                     $user = Auth::user();
                     $user -> loadouts() -> save($loadout);
                     $user -> save();
+                } catch (\Illuminate\Database\QueryException $e) {
+                    return Redirect::back() -> with(array('alert' => 'Error: Failed to create new loadout.', 'alert-class' => 'alert-danger'));
                 }
-            } catch (\Illuminate\Database\QueryException $e) {
-                return Redirect::back() -> with(array('alert' => 'Error: Failed to create new loadout.', 'alert-class' => 'alert-danger'));
             }
+            return Redirect::back() -> with(array('alert' => 'Loadout has been successfully created.', 'alert-class' => 'alert-success'));
+        } else {
+            return Redirect::back() -> with(array('alert' => 'You must be logged in to do that.', 'alert-class' => 'alert-danger'));
         }
-        return Redirect::back() -> with(array('alert' => 'Loadout has been successfully created.', 'alert-class' => 'alert-success'));
-
     }
 
     // $inputAttachments are attachments given by Input from form
@@ -106,8 +108,12 @@ class LoadoutController extends BaseController {
             } else {
                 $user -> loadouts() -> save($loadout);
                 $user -> save();
-                return Redirect::back() -> with(array('alert' => 'Your vote for an existing loadout has been recorded.', 'alert-class' => 'alert-success'));
+                $response = array('success' => 1);
+                return Response::json($response);
+                //return Redirect::back() -> with(array('alert' => 'Your vote for an existing loadout has been recorded.', 'alert-class' => 'alert-success'));
             }
+        } else {
+            return Redirect::back() -> with(array('alert' => 'You must be logged in to do that.', 'alert-class' => 'alert-danger'));
         }
     }
 

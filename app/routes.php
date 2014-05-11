@@ -197,7 +197,7 @@ Route::get('{game}/{weapon}/{loadout}', array(
     'uses' => 'LoadoutController@show'
 ));
 
-Route::get('{game}/{weapon}/{loadout}/upvote', array(
+Route::post('{game}/{weapon}/{loadout}/upvote', array(
     'as' => 'upvoteLoadout',
     'uses' => 'LoadoutController@upvote'
 ));

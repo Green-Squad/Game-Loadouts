@@ -10,8 +10,65 @@
         <div class="col-lg-12">
             <h2><small>Loadout</small></h2>
             @foreach($loadout -> attachments as $attachment)
-            <p>{{ $attachment -> name }}</p>
+            <p>
+                {{ $attachment -> name }}
+            </p>
             @endforeach
+            
+            
+            <?php
+            define('DISQUS_SECRET_KEY', 'YswO6okCvBMxLMP0Gf2JHpymuW6Nxx8UYVEwE2h44Xxgej7dziGgEbet2GwokkUP');
+            define('DISQUS_PUBLIC_KEY', 'COZqmFYdQiyinQ5MzXSOqRbxOQ8grhFvSd0dYb0Zc37wJSRxzDCCtIUhV83AyUM8');
+            
+            if(Auth::check()) {
+                $username = Auth::user() -> username;
+                $email = Auth::user() -> email;
+                $id = Auth::user() -> email;
+    
+                $data = array("id" => $id, "username" => $username, "email" => $email);
+    
+                function dsq_hmacsha1($data, $key) {
+                    $blocksize = 64;
+                    $hashfunc = 'sha1';
+                    if (strlen($key) > $blocksize)
+                        $key = pack('H*', $hashfunc($key));
+                    $key = str_pad($key, $blocksize, chr(0x00));
+                    $ipad = str_repeat(chr(0x36), $blocksize);
+                    $opad = str_repeat(chr(0x5c), $blocksize);
+                    $hmac = pack('H*', $hashfunc(($key ^ $opad) . pack('H*', $hashfunc(($key ^ $ipad) . $data))));
+                    return bin2hex($hmac);
+                }
+
+                $message = base64_encode(json_encode($data));
+                $timestamp = time();
+                $hmac = dsq_hmacsha1($message . ' ' . $timestamp, DISQUS_SECRET_KEY);
+            } else {
+                $message = NULL;
+                $timestamp = NULL;
+                $hmac = NULL;
+            }
+            ?>
+
+            
+            
+
+            <script type="text/javascript">
+                var disqus_config = function() {
+                this.page.remote_auth_s3 = "<?php echo "$message $hmac $timestamp"; ?>";
+                this.page.api_key = "<?php echo DISQUS_PUBLIC_KEY; ?>";
+                
+                 this.sso = {
+                      name:    "Game Loadouts",
+                      button:  "http://tryhard.dornblaser.me/i/login.png",
+                      icon:    "http://tryhard.dornblaser.me/i/login.png",
+                      url:     "http://tryhard.dornblaser.me/login/",
+                      logout:  "http://tryhard.dornblaser.me/logout/",
+                      width:   "800",
+                      height:  "400"
+                  };
+                
+                };
+            </script>
 
             <div id="disqus_thread"></div>
             <script type="text/javascript">

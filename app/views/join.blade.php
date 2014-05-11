@@ -13,11 +13,8 @@ Join Us!
             <h2>Account Registration</h2>
         </legend>
         <div class="form-group">
-            <div class="col-lg-6">
-                {{ Form::text('first_name', '', array('class' => 'form-control input-lg', 'placeholder' => 'First Name', 'required' => '')) }}
-            </div>
-            <div class="col-lg-6">
-                {{ Form::text('last_name', '', array('class' => 'form-control input-lg', 'placeholder' => 'Last Name', 'required' => '')) }}
+            <div class="col-lg-12">
+                {{ Form::text('username', '', array('class' => 'form-control input-lg', 'placeholder' => 'Username', 'required' => '')) }}
             </div>
         </div>
         <div class="form-group">
@@ -32,7 +29,7 @@ Join Us!
         </div>
         <div class="form-group">
             <div class="col-lg-12">
-                {{ Form::password('confirm_password', array('class' => 'form-control input-lg', 'placeholder' => 'Confirm Password', 'required' => '')) }}
+                {{ Form::password('password_confirmation', array('class' => 'form-control input-lg', 'placeholder' => 'Confirm Password', 'required' => '')) }}
             </div>
         </div>
         <div class="form-group">

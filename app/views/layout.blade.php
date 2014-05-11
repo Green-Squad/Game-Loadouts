@@ -57,7 +57,7 @@
                         <li>
                             {{ HTML::linkRoute('adminDashboard', 'Admin') }}
                         </li>                        @endif                        <li class="dropdown">
-                            <a href="#" class="dropdown-toggle" data-toggle="dropdown"> {{ Auth::user() -> first_name }} <b class="caret"></b> </a>
+                            <a href="#" class="dropdown-toggle" data-toggle="dropdown"> {{ Auth::user() -> username }} <b class="caret"></b> </a>
                             <ul class="dropdown-menu">
                                 <li class="">
                                     {{ HTML::linkRoute('account', 'Account') }}
@@ -84,6 +84,17 @@
                 {{ Session::get('alert') }}
             </div>
             @endif
+            @if( $errors->count() > 0 )
+
+            @foreach( $errors -> all() as $message )
+            <div class="alert alert-dismissable alert-danger">
+                <button type="button" class="close" data-dismiss="alert">
+                    ×
+                </button>
+                {{ $message }}
+            </div>
+            @endforeach
+            @endif
 
             @yield('content')
             <hr>
@@ -100,5 +111,7 @@
         <!-- JavaScript -->
         <script src="{{ asset('js/jquery-1.10.2.js') }}"></script>
         <script src="{{ asset('js/bootstrap.min.js') }}"></script>
+
+        @yield('scripts')
     </body>
 </html>

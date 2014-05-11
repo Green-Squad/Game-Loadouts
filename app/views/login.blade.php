@@ -14,7 +14,7 @@ Login
         </legend>
         <div class="form-group">
             <div class="col-lg-12">
-                {{ Form::text('email', '', array('class' => 'form-control input-lg', 'placeholder' => 'Email', 'required' => '')) }}
+                {{ Form::text('emailOrUsername', '', array('class' => 'form-control input-lg', 'placeholder' => 'Email or Username', 'required' => '')) }}
             </div>
         </div>
         <div class="form-group">
