@@ -97,7 +97,8 @@ class LoadoutController extends BaseController {
     }
 
     public function show(Game $game, $weaponName, Loadout $loadout) {
-        return View::make('loadout', compact('loadout'));
+        $weapon = Weapon::where('game_id', $game -> id, 'AND') -> where('name', $weaponName) -> first();
+        return View::make('loadout', compact('loadout', 'game', 'weapon'));
     }
 
     public function upvote(Game $game, $weaponName, Loadout $loadout) {

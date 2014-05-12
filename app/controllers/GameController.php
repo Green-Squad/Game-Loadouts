@@ -85,7 +85,7 @@ class GameController extends BaseController {
     }
     
     public static function listWeapons(Game $game) {
-        $weapons = Weapon::where('game_id', $game -> id) -> get();
+        $weapons = Weapon::where('game_id', $game -> id) -> orderBy('name') -> get();
         return View::make('game', compact('game', 'weapons'));
     }
 

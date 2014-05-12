@@ -8,7 +8,7 @@ Create Weapon
 
 <div class="row">
     <div class="col-lg-12">
-        <h1>Weapon <small>Create New</small></h1>
+        <h1>Weapon <small>Create</small></h1>
         <ol class="breadcrumb">
             <li>
                 <i class="fa fa-dashboard"></i> Dashboard

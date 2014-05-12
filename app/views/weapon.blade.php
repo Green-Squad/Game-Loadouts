@@ -5,7 +5,6 @@
 @stop
 
 @section('content')
-
 <div class="well">
     <div class="row">
         <div class="col-lg-12">
@@ -22,10 +21,12 @@
                 @else
                 <a href="javascript:void(0)" id="upvote-{{ $loadout['id'] }}" class='clickable' data-loadout_id="{{ $loadout['id'] }}">Upvote</a>
                 @endif
-                <a href="{{ route('showLoadout', array($game -> id, $weapon -> name, $loadout['id'])) }}"> <span id="count-{{ $loadout['id'] }}">{{ $loadout['count']}}</span>
+                <a href="{{ route('showLoadout', array($game -> id, $weapon -> name, $loadout['id'])) }}"> <span id="count-{{ $loadout['id'] }}">{{ $loadout['count'] }}</span> 
                 @foreach(Loadout::findOrFail($loadout['id']) -> attachments as $attachment)
                 {{ $attachment -> name }}
                 @endforeach </a>
+                
+                <a href="{{ route('showLoadout', array($game -> id, $weapon -> name, $loadout['id'])) }}" class="comment">Comments</a>
             </p>
             @endforeach
         </div>
@@ -72,7 +73,14 @@
 @stop
 
 @section('scripts')
+
 <script type="text/javascript">
+    
+   $('.comment').each(function() {
+        var _href = $(this).attr('href'); 
+        $(this).attr('href', _href + '#disqus_thread');
+   });
+
    $('.clickable').click(function() {
         var game_id = '<?php echo $game -> id; ?>';
         var weapon_name = '<?php echo $weapon -> name; ?>';
@@ -82,5 +90,18 @@
             $('#upvote-'+loadout_id).contents().unwrap();
         }, 'json');
     });
+</script>
+
+<script type="text/javascript">
+/* * * CONFIGURATION VARIABLES: EDIT BEFORE PASTING INTO YOUR WEBPAGE * * */
+var disqus_shortname = 'tryharddev'; // required: replace example with your forum shortname
+
+/* * * DON'T EDIT BELOW THIS LINE * * */
+(function () {
+var s = document.createElement('script'); s.async = true;
+s.type = 'text/javascript';
+s.src = 'http://' + disqus_shortname + '.disqus.com/count.js';
+(document.getElementsByTagName('HEAD')[0] || document.getElementsByTagName('BODY')[0]).appendChild(s);
+}());
 </script>
 @stop

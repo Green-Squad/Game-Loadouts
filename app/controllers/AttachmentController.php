@@ -24,9 +24,14 @@ class AttachmentController extends BaseController {
 
         if (Input::hasFile('image')) {
             $destinationPath = public_path() . '/img/';
+            $thumbPath = public_path() . '/img/thumb/';
             $fileExtension = $image -> getClientOriginalExtension();
             $fileName = $game -> id . '-' . $name . '.' . $fileExtension;
+
             $image -> move($destinationPath, $fileName);
+
+            copy($destinationPath . $fileName, $thumbPath . $fileName);
+            HelperController::createThumbnail($thumbPath . $fileName, $fileExtension, 64);
         } else {
             return Redirect::back() -> with(array(
                 'alert' => 'Error: Failed to upload image',
@@ -40,6 +45,7 @@ class AttachmentController extends BaseController {
             $attachment -> slot = $slot;
             $attachment -> game_id = $game_id;
             $attachment -> image_url = "img/$fileName";
+            $attachment -> thumb_url = "img/thumb/$fileName";
             $attachment -> save();
         } catch (\Illuminate\Database\QueryException $e) {
             return Redirect::route('adminDashboard') -> with(array(
@@ -82,11 +88,16 @@ class AttachmentController extends BaseController {
 
             if (Input::hasFile('image')) {
                 $destinationPath = public_path() . '/img/';
+                $thumbPath = public_path() . '/img/thumb/';
                 $fileExtension = $image -> getClientOriginalExtension();
                 $fileName = $game -> id . '-' . $name . '.' . $fileExtension;
                 $image -> move($destinationPath, $fileName);
 
+                copy($destinationPath . $fileName, $thumbPath . $fileName);
+                HelperController::createThumbnail($thumbPath . $fileName, $fileExtension, 64);
+
                 $attachment -> image_url = "img/$fileName";
+                $attachment -> thumb_url = "img/thumb/$fileName";
             }
 
             $attachment -> save();

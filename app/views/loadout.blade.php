@@ -15,6 +15,8 @@
             </p>
             @endforeach
             
+            <p>What situations do you like to use this {{ $weapon -> name }} loadout in {{ $game -> id }}? Is this a troll loadout? Is it over powered? Discuss below!</p>
+            
             
             <?php
             define('DISQUS_SECRET_KEY', 'YswO6okCvBMxLMP0Gf2JHpymuW6Nxx8UYVEwE2h44Xxgej7dziGgEbet2GwokkUP');
@@ -74,8 +76,7 @@
             <script type="text/javascript">
                 /* * * CONFIGURATION VARIABLES: EDIT BEFORE PASTING INTO YOUR WEBPAGE * * */
                 var disqus_shortname = 'tryharddev';
-                // required: replace example with your forum shortname
-
+                var disqus_identifier = 'loadout-' + {{ $loadout -> id }};
                 /* * * DON'T EDIT BELOW THIS LINE * * */
                 (function() {
                     var dsq = document.createElement('script');

@@ -15,8 +15,6 @@ class CreateUsersTable extends Migration {
             $table -> string('email', 128) -> primary();
             $table -> string('username', 128);
             $table -> string('password', 64);
-            $table -> string('first_name', 50);
-            $table -> string('last_name', 50);
             $table -> string('role', 16);
             $table -> string('remember_token', 100);
             $table -> dateTime('disabled_until');
@@ -40,9 +38,10 @@ class CreateUsersTable extends Migration {
             $table -> string('name', 128);
             $table -> string('game_id', 128);
             $table -> string('image_url', 128);
+            $table -> string('thumb_url', 128);
             $table -> timestamps();
 
-            $table -> foreign('game_id') -> references('id') -> on('games') -> on_update('cascade') -> on_delete('cascade');
+            $table -> foreign('game_id') -> references('id') -> on('games') -> onUpdate('cascade') -> onDelete('cascade');
 
             $table -> engine = 'InnoDB';
 
@@ -54,9 +53,10 @@ class CreateUsersTable extends Migration {
             $table -> integer('slot');
             $table -> string('game_id', 128);
             $table -> string('image_url', 128);
+            $table -> string('thumb_url', 128);
             $table -> timestamps();
 
-            $table -> foreign('game_id') -> references('id') -> on('games') -> on_update('cascade') -> on_delete('cascade');
+            $table -> foreign('game_id') -> references('id') -> on('games') -> onUpdate('cascade') -> onDelete('cascade');
 
             $table -> engine = 'InnoDB';
         });
@@ -67,8 +67,8 @@ class CreateUsersTable extends Migration {
             $table -> integer('weapon_id') -> unsigned();
             $table -> timestamps();
 
-            $table -> foreign('attachment_id') -> references('id') -> on('attachments') -> on_update('cascade') -> on_delete('cascade');
-            $table -> foreign('weapon_id') -> references('id') -> on('weapons') -> on_update('cascade') -> on_delete('cascade');
+            $table -> foreign('attachment_id') -> references('id') -> on('attachments') -> onUpdate('cascade') -> onDelete('cascade');
+            $table -> foreign('weapon_id') -> references('id') -> on('weapons') -> onUpdate('cascade') -> onDelete('cascade');
 
             $table -> engine = 'InnoDB';
         });
@@ -78,7 +78,7 @@ class CreateUsersTable extends Migration {
             $table -> integer('weapon_id') -> unsigned();
             $table -> timestamps();
 
-            $table -> foreign('weapon_id') -> references('id') -> on('weapons') -> on_update('cascade') -> on_delete('cascade');
+            $table -> foreign('weapon_id') -> references('id') -> on('weapons') -> onUpdate('cascade') -> onDelete('cascade');
 
             $table -> engine = 'InnoDB';
         });
@@ -89,8 +89,8 @@ class CreateUsersTable extends Migration {
             $table -> integer('loadout_id') -> unsigned();
             $table -> timestamps();
 
-            $table -> foreign('attachment_id') -> references('id') -> on('attachments') -> on_update('cascade') -> on_delete('cascade');
-            $table -> foreign('loadout_id') -> references('id') -> on('loadouts') -> on_update('cascade') -> on_delete('cascade');
+            $table -> foreign('attachment_id') -> references('id') -> on('attachments') -> onUpdate('cascade') -> onDelete('cascade');
+            $table -> foreign('loadout_id') -> references('id') -> on('loadouts') -> onUpdate('cascade') -> onDelete('cascade');
 
             $table -> engine = 'InnoDB';
 
@@ -102,8 +102,8 @@ class CreateUsersTable extends Migration {
             $table -> integer('loadout_id') -> unsigned();
             $table -> timestamps();
 
-            $table -> foreign('user_id') -> references('email') -> on('users') -> on_update('cascade') -> on_delete('cascade');
-            $table -> foreign('loadout_id') -> references('id') -> on('loadouts') -> on_update('cascade') -> on_delete('cascade');
+            $table -> foreign('user_id') -> references('email') -> on('users') -> onUpdate('cascade') -> onDelete('cascade');
+            $table -> foreign('loadout_id') -> references('id') -> on('loadouts') -> onUpdate('cascade') -> onDelete('cascade');
 
             $table -> engine = 'InnoDB';
         });
