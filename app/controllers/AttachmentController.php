@@ -23,8 +23,8 @@ class AttachmentController extends BaseController {
         $game_id = $game -> id;
 
         if (Input::hasFile('image')) {
-            $destinationPath = public_path() . '/img/';
-            $thumbPath = public_path() . '/img/thumb/';
+            $destinationPath = public_path() . '/uploads/';
+            $thumbPath = public_path() . '/uploads/thumb/';
             $fileExtension = $image -> getClientOriginalExtension();
             $fileName = $game -> id . '-' . $name . '.' . $fileExtension;
 
@@ -44,8 +44,8 @@ class AttachmentController extends BaseController {
             $attachment -> name = $name;
             $attachment -> slot = $slot;
             $attachment -> game_id = $game_id;
-            $attachment -> image_url = "img/$fileName";
-            $attachment -> thumb_url = "img/thumb/$fileName";
+            $attachment -> image_url = "uploads/$fileName";
+            $attachment -> thumb_url = "uploads/thumb/$fileName";
             $attachment -> save();
         } catch (\Illuminate\Database\QueryException $e) {
             return Redirect::route('adminDashboard') -> with(array(
@@ -87,8 +87,8 @@ class AttachmentController extends BaseController {
             $attachment -> slot = $slot;
 
             if (Input::hasFile('image')) {
-                $destinationPath = public_path() . '/img/';
-                $thumbPath = public_path() . '/img/thumb/';
+                $destinationPath = public_path() . '/uploads/';
+                $thumbPath = public_path() . '/uploads/thumb/';
                 $fileExtension = $image -> getClientOriginalExtension();
                 $fileName = $game -> id . '-' . $name . '.' . $fileExtension;
                 $image -> move($destinationPath, $fileName);
@@ -96,8 +96,8 @@ class AttachmentController extends BaseController {
                 copy($destinationPath . $fileName, $thumbPath . $fileName);
                 HelperController::createThumbnail($thumbPath . $fileName, $fileExtension, 64);
 
-                $attachment -> image_url = "img/$fileName";
-                $attachment -> thumb_url = "img/thumb/$fileName";
+                $attachment -> image_url = "uploads/$fileName";
+                $attachment -> thumb_url = "uploads/thumb/$fileName";
             }
 
             $attachment -> save();

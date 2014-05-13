@@ -36,23 +36,25 @@ Edit Weapon {{ $weapon -> name }}
                         {{ Form::text('name', $weapon -> name, array('class' => 'form-control input-lg', 'placeholder' => 'Game Name', 'required' => '')) }}
                     </div>
                 </div>
-                @foreach($attachmentsBySlot as $key => $slot)
-                <div class="col-lg-3">
-                    <div>
-                        {{ Form::label('', 'Slot ' . $key, array('class' => 'control-label')) }}
+                <div class="form-group">
+                    @foreach($attachmentsBySlot as $key => $slot)
+                    <div class="col-lg-3">
+                        <div>
+                            {{ Form::label('', 'Slot ' . $key, array('class' => 'control-label')) }}
+                        </div>
+                        <div class="btn-group-vertical" data-toggle="buttons">
+                            @foreach($slot as $attachment)
+                            <label class="btn btn-primary {{ $attachment -> checked }}"> @if(!empty($attachment -> checked))
+                                <input type="checkbox" value="{{ $attachment -> id }}" name="attachments[]" checked>
+                                @else
+                                <input type="checkbox" value="{{ $attachment -> id }}" name="attachments[]">
+                                @endif
+                                {{ $attachment -> name }} </label>
+                            @endforeach
+                        </div>
                     </div>
-                    <div class="btn-group-vertical" data-toggle="buttons">
-                        @foreach($slot as $attachment)
-                        <label class="btn btn-primary {{ $attachment -> checked }}"> @if(!empty($attachment -> checked))
-                            <input type="checkbox" value="{{ $attachment -> id }}" name="attachments[]" checked>
-                            @else
-                            <input type="checkbox" value="{{ $attachment -> id }}" name="attachments[]">
-                            @endif
-                            {{ $attachment -> name }} </label>
-                        @endforeach
-                    </div>
+                    @endforeach
                 </div>
-                @endforeach
                 <div class="form-group">
                     <div class="col-lg-12">
                         {{ Form::label('image', 'Upload Image: ', array('class' => 'control-label'))}}

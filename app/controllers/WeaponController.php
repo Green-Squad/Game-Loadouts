@@ -19,7 +19,7 @@ class WeaponController extends BaseController {
                 $attachmentsBySlot[$slot] = array($attachment);
             }
         }
-        
+
         ksort($attachmentsBySlot);
 
         return View::make('admin.weapon.create', compact('game', 'attachmentsBySlot'));
@@ -37,8 +37,8 @@ class WeaponController extends BaseController {
         $game_id = $game -> id;
 
         if (Input::hasFile('image')) {
-            $destinationPath = public_path() . '/img/';
-            $thumbPath = public_path() . '/img/thumb/';
+            $destinationPath = public_path() . '/uploads/';
+            $thumbPath = public_path() . '/uploads/thumb/';
 
             $fileExtension = $image -> getClientOriginalExtension();
             $fileName = $game -> id . '-' . $name . '.' . $fileExtension;
@@ -58,8 +58,8 @@ class WeaponController extends BaseController {
             $weapon = new Weapon;
             $weapon -> name = $name;
             $weapon -> game_id = $game_id;
-            $weapon -> image_url = "img/$fileName";
-            $weapon -> thumb_url = "img/thumb/$fileName";
+            $weapon -> image_url = "uploads/$fileName";
+            $weapon -> thumb_url = "uploads/thumb/$fileName";
             $weapon -> save();
 
             foreach ($attachments as $attachment) {
@@ -105,7 +105,7 @@ class WeaponController extends BaseController {
                 $attachmentsBySlot[$slot] = array($attachment);
             }
         }
-        
+
         ksort($attachmentsBySlot);
 
         return View::make('admin.weapon.edit', compact('game', 'weapon', 'attachmentsBySlot'));
@@ -128,8 +128,8 @@ class WeaponController extends BaseController {
             $weapon -> name = $name;
 
             if (Input::hasFile('image')) {
-                $destinationPath = public_path() . '/img/';
-                $thumbPath = public_path() . '/img/thumb/';
+                $destinationPath = public_path() . '/uploads/';
+                $thumbPath = public_path() . '/uploads/thumb/';
                 $fileExtension = $image -> getClientOriginalExtension();
                 $fileName = $game -> id . '-' . $name . '.' . $fileExtension;
                 $image -> move($destinationPath, $fileName);
@@ -137,8 +137,8 @@ class WeaponController extends BaseController {
                 copy($destinationPath . $fileName, $thumbPath . $fileName);
                 HelperController::createThumbnail($thumbPath . $fileName, $fileExtension, 128);
 
-                $weapon -> thumb_url = "img/thumb/$fileName";
-                $weapon -> image_url = "img/$fileName";
+                $weapon -> thumb_url = "uploads/thumb/$fileName";
+                $weapon -> image_url = "uploads/$fileName";
             }
 
             $weapon -> save();
@@ -194,6 +194,7 @@ class WeaponController extends BaseController {
     }
 
     public static function listLoadouts(Game $game, $weaponName) {
+
         $weapon = Weapon::where('game_id', $game -> id, 'AND') -> where('name', $weaponName) -> first();
         $loadouts = Loadout::where('weapon_id', $weapon -> id) -> get();
 
@@ -223,7 +224,7 @@ class WeaponController extends BaseController {
             }
         }
         ksort($attachmentsBySlot);
-       
+
         return View::make('weapon', compact('game', 'weapon', 'loadouts', 'attachmentsBySlot'));
     }
 

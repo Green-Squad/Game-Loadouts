@@ -1,0 +1,305 @@
+/* ==========================================================================
+   Media Queries
+   ========================================================================== */
+
+/* ---------------------------------------------------------------------- */
+/*	Version 1200px
+/* ---------------------------------------------------------------------- */
+
+@media handheld, only screen and (max-width: 1200px) {
+	.logos { 
+		padding: 0 10px;
+	}
+	.logos li { 
+		margin: 0 3px;
+		width: auto;
+	}
+	.logos li img { 
+		width: 183px;
+	}
+
+	#classes .classes-club .class-club{
+	    height: 252px; 
+	    width: 300px;
+	}
+
+	.post { width: 340px; }
+	.post header { height: 220px; }
+	.post header h3 { font-size: 14px; }
+
+	#news .post:first-child header {
+		height: 380px;
+	}
+
+	.flickr-feed li a img {
+		height: 60px;
+		width: 60px;
+	}
+
+	.grid .content .element .link {
+		width: 300px;
+	}
+
+}
+
+
+/* ---------------------------------------------------------------------- */
+/*	Version 1024px
+/* ---------------------------------------------------------------------- */
+
+@media handheld, only screen and (max-width: 1024px) {
+	header .top-bar ul.social-header {
+		padding: 0;
+	}
+	
+
+}
+
+
+
+/* ---------------------------------------------------------------------- */
+/*	Version 990px
+/* ---------------------------------------------------------------------- */
+@media handheld, only screen and (max-width: 990px) {
+	header .main-menu .nav-collapse .nav > li > a{
+		border-radius: 0;
+		padding: 1.7em;
+	}
+
+	header .main-menu .nav li > a { padding: 0 0.8em; }
+
+	#home .new-classes .new-class {
+		margin: 0 0 30px 0;
+	}
+
+	.tp-leftarrow.default,
+	.tp-rightarrow.default {
+		width: 48px;
+		height: 48px;
+		background-size: 96px 96px;
+	}
+
+	.tp-rightarrow.default:hover {
+		background-position: 0 -49.5px;
+	}
+
+	.tp-leftarrow.default {
+		background-position: -48px 0;
+	}
+
+	.tp-leftarrow.default:hover {
+		background-position: -48px -49.5px;
+	}
+
+	.logos {text-align: center;}
+	.logos li { float: none; display: inline-block; width: 210px; margin: 10px;}
+	.logo a img { height: 60px; }
+
+
+	.post { width: 258px; }
+	.post header { height: 160px;}
+	.post header h3 { line-height: 2.5em; }
+
+
+	#classes .classes-club .class-club{
+	    height: 193px; 
+	    width: 230px;
+	}
+
+	#news .post:first-child header {
+		height: 290px;
+	}
+	#news .post:first-child header h3 {
+		font-size: 14px;
+		line-height: 2em;
+	}
+}
+
+
+/* ---------------------------------------------------------------------- */
+/*	Mobile Version 767px
+/* ---------------------------------------------------------------------- */
+
+@media handheld, only screen and (max-width: 767px) {
+
+	header .top-bar ul.social-header,
+	header .top-bar ul.misc {
+ 		width: 100%;
+ 		text-align: center;
+	}
+	header .top-bar ul.misc li,
+	header .top-bar ul.social-header li {
+		display: inline-block;
+		float: none;
+	}
+
+
+
+
+
+	header .main-menu .nav li > a {
+		height: 48px;
+		line-height: 48px;
+	}
+	header .main-menu .navbar .dropdown {
+	  position: static;
+	}
+
+	header .main-menu .navbar .dropdown ul {
+	  position: static;
+	  text-align: left;
+	  padding: 0;
+	  display: block;
+	  margin: 0 0 0 30px;
+	}
+	header .main-menu .navbar .dropdown ul li {
+	  list-style: none;
+	  display: block;
+	  padding: 0;
+	  background-color: #252f38;
+	  margin: 1px 0 0;
+	}
+	header .main-menu .navbar .dropdown ul li a{
+	  margin: 0;
+	  padding: 0 15px;
+	  width: 165px;
+	  line-height: 44px;
+	  height: 44px;
+	  display: inline-block;
+	}
+	header .main-menu .navbar .dropdown ul li a:hover{
+	  text-decoration: none;
+	}
+
+	.copyright ul, .copyright p {
+		float: none!important;
+		text-align: center;
+	}
+	.copyright ul {
+		display: block;
+		width: 100%;
+	}
+	.copyright ul li {
+		display: inline-block;
+	}
+	#classes .classes-club {
+		margin: 0 0 0 30px;
+	}
+	
+	.post { width: 48%; }
+	.post header { height: inherit; }
+	.post header img {
+		height: inherit;
+		width: 100%;
+	}
+
+	#news .post:first-child header {
+		height: inherit;
+	}
+	#news .post:first-child header h3 {
+		font-size: 14px;
+		line-height: 3em;
+	}
+}
+
+
+/* ---------------------------------------------------------------------- */
+/*	Mobile Version 600px
+/* ---------------------------------------------------------------------- */
+
+@media handheld, only screen and (max-width: 600px) {}
+	
+
+/* ---------------------------------------------------------------------- */
+/*	Mobile Version 568px
+/* ---------------------------------------------------------------------- */
+
+@media handheld, only screen and (max-width: 568px) {
+	header .top-bar ul.misc li {
+		width: 100%;
+	}
+
+	header .top-bar ul.social-header li a {
+		padding: 1.1em 1.6em;
+	}
+
+
+	.filters {
+		text-align: center;
+	}
+
+	.filters button {
+		float: none!important;
+		display: inline-block;
+		margin-bottom: 10px;
+	}
+}
+
+
+/* ---------------------------------------------------------------------- */
+/*	Mobile Version 480px
+/* ---------------------------------------------------------------------- */
+
+@media handheld, only screen and (max-width: 480px) {
+	.button-gym.view-all {
+		margin: 0 50px;
+	}
+
+	.slider-control,
+	.slider-control.prev {
+		margin: -16px 0 0 0;
+	}
+
+	#home .banner .slide1 h2 {
+		margin-top: 0;
+	}
+
+	.tp-leftarrow.default,
+	.tp-rightarrow.default {
+		width: 32px;
+		height: 32px;
+		background-size: 64px 64px;
+	}
+
+	.tp-rightarrow.default:hover {
+		background-position: 0 -33px;
+	}
+
+	.tp-leftarrow.default {
+		background-position: -32px 0;
+	}
+
+	.tp-leftarrow.default:hover {
+		background-position: -32px -33px;
+	}
+
+	#home .banner .slide3 h2,
+	#home .banner .slide3 > div > p,
+	#home .banner .slide3 a {
+		margin-left: 30px;
+	}
+
+	.nav-tabs li {
+		width: 100%;
+	}
+	.logo a { width: 100%; }
+	.logo a img { 
+		margin: 0 5%;
+		width: 90%;
+		max-width: 350px;
+	}
+
+	.post:nth-child(2n+3) { margin-left: 0px; }
+	.post { width: 100%; }
+	.post header { height: inherit; }
+
+	.pagination li {display: inline-block;}
+}
+
+
+/* ---------------------------------------------------------------------- */
+/*	Mobile Version 320px
+/* ---------------------------------------------------------------------- */
+
+@media handheld, only screen and (max-width: 320px) { }
+

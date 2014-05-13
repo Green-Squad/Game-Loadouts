@@ -58,7 +58,7 @@ Game Administration
                     </td>
                     <td>
                         <a href="{{ asset($weapon -> image_url) }}">
-                            <img src="{{ asset($weapon -> image_url) }}" alt="Image URL" class="thumbnail" />
+                            <img src="{{ asset($weapon -> thumb_url) }}" alt="thumb URL" class="thumbnail" />
                         </a>
                     </td>
                     <td>
@@ -112,7 +112,7 @@ Game Administration
                     </td>
                     <td>
                         <a href="{{ asset($attachment -> image_url) }}">
-                            <img src="{{ asset($attachment -> image_url) }}" alt="Image URL" class="thumbnail" />
+                            <img src="{{ asset($attachment -> thumb_url) }}" alt="Image URL" class="thumbnail" />
                         </a>
                     </td>
                     <td>

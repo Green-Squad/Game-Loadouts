@@ -6,7 +6,7 @@ Login
 
 @section('content')
 
-<div class="well">
+<div class="col-lg-7">
     {{ Form::open(array('action' => 'UserController@login', 'id' => 'logInForm', 'class' => 'form-horizontal')) }}
     <fieldset>
         <legend>

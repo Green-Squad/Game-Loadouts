@@ -6,7 +6,7 @@ Join Us!
 
 @section('content')
 
-<div class="well">
+<div class="col-lg-7">
     {{ Form::open(array('action' => 'UserController@join', 'id' => 'registerForm', 'class' => 'form-horizontal')) }}
     <fieldset>
         <legend>
