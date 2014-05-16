@@ -29,11 +29,17 @@ class LoadoutController extends BaseController {
 
                 $user = Auth::user();
                 if ($this -> userHasLoadout($user -> loadouts, $existingLoadout -> id)) {
-                    return Redirect::back() -> with(array('alert' => 'You have already submitted this loadout.', 'alert-class' => 'alert-warning'));
+                    return Redirect::back() -> with(array(
+                        'alert' => 'You have already submitted this loadout.',
+                        'alert-class' => 'alert-warning'
+                    ));
                 } else {
                     $user -> loadouts() -> save($existingLoadout);
                     $user -> save();
-                    return Redirect::back() -> with(array('alert' => 'Your vote for an existing loadout has been recorded.', 'alert-class' => 'alert-success'));
+                    return Redirect::back() -> with(array(
+                        'alert' => 'Your vote for an existing loadout has been recorded.',
+                        'alert-class' => 'alert-success'
+                    ));
 
                 }
             } else {
@@ -52,12 +58,21 @@ class LoadoutController extends BaseController {
                     $user -> loadouts() -> save($loadout);
                     $user -> save();
                 } catch (\Illuminate\Database\QueryException $e) {
-                    return Redirect::back() -> with(array('alert' => 'Error: Failed to create new loadout.', 'alert-class' => 'alert-danger'));
+                    return Redirect::back() -> with(array(
+                        'alert' => 'Error: Failed to create new loadout.',
+                        'alert-class' => 'alert-danger'
+                    ));
                 }
             }
-            return Redirect::back() -> with(array('alert' => 'Loadout has been successfully created.', 'alert-class' => 'alert-success'));
+            return Redirect::back() -> with(array(
+                'alert' => 'Loadout has been successfully created.',
+                'alert-class' => 'alert-success'
+            ));
         } else {
-            return Redirect::back() -> with(array('alert' => 'You must be logged in to do that.', 'alert-class' => 'alert-danger'));
+            return Redirect::back() -> with(array(
+                'alert' => 'You must be logged in to do that.',
+                'alert-class' => 'alert-danger'
+            ));
         }
     }
 
@@ -98,6 +113,19 @@ class LoadoutController extends BaseController {
 
     public function show(Game $game, $weaponName, Loadout $loadout) {
         $weapon = Weapon::where('game_id', $game -> id, 'AND') -> where('name', $weaponName) -> first();
+        $loadout -> count = LoadoutController::countSubmissions($loadout -> id);
+
+        if (Auth::check()) {
+            $user = Auth::user();
+            if (LoadoutController::userHasLoadout($user -> loadouts, $loadout -> id)) {
+                $loadout -> upvoted = 1;
+            } else {
+                $loadout -> upvoted = 0;
+            }
+        } else {
+            $loadout -> upvoted = 0;
+        }
+
         return View::make('loadout', compact('loadout', 'game', 'weapon'));
     }
 
@@ -105,16 +133,35 @@ class LoadoutController extends BaseController {
         if (Auth::check()) {
             $user = Auth::user();
             if (LoadoutController::userHasLoadout($user -> loadouts, $loadout -> id)) {
-                return Redirect::back() -> with(array('alert' => 'You have already submitted this loadout.', 'alert-class' => 'alert-warning'));
+                $response = array('success' => 0);
+                return Response::json($response);
             } else {
                 $user -> loadouts() -> save($loadout);
                 $user -> save();
                 $response = array('success' => 1);
                 return Response::json($response);
-                //return Redirect::back() -> with(array('alert' => 'Your vote for an existing loadout has been recorded.', 'alert-class' => 'alert-success'));
             }
         } else {
-            return Redirect::back() -> with(array('alert' => 'You must be logged in to do that.', 'alert-class' => 'alert-danger'));
+            $response = array('success' => 0);
+            return Response::json($response);
+        }
+    }
+
+    public function detach(Game $game, $weaponName, Loadout $loadout) {
+        if (Auth::check()) {
+            $user = Auth::user();
+            if (LoadoutController::userHasLoadout($user -> loadouts, $loadout -> id)) {
+                $user -> loadouts() -> detach($loadout);
+                $user -> save();
+                $response = array('success' => 1);
+                return Response::json($response);
+            } else {
+                $response = array('success' => 0);
+                return Response::json($response);
+            }
+        } else {
+            $response = array('success' => 0);
+            return Response::json($response);
         }
     }
 

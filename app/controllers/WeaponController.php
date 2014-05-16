@@ -193,25 +193,58 @@ class WeaponController extends BaseController {
         ));
     }
 
+    public static function fixJSON($json) {
+        $pattern = '/[();]/';
+        $newJSON = preg_replace($pattern, '', $json);
+        return $newJSON;
+    }
+
     public static function listLoadouts(Game $game, $weaponName) {
 
         $weapon = Weapon::where('game_id', $game -> id, 'AND') -> where('name', $weaponName) -> first();
         $loadouts = Loadout::where('weapon_id', $weapon -> id) -> get();
 
+        $shortname = 'tryharddev';
+        $count_js = 'http://' . $shortname . '.disqus.com/count-data.js?';
+
         foreach ($loadouts as $loadout) {
+
+            $count_js .= '&1=loadout-' . $loadout -> id;
+
             $loadout -> count = LoadoutController::countSubmissions($loadout -> id);
             if (Auth::check() && LoadoutController::userHasLoadout(Auth::user() -> loadouts, $loadout -> id)) {
                 $loadout -> upvoted = 1;
             } else {
                 $loadout -> upvoted = 0;
             }
-            //return var_dump(DB::table('loadout_user') -> where('user_id', Auth::user() -> id, 'AND') -> where('loadout_id', $loadout -> id) -> get());
+
+        }
+        
+        $count_js = @file_get_contents($count_js);
+
+        //Strip it of spaces, hard to parse later on
+        str_replace(' ', '', $count_js);
+
+        if (preg_match('/DISQUSWIDGETS.displayCount((.*))/', $count_js, $matches)) {
+            $newJson = WeaponController::fixJSON($matches[1]);
+            $count_json = @json_decode($newJson, TRUE);
+
+            foreach ($count_json['counts'] as $count) {
+                $loadout_id = $count['id'];
+                $loadout_id = preg_replace('/loadout-/', '', $loadout_id);
+                foreach ($loadouts as $loadout) {
+                    if ($loadout_id == $loadout -> id) {
+                        $loadout -> comments = $count['comments'];
+                        break;
+                    }
+                }
+            }
         }
 
         $loadouts = $loadouts -> toArray();
         uasort($loadouts, "WeaponController::countSort");
+        
         // sort by Loadout submission count
-
         $attachments = $weapon -> attachments -> sortBy('name');
 
         $attachmentsBySlot = array();

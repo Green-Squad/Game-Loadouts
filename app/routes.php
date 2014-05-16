@@ -15,10 +15,20 @@ Route::model('user', 'User');
 Route::model('game', 'Game');
 Route::model('loadout', 'Loadout');
 
+HTML::macro('navLink', function($route, $text) {
+    if (Request::path() == $route) {
+        $active = "class = 'active'";
+    } else {
+        $active = '';
+    }
+    return '<li ' . $active . '>' . link_to($route, $text) . '</li>';
+});
+
 Route::get('/', array(
     'as' => 'home',
     function() {
-        return View::make('home');
+        $games = Game::where('live', 1) -> orderBy(DB::raw('RAND()')) -> take(4) -> get();
+        return View::make('home', compact('games'));
     }
 
 ));
@@ -180,6 +190,11 @@ Route::group(array('before' => 'auth'), function() {
     });
 });
 
+Route::get('games', array(
+    'as' => 'showGames',
+    'uses' => 'GameController@showGames'
+));
+
 Route::get('{game}', array(
     'as' => 'showGame',
     'uses' => 'GameController@listWeapons'
@@ -200,4 +215,9 @@ Route::get('{game}/{weapon}/{loadout}', array(
 Route::post('{game}/{weapon}/{loadout}/upvote', array(
     'as' => 'upvoteLoadout',
     'uses' => 'LoadoutController@upvote'
+));
+
+Route::post('{game}/{weapon}/{loadout}/detach', array(
+    'as' => 'detachLoadout',
+    'uses' => 'LoadoutController@detach'
 ));

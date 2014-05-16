@@ -28,6 +28,7 @@
         <![endif]-->
     </head>
     <body>
+        
         <!-- Header -->
         <header>
             <!-- Top Bar -->
@@ -45,32 +46,26 @@
                                         <span class="icon-bar"></span>
                                         <span class="icon-bar"></span>
                                     </button>
-                                    <h1 class="logo"><a href="{{ route('home') }}">Game Loadouts</a></h1>
+                                    <h1 class="logo"><a href="{{ route('home') }}"> Game Loadouts </a></h1>
                                 </div>
 
                                 <!-- Collect the nav links, forms, and other content for toggling -->
                                 <div class="collapse navbar-collapse navbar-ex1-collapse">
                                     <ul class="nav navbar-nav navbar-right">
-                                        <li>
-                                            {{ HTML::linkRoute('home', 'Home') }}
-                                        </li>
+                                        {{ HTML::navLink("/", 'Home') }}
                                         <li class="dropdown">
-                                            <a href="#" class="dropdown-toggle">Games <b class="caret"></b></a>
-                                            <ul class="dropdown-menu">
+                                            <a href="{{ route('showGames') }}" class="dropdown-toggle"> Games <b class="caret"></b> </a>
+                                            <ul>
                                                 @foreach(GameController::listGames() as $game)
-                                                <li class="">
+                                                <li>
                                                     <a href="{{ route('showGame', $game -> id) }}"> {{ $game -> id }} </a>
                                                 </li>
                                                 @endforeach
                                             </ul>
                                         </li>
                                         @if(Auth::guest())
-                                        <li>
-                                            {{ HTML::linkRoute('join', 'Join') }}
-                                        </li>
-                                        <li>
-                                            {{ HTML::linkRoute('login', 'Login') }}
-                                        </li>
+                                        {{ HTML::navLink("join", 'Join') }}
+                                        {{ HTML::navLink("login", 'Login') }}
                                         @elseif(Auth::check())
                                         @if(Auth::user() -> role == 'Admin')
                                         <li>
@@ -79,11 +74,11 @@
                                         @endif
                                         <li class="dropdown">
                                             <a href="#" class="dropdown-toggle" data-toggle="dropdown"> {{ Auth::user() -> username }} <b class="caret"></b> </a>
-                                            <ul class="dropdown-menu">
-                                                <li class="">
+                                            <ul>
+                                                <li>
                                                     {{ HTML::linkRoute('account', 'Account') }}
                                                 </li>
-                                                <li class="">
+                                                <li>
                                                     {{ HTML::linkRoute('logout', 'Logout') }}
                                                 </li>
                                             </ul>
@@ -101,193 +96,156 @@
         <!-- End header -->
 
         <!-- Content -->
-         @yield('sub-header')
-            <article class="article-container">
-                <div class="container" >
-                    @if(Session::has('alert'))
-                    <div class="alert alert-dismissable {{ Session::get('alert-class') }}">
-                        <button type="button" class="close" data-dismiss="alert">
-                            ×
-                        </button>
-                        {{ Session::get('alert') }}
-                    </div>
-                    @endif
-                    @if( $errors->count() > 0 )
-
-                    @foreach( $errors -> all() as $message )
-                    <div class="alert alert-dismissable alert-danger">
-                        <button type="button" class="close" data-dismiss="alert">
-                            ×
-                        </button>
-                        {{ $message }}
-                    </div>
-                    @endforeach
-                    @endif
-
-                    @yield('content')
+        @yield('sub-header')
+        @yield('intro')
+        <article class="article-container">
+            <div class="container">
+                @if(Session::has('alert'))
+                <div class="alert alert-dismissable {{ Session::get('alert-class') }}">
+                    <button type="button" class="close" data-dismiss="alert">
+                        ×
+                    </button>
+                    {{ Session::get('alert') }}
                 </div>
-            </article>
-            <!-- Footer -->
-            <footer>
-                <div class="container" >
-                    <div class="row misc">
-                        <div class="col-md-3" >
-                            <h3>About the Club</h3>
-                            <p>
-                                Phasellus sit amet justo sapien. Praesent bibendum, enim non fringilla vestibulum.
-                            </p>
-                            <p>
-                                We can condimentum est lacus ut dolor. Sed facilisis ante felis, vitae mattis massa luctus sit amet. Vestibulum eu blandit ipsum. In ornare enim nunc.
-                            </p>
-                            <ul class="about" >
-                                <li>
-                                    <i class="entypo-location" ></i>Street 32165, 646 UK
-                                </li>
-                                <li>
-                                    <i class="entypo-mobile" ></i>(62626) 5154 4545
-                                </li>
-                                <li>
-                                    <i class="entypo-mail" ></i>email@democompany.com
-                                </li>
-                                <li>
-                                    <i class="entypo-clock" ></i>From 10:15 AM to 7:30 PM
-                                </li>
-                            </ul>
-                        </div>
-                        <div class="col-md-3">
-                            <h3>Useful Links</h3>
-                            <ul class="links" >
-                                <li>
-                                    <a href="#"><i class="entypo-right-open-mini" ></i>Meet the Coaches of the Club</a>
-                                </li>
-                                <li>
-                                    <a href="#"><i class="entypo-right-open-mini" ></i>Meet the Trainers</a>
-                                </li>
-                                <li>
-                                    <a href="#"><i class="entypo-right-open-mini" ></i>See the Club inside</a>
-                                </li>
-                                <li>
-                                    <a href="#"><i class="entypo-right-open-mini" ></i>Testimonials Videos</a>
-                                </li>
-                                <li>
-                                    <a href="#"><i class="entypo-right-open-mini" ></i>Meet the Trainers of the Club</a>
-                                </li>
-                                <li>
-                                    <a href="#"><i class="entypo-right-open-mini" ></i>Personal Coaching Video</a>
-                                </li>
-                            </ul>
-                        </div>
-                        <div class="col-md-3">
-                            <h3>Newsletter</h3>
-                            <p>
-                                Suscribe to our ahasellus sit amet justo sapien and raesent bibendum you will get nim non fringilla vestibulum.
-                            </p>
-                            <form id="newsletter" role="form" action="newsletter.php" method="post" accept-charset="utf-8">
-                                <div class="form-group">
-                                    <label for="name" class="sr-only">Your Name</label>
-                                    <input type="text" name="name" class="form-control" id="name" placeholder="Your name">
-                                </div>
-                                <div class="form-group">
-                                    <label for="email" class="sr-only">Email address</label>
-                                    <input type="email" name="email" class="form-control" id="email" placeholder="Enter email">
-                                </div>
-                                <input class="button-gym" type="submit" name="submit" value="Suscribe now" id="submit"/>
-                            </form>
-                        </div>
-                        <div class="col-md-3">
-                            <h3>Get Social</h3>
-                            <p>
-                                Follow us on the Social Networks to let all the news and win disccounts!
-                            </p>
-                            <ul class="social" >
-                                <li>
-                                    <a href="#"><i class="entypo-facebook" ></i></a>
-                                </li>
-                                <li>
-                                    <a href="#"><i class="entypo-twitter" ></i></a>
-                                </li>
-                                <li>
-                                    <a href="#"><i class="entypo-linkedin" ></i></a>
-                                </li>
-                                <li>
-                                    <a href="#"><i class="entypo-play" ></i></a>
-                                </li>
-                                <li>
-                                    <a href="#"><i class="entypo-tumblr" ></i></a>
-                                </li>
-                                <li>
-                                    <a href="#"><i class="entypo-gplus" ></i></a>
-                                </li>
-                                <li>
-                                    <a href="#"><i class="entypo-pinterest-circled" ></i></a>
-                                </li>
-                            </ul>
-                        </div>
-                    </div>
+                @endif
+                @if( $errors->count() > 0 )
+
+                @foreach( $errors -> all() as $message )
+                <div class="alert alert-dismissable alert-danger">
+                    <button type="button" class="close" data-dismiss="alert">
+                        ×
+                    </button>
+                    {{ $message }}
                 </div>
-                <div class="copyright" >
-                    <div class="container">
-                        <p class="pull-left" >
-                            &copy; All rights reserved. Gym Website by <a href="#">Demo</a>
+                @endforeach
+                @endif
+
+                @yield('content')
+            </div>
+        </article>
+
+        <!-- Footer -->
+        <footer>
+            <div class="container" >
+                <div class="row misc">
+                    <div class="col-md-4" >
+                        <h3>About Game Loadouts</h3>
+                        <p>Game Loadouts is a portal for finding the best ways to outfit your weapons in your favorite games.</p>
+        				<p>This website comes in handy when you need to complete challenges with various weapons and need to know the best attachment combination for that weapon.</p>
+        				<p>It is also great for fine-tuning your favorite gun to help improve your gameplay. This will save you rounds of trial and error to find the best loadout.</p>
+                    </div>
+                    <div class="col-md-4">
+                        <h3>Feedback</h3>
+                        <p>
+                            Submit bug reports or suggest new features for the site!
                         </p>
-                        <ul class="main-links pull-right" >
+                        <p>Use the link below and then select "Submit New Idea" on the top left.</p>
+                        <p>
+                            <a class="button-gym" href="http://greensquad.ideascale.com/a/ideafactory.do?id=29675&mode=top&discussionFilter=byids&discussionID=7136"> Submit Feedback </a>
+                        </p>
+                    </div>
+                    <div class="col-md-4">
+                        <h3>Get Social</h3>
+                        <p>
+                            Follow us on these social networks to keep up-to-date with the site!
+                        </p>
+                        <ul class="social" >
                             <li>
-                                <a href="#">Home</a>
+                                <a href="#"><i class="entypo-facebook" ></i></a>
                             </li>
                             <li>
-                                <a href="#">Classes</a>
-                            </li>
-                            <li>
-                                <a href="#">Trainers</a>
-                            </li>
-                            <li>
-                                <a href="#">Club</a>
-                            </li>
-                            <li>
-                                <a href="#">News</a>
-                            </li>
-                            <li>
-                                <a href="#">Price</a>
+                                <a href="https://twitter.com/GameLoadouts"><i class="entypo-twitter" ></i></a>
                             </li>
                         </ul>
                     </div>
                 </div>
-            </footer>
-            <!-- End footer -->
+            </div>
+            <div class="copyright" >
+                <div class="container">
+                    <p class="pull-left" >
+                        Copyright &copy;
+                        <a href="{{ route('home') }}"> Game Loadouts </a>
+                        {{ date('Y') }}
+                    </p>
+                    <ul class="main-links pull-right" >
+                        <li>
+                            {{ HTML::linkRoute('home', 'Home') }}
+                        </li>
+                        <li>
+                            {{ HTML::linkRoute('showGames', 'Games') }}
+                        </li>
+                        @if(Auth::guest())
+                        <li>
+                            {{ HTML::linkRoute('join', 'Join') }}
+                        </li>
+                        <li>
+                            {{ HTML::linkRoute('login', 'Login') }}
+                        </li>
+                        @elseif(Auth::check())
+                        @if(Auth::user() -> role == 'Admin')
+                        <li>
+                            {{ HTML::linkRoute('adminDashboard', 'Admin') }}
+                        </li>
+                        @endif
+                        <li>
+                            {{ HTML::linkRoute('account', 'Account') }}
+                        </li>
+                        <li>
+                            {{ HTML::linkRoute('logout', 'Logout') }}
+                        </li>
+                        @endif
+                    </ul>
+                </div>
+            </div>
+        </footer>
+        <!-- End footer -->
 
-            <a href="#" class="scrollup"><i class="entypo-up-open"></i></a>
+        <a href="#" class="scrollup"><i class="entypo-up-open"></i></a>
 
-            <!-- Javascript Files -->
-            <!-- jQuery -->
-            <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js" type="text/javascript" ></script>
-            <script>
-                window.jQuery || document.write("<script src=\"js/jquery-1.9.1.min.js\" type=\"text/javascript\"><\/script>")
-            </script>
+        <!-- Javascript Files -->
+        <!-- jQuery -->
+        <script src="{{ asset('js/jquery-1.9.1.min.js') }}" type="text/javascript" ></script>
 
-            <!-- Respond media queries for IE8 -->
-            <script src="{{ asset('js/respond.min.js') }}"></script>
+        <!-- Respond media queries for IE8 -->
+        <script src="{{ asset('js/respond.min.js') }}"></script>
 
-            <!-- Bootstrap -->
-            <script src="{{ asset('js/bootstrap.min.js') }}" type="text/javascript" ></script>
+        <!-- Bootstrap -->
+        <script src="{{ asset('js/bootstrap.min.js') }}" type="text/javascript" ></script>
 
-            <!-- Easing -->
-            <script type="text/javascript" src="{{ asset('js/jquery.easing.min.js') }}" ></script>
+        <!-- Easing -->
+        <script type="text/javascript" src="{{ asset('js/jquery.easing.min.js') }}" ></script>
 
-            <!-- Placeholder.js http://widgetulous.com/placeholderjs/ -->
-            <script type="text/javascript" src="{{ asset('js/placeholder.js') }}" ></script>
+        <!-- Placeholder.js http://widgetulous.com/placeholderjs/ -->
+        <script type="text/javascript" src="{{ asset('js/placeholder.js') }}" ></script>
 
-            <!-- Retina Display -->
-            <script type="text/javascript" src="{{ asset('js/retina.js') }}" ></script>
+        <!-- Retina Display -->
+        <script type="text/javascript" src="{{ asset('js/retina.js') }}" ></script>
 
-            <!-- Revolution Slider  -->
-            <script type="text/javascript" src="{{ asset('rs-plugin/pluginsources/jquery.themepunch.plugins.min.js') }}"></script>
-            <script type="text/javascript" src="{{ asset('rs-plugin/js/jquery.themepunch.revolution.min.js') }}"></script>
+        <!-- Custom site js-->
+        <script src="{{ asset('js/script.js') }}" type="text/javascript" ></script>
+        <!-- End Javascript Files -->
 
-            <!-- Custom site js-->
-            <script src="{{ asset('js/script.js') }}" type="text/javascript" ></script>
-            <!-- End Javascript Files -->
-            
-            @yield('scripts')
+        @if(Auth::guest() || Auth::user() -> role != 'Admin')
+        <script>
+            (function(i, s, o, g, r, a, m) {
+                i['GoogleAnalyticsObject'] = r;
+                i[r] = i[r] ||
+                function() {
+                    (i[r].q = i[r].q || []).push(arguments)
+                }, i[r].l = 1 * new Date();
+                a = s.createElement(o), m = s.getElementsByTagName(o)[0];
+                a.async = 1;
+                a.src = g;
+                m.parentNode.insertBefore(a, m)
+            })(window, document, 'script', '//www.google-analytics.com/analytics.js', 'ga');
+
+            ga('create', 'UA-50909901-1', 'gameloadouts.com');
+            ga('send', 'pageview');
+
+        </script>
+        @endif
+
+        @yield('scripts')
 
     </body>
 </html>

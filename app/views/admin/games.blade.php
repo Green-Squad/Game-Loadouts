@@ -27,6 +27,7 @@ Game Administration
                 <tr>
                     <th> ID <i class="fa fa-sort"></i></th>
                     <th> Live </th>
+                    <th> Thumb URL </th>
                     <th> Created at <i class="fa fa-sort"></i></th>
                     <th> Updated at <i class="fa fa-sort"></i></th>
                     <th> Actions </th>
@@ -42,6 +43,9 @@ Game Administration
                     </td>
                     <td>
                         {{ $game -> live }}
+                    </td>
+                    <td style="width: 10%">
+                        <a href="{{ asset($game -> thumb_url) }}"><img style="width: 100%" src="{{ asset($game -> thumb_url) }}" alt="" /></a>
                     </td>
                     <td>
                         {{ $game -> created_at }}

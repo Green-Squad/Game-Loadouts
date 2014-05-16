@@ -28,6 +28,8 @@ class CreateUsersTable extends Migration {
         Schema::create('games', function(Blueprint $table) {
             $table -> string('id', 128) -> primary();
             $table -> integer('live');
+            $table -> string('image_url', 128);
+            $table -> string('thumb_url', 128);
             $table -> timestamps();
 
             $table -> engine = 'InnoDB';

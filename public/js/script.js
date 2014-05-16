@@ -5,12 +5,13 @@ $(document).ready(function() {
 	if($('.banner').length) {
 		var height=$('.homev2').length>0?447:415;
 		$('.banner').revolution({
-			delay:3000,
+			delay:9000,
 			hideThumbs:1,
 			startwidth:1170,
 			startheight:500,
 			shadow:0,
-			touchenabled:"on",
+			onHoverStop:"off",
+			touchenabled:"off",
 			navigationType: "none",
 		});    
 	}
@@ -246,7 +247,6 @@ $(document).ready(function() {
 		return false;
 	});
 
-
 	$("#contact-form").submit(function() {
 		var elem = $(this);
 		var urlTarget = $(this).attr("action");
@@ -266,11 +266,4 @@ $(document).ready(function() {
 		})
 		return false;
 	});
-
 });
-
-
-
-
-
-

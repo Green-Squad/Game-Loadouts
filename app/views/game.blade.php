@@ -42,23 +42,43 @@
 @stop
 
 @section('content')
-<div class="col-lg-12">
+<div class="col-md-8">
     <h2>Weapons</h2>
-    <table class="table">
+    <span class="line"> <span class="sub-line"></span> </span>
+    <table class="table table-striped table-hover">
         @foreach($weapons as $weapon)
         <tr>
-            <td class="leftTable">
-                <a class="block" href="{{ route('showLoadouts', array($game -> id, $weapon -> name)) }}">
-                    <img src="{{ asset($weapon -> thumb_url) }}" alt="{{ $weapon -> name }}" />
+            <td class="no-padding">
+                <a class="block padding-8px flex" href="{{ route('showLoadouts', array($game -> id, $weapon -> name)) }}">
+                    <div class="col-md-3 vertical-center">
+                        <img src="{{ asset($weapon -> thumb_url) }}" alt="{{ $weapon -> name }}" />
+                    </div>
+                    <div class="col-md-9 vertical-center">
+                        <span class="h3">{{ $weapon -> name }}</span>
+                    </div>
+                    <div class="clearfix"></div>
                 </a>
+
             </td>
-            <td class="rightTable">
-                <a class="h3 block" href="{{ route('showLoadouts', array($game -> id, $weapon -> name)) }}">
-                    {{ $weapon -> name }}
-                </a>
-            </td>
+
         </tr>
         @endforeach
     </table>
+</div>
+<div class="col-md-4">
+    <h2>Recent Loadouts</h2>
+    <span class="line"> <span class="sub-line"></span> </span>
+    @foreach($recentLoadouts as $loadout)
+    <?php $loadout = Loadout::findOrFail($loadout -> id); ?>
+    <a class="loadoutSmall block" href="{{ route('showLoadout', array($game -> id, Weapon::findOrFail($loadout -> weapon_id) -> name, $loadout ->id)) }}">
+        <h4 class="weaponSmall">{{ Weapon::findOrFail($loadout -> weapon_id) -> name }}</h4>
+        @foreach($loadout -> attachments as $attachment)
+        <div class="attachmentSmall">
+            <img src="{{ asset($attachment -> thumb_url) }}" alt="{{ $attachment -> name }}" />
+            {{ $attachment -> name }}
+        </div>
+        @endforeach
+    </a>
+    @endforeach
 </div>
 @stop

@@ -9,14 +9,14 @@
 @stop
 
 @section('sub-header')
-<section id="game" >
+<section id="game">
     <!-- Sub Header -->
     <div class="sub-header">
         <div class="container">
             <div class="row">
                 <ul class="sub-header-container">
                     <li>
-                        <h3 class="title">{{ $game -> id }} \ {{ $weapon -> name }}</h3>
+                        <h3 class="title"><span class="game-title">{{ $game -> id }} \</span> {{ $weapon -> name }}</h3>
                     </li>
                     <li>
                         <ul class="custom-breadcrumb">
@@ -60,22 +60,66 @@
 </section>
 @stop
 
-@section('content')
-
-<div class="col-lg-12">
-    <h2><small>Loadout</small></h2>
-    @foreach($loadout -> attachments as $attachment)
-    <p>
-        {{ $attachment -> name }}
-    </p>
-    @endforeach
-
-    <p>
-        What situations do you like to use this {{ $weapon -> name }} loadout in {{ $game -> id }}? Is this a troll loadout? Is it over powered? Discuss below!
-    </p>
+@section('intro')
+<div id="home">
+    <div id="intro" style="padding: 15px 0">
+        <div class="container">
+            <div class="row flex">
+                <div class="col-md-6 vertical-center">
+                    <img src="{{ asset($weapon -> image_url) }}" alt="{{ $weapon -> name }}" class="weapon-img"/>
+                </div>
+                <div class="col-md-6 vertical-center">
+                    <div class="loadout">
+                        <div class="col-md-12">
+                            @foreach(Loadout::findOrFail($loadout['id']) -> attachments as $attachment)
+                            <div class="attachment">
+                                <img src="{{ asset($attachment -> thumb_url) }}" alt="{{ $attachment -> name }}" />
+                                {{ $attachment -> name }}
+                            </div>
+                            @endforeach
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
 </div>
-<div class="col-lg-12">
-    <div class="well">
+<div id="trainers">
+    <div id="suscribe">
+        <div class="container">
+            <div class="col-md-12">
+                <div class="row flex padding-8px">
+                    <div class="col-md-6 vertical-center">
+                        @if ($loadout -> count == 1)
+                        <h2><span id="count-{{$loadout -> id }}">1</span> vote for this loadout</h2>
+                        @else
+                        <h2><span id="count-{{$loadout -> id }}">{{ $loadout -> count }}</span> votes for this loadout</h2>
+                        @endif
+                    </div>
+                    <div class="col-md-6 vertical-center margin-50px">
+                        @if (Auth::guest())
+                        <a href="{{ route('login') }}" class="big-button button-gym nowrap">Vote</a>
+                        @elseif ($loadout -> upvoted == 1)
+                        <a href="javascript:void(0)" class="big-button button-gym nowrap clickable" id="loadout-{{ $loadout -> id }}" data-loadout_id="{{ $loadout -> id }}">Remove Vote</a>
+                        @else
+                        <a href="javascript:void(0)" class="big-button button-gym nowrap clickable" id="loadout-{{ $loadout -> id }}" data-loadout_id="{{ $loadout -> id }}">Vote</a>
+                        @endif
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+@stop
+
+@section('content')
+<div class="col-md-12">
+    <h3>
+        What situations do you like to use this {{ $weapon -> name }} loadout in {{ $game -> id }}? Is this a troll loadout? Is it over powered? Discuss below!
+    </h3>
+</div>
+<div class="well">
+    <div class="col-md-12">
         <div class="row">
             <?php
             define('DISQUS_SECRET_KEY', 'YswO6okCvBMxLMP0Gf2JHpymuW6Nxx8UYVEwE2h44Xxgej7dziGgEbet2GwokkUP');
@@ -115,24 +159,19 @@
             ?>
 
             <script type="text/javascript">
-                                var disqus_config = function() {
-                this.page.remote_auth_s3 = "<?php echo "$message $hmac $timestamp"; ?>
-                    ";
-                    this.page.api_key = "
-                <?php echo DISQUS_PUBLIC_KEY; ?>
-                    ";
+                var disqus_config = function() {
+                    this.page.remote_auth_s3 = "<?php echo "$message $hmac $timestamp"; ?>";
+                    this.page.api_key = "<?php echo DISQUS_PUBLIC_KEY; ?>";
 
                     this.sso = {
                     name:    "Game Loadouts",
-                    button:  "http://tryhard.dornblaser.me/i/login.png",
-                    icon:    "http://tryhard.dornblaser.me/i/login.png",
-                    url:     "http://tryhard.dornblaser.me/login/",
-                    logout:  "http://tryhard.dornblaser.me/logout/",
+                    button:  "http://www.gameloadouts.com/img/login.png",
+                    url:     "http://www.gameloadouts.com/login/",
+                    logout:  "http://www.gameloadouts.com/logout/",
                     width:   "800",
                     height:  "400"
                     };
-
-                    };
+                };
             </script>
 
             <div id="disqus_thread"></div>
@@ -153,10 +192,29 @@
                 Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a>
             </noscript>
             <a href="http://disqus.com" class="dsq-brlink">comments powered by <span class="logo-disqus">Disqus</span></a>
-
         </div>
     </div>
-
 </div>
+@stop
 
+@section('scripts')
+<script type="text/javascript">
+    $('.clickable').click(function() {
+        var game_id = '<?php echo $game -> id; ?>';
+        var weapon_name = '<?php echo $weapon -> name; ?>';
+        var loadout_id = $(this).data('loadout_id');
+        
+        if ($(this).text() == 'Vote') {
+            $.post('/' + game_id + '/' + weapon_name + '/' + loadout_id + '/upvote', function(data) {
+                $('#count-' + loadout_id).text(parseInt($('#count-' + loadout_id).text()) + 1);
+                $('#loadout-' + loadout_id).text('Remove Vote');
+            }, 'json');
+        } else {
+            $.post('/' + game_id + '/' + weapon_name + '/' + loadout_id + '/detach', function(data) {
+                $('#count-' + loadout_id).text(parseInt($('#count-' + loadout_id).text()) - 1);
+                $('#loadout-' + loadout_id).text('Vote');
+            }, 'json');
+        }
+    });
+</script>
 @stop

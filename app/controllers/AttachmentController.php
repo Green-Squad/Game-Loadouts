@@ -26,7 +26,7 @@ class AttachmentController extends BaseController {
             $destinationPath = public_path() . '/uploads/';
             $thumbPath = public_path() . '/uploads/thumb/';
             $fileExtension = $image -> getClientOriginalExtension();
-            $fileName = $game -> id . '-' . $name . '.' . $fileExtension;
+            $fileName = $game -> id . '-' . $name . '-' . $slot . '.' . $fileExtension;
 
             $image -> move($destinationPath, $fileName);
 
@@ -90,7 +90,7 @@ class AttachmentController extends BaseController {
                 $destinationPath = public_path() . '/uploads/';
                 $thumbPath = public_path() . '/uploads/thumb/';
                 $fileExtension = $image -> getClientOriginalExtension();
-                $fileName = $game -> id . '-' . $name . '.' . $fileExtension;
+                $fileName = $game -> id . '-' . $name . '-' . $slot . '.' . $fileExtension;
                 $image -> move($destinationPath, $fileName);
 
                 copy($destinationPath . $fileName, $thumbPath . $fileName);
@@ -133,6 +133,13 @@ class AttachmentController extends BaseController {
     public function destroy(Game $game, $attachmentID) {
         try {
             $attachment = Attachment::findOrFail($attachmentID);
+            
+            $loadouts = $attachment -> loadouts;
+            
+            foreach($loadouts as $loadout) {
+                $loadout -> delete();
+            }
+                        
             $attachmentName = $attachment -> name;
             $attachment -> delete();
         } catch(\Illuminate\Database\QueryException $e) {

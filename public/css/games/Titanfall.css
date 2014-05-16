@@ -365,3 +365,7 @@ header .top-bar ul li.active a i, header .top-bar ul li:hover a i {
     color: #ffd302;
 }
 
+.theme-color {
+    color: #e0b900;
+}
+

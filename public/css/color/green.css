@@ -382,7 +382,9 @@ header .top-bar ul li:hover a i {
     color: #1C9845;
 }
 
-
+.theme-color {
+    color: #21b44e;
+}
 
 
 
