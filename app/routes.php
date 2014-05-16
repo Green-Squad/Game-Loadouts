@@ -75,6 +75,8 @@ Route::group(array('before' => 'auth'), function() {
         'as' => 'logout',
         'uses' => 'UserController@logout'
     ));
+	
+	Route::get('submissions', array('as' => 'submissions', 'uses' => 'UserController@showSubmissions'));
 
     Route::group(array('before' => 'standard'), function() {
         /* Standard users only */
@@ -93,8 +95,8 @@ Route::group(array('before' => 'auth'), function() {
                 function() {
                     return View::make('admin.home');
                 }
-
             ));
+			Route::get('toggleAds', 'HelperController@toggleAds');
             Route::group(array('prefix' => 'user'), function() {
                 Route::get('create', array(
                     'as' => 'createUser',

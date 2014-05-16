@@ -128,23 +128,23 @@
         <footer>
             <div class="container" >
                 <div class="row misc">
-                    <div class="col-md-4" >
+                    <div class="col-md-3" >
                         <h3>About Game Loadouts</h3>
                         <p>Game Loadouts is a portal for finding the best ways to outfit your weapons in your favorite games.</p>
         				<p>This website comes in handy when you need to complete challenges with various weapons and need to know the best attachment combination for that weapon.</p>
         				<p>It is also great for fine-tuning your favorite gun to help improve your gameplay. This will save you rounds of trial and error to find the best loadout.</p>
                     </div>
-                    <div class="col-md-4">
+                    <div class="col-md-3">
                         <h3>Feedback</h3>
                         <p>
                             Submit bug reports or suggest new features for the site!
                         </p>
                         <p>Use the link below and then select "Submit New Idea" on the top left.</p>
                         <p>
-                            <a class="button-gym" href="http://greensquad.ideascale.com/a/ideafactory.do?id=29675&mode=top&discussionFilter=byids&discussionID=7136"> Submit Feedback </a>
+                            <a class="button-gym" href="http://greensquad.ideascale.com/a/ideafactory.do?id=29675&amp;mode=top&amp;discussionFilter=byids&amp;discussionID=7136"> Submit Feedback </a>
                         </p>
                     </div>
-                    <div class="col-md-4">
+                    <div class="col-md-3">
                         <h3>Get Social</h3>
                         <p>
                             Follow us on these social networks to keep up-to-date with the site!
@@ -157,6 +157,13 @@
                                 <a href="https://twitter.com/GameLoadouts"><i class="entypo-twitter" ></i></a>
                             </li>
                         </ul>
+                    </div>
+                    <div class="col-md-3">
+                        <h3>Games</h3>
+                         <p></p>  
+                         @foreach(GameController::listGames() as $game)
+                                <p><a class="button-gym" href="{{ route('showGame', $game -> id)  }}">{{ $game -> id  }}</a></p>
+                         @endforeach
                     </div>
                 </div>
             </div>

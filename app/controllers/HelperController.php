@@ -1,7 +1,13 @@
 <?php
 
 class HelperController extends BaseController {
-
+	
+	static $ads = 0;
+	
+	public static function adsEnabled() {
+		return self::$ads;
+	}
+	
     public static function createThumbnail($thumb_url, $extension, $maxsize) {
 
         /* read the source image */

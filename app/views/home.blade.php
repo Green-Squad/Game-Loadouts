@@ -19,7 +19,7 @@ Game Loadouts
                     data-slotamount="1"
                     >
                         <img src="{{ asset($game -> image_url )}}" alt="{{ $game -> id }}" />
-                        <a href="{{ route('showGame', $game -> id) }}">
+                        <a href="{{ route('showGame', urlencode($game -> id)) }}">
                             <div
                             class="caption lfb ltb"
                             data-x="600"
@@ -32,7 +32,7 @@ Game Loadouts
                             <div
                             class="caption lfb ltb"
                             data-x="600"
-                            data-y="120"
+                            data-y="104"
                             data-start="500"
                             >
                                 <p>

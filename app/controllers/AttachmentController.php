@@ -27,7 +27,8 @@ class AttachmentController extends BaseController {
             $thumbPath = public_path() . '/uploads/thumb/';
             $fileExtension = $image -> getClientOriginalExtension();
             $fileName = $game -> id . '-' . $name . '-' . $slot . '.' . $fileExtension;
-
+            $fileName = urlencode($fileName);
+            
             $image -> move($destinationPath, $fileName);
 
             copy($destinationPath . $fileName, $thumbPath . $fileName);
@@ -91,6 +92,8 @@ class AttachmentController extends BaseController {
                 $thumbPath = public_path() . '/uploads/thumb/';
                 $fileExtension = $image -> getClientOriginalExtension();
                 $fileName = $game -> id . '-' . $name . '-' . $slot . '.' . $fileExtension;
+                $fileName = urlencode($fileName);
+                
                 $image -> move($destinationPath, $fileName);
 
                 copy($destinationPath . $fileName, $thumbPath . $fileName);

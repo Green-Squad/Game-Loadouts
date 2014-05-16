@@ -26,7 +26,7 @@ class GameController extends BaseController {
             $thumbPath = public_path() . '/uploads/thumb/';
 
             $fileExtension = $image -> getClientOriginalExtension();
-            $fileName = $id . '.' . $fileExtension;
+            $fileName = urlencode($id) . '.' . $fileExtension;
 
             $image -> move($destinationPath, $fileName);
 
@@ -88,7 +88,7 @@ class GameController extends BaseController {
                 $destinationPath = public_path() . '/uploads/';
                 $thumbPath = public_path() . '/uploads/thumb/';
                 $fileExtension = $image -> getClientOriginalExtension();
-                $fileName = $id . '.' . $fileExtension;
+                $fileName = urlencode($id) . '.' . $fileExtension;
                 $image -> move($destinationPath, $fileName);
 
                 copy($destinationPath . $fileName, $thumbPath . $fileName);

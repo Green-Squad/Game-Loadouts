@@ -23,8 +23,6 @@
 	    width: 300px;
 	}
 
-	.post { width: 340px; }
-	.post header { height: 220px; }
 	.post header h3 { font-size: 14px; }
 
 	#news .post:first-child header {
@@ -96,8 +94,6 @@
 	.logo a img { height: 60px; }
 
 
-	.post { width: 258px; }
-	.post header { height: 160px;}
 	.post header h3 { line-height: 2.5em; }
 
 
@@ -186,8 +182,6 @@
 		margin: 0 0 0 30px;
 	}
 	
-	.post { width: 48%; }
-	.post header { height: inherit; }
 	.post header img {
 		height: inherit;
 		width: 100%;
@@ -289,9 +283,7 @@
 		max-width: 350px;
 	}
 
-	.post:nth-child(2n+3) { margin-left: 0px; }
 	.post { width: 100%; }
-	.post header { height: inherit; }
 
 	.pagination li {display: inline-block;}
 }

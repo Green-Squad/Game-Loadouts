@@ -5,7 +5,7 @@ class Weapon extends Eloquent {
     protected $table = 'weapons';
 
     public function attachments() {
-        return $this -> belongsToMany('Attachment');
+        return $this -> belongsToMany('Attachment') -> withTimestamps();
     }
 
 }

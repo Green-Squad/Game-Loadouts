@@ -79,6 +79,45 @@ Dashboard
             </a>
         </div>
     </div>
+    <div class="col-lg-3">
+    	@if(HelperController::adsEnabled())
+		<div class="panel panel-success">
+		@else
+		<div class="panel panel-danger">
+		@endif
+            <div class="panel-heading">
+                <div class="row">
+                    <div class="col-xs-6">
+                        <i class="fa fa-stop fa-5x"></i>
+                    </div>
+                    <div class="col-xs-6 text-right">
+                        <p class="announcement-heading">
+                        	@if(HelperController::adsEnabled())
+                        	On
+                        	@else
+                        	Off
+                        	@endif
+                        </p>
+                        <p class="announcement-text">
+                            Advertisements
+                        </p>
+                    </div>
+                </div>
+            </div>
+            <a href="#">
+                <div class="panel-footer announcement-bottom">
+                    <div class="row">
+                        <div class="col-xs-6">
+                            
+                        </div>
+                        <div class="col-xs-6 text-right">
+                            <i class="fa fa-arrow-circle-right"></i>
+                        </div>
+                    </div>
+                </div>
+            </a>
+        </div>
+    </div>
 </div><!-- /.row -->
 
 <div class="row">

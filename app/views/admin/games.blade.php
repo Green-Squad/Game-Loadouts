@@ -76,4 +76,5 @@ Game Administration
 <script src="{{ asset('js/tablesorter/jquery.tablesorter.js') }}"></script>
 <script src="{{ asset('js/tablesorter/tables.js') }}"></script>
 
+
 @stop

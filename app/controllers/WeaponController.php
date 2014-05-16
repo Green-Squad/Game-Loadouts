@@ -42,7 +42,8 @@ class WeaponController extends BaseController {
 
             $fileExtension = $image -> getClientOriginalExtension();
             $fileName = $game -> id . '-' . $name . '.' . $fileExtension;
-
+            $fileName = urlencode($fileName);
+            
             $image -> move($destinationPath, $fileName);
 
             copy($destinationPath . $fileName, $thumbPath . $fileName);
@@ -132,6 +133,8 @@ class WeaponController extends BaseController {
                 $thumbPath = public_path() . '/uploads/thumb/';
                 $fileExtension = $image -> getClientOriginalExtension();
                 $fileName = $game -> id . '-' . $name . '.' . $fileExtension;
+                $fileName = urlencode($fileName);
+                
                 $image -> move($destinationPath, $fileName);
 
                 copy($destinationPath . $fileName, $thumbPath . $fileName);
