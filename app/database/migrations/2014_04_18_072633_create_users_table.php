@@ -52,7 +52,7 @@ class CreateUsersTable extends Migration {
         Schema::create('attachments', function(Blueprint $table) {
             $table -> increments('id');
             $table -> string('name', 128);
-            $table -> integer('slot');
+            $table -> string('slot', 64);
             $table -> string('game_id', 128);
             $table -> string('image_url', 128);
             $table -> string('thumb_url', 128);

@@ -61,3 +61,12 @@ Create Attachment
 </div><!-- /.row -->
 
 @stop
+
+@section('page-scripts')
+<script type="text/javascript">
+$('input[name=image]').change(function() {
+var name = $('input[name=image]').val().replace(/C:\\fakepath\\/i, '').replace(/.png|.jpg|.gif|.jpeg/,'');
+$('input[name=name]').val(name);
+});
+</script>
+@stop

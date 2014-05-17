@@ -24,7 +24,7 @@ Edit Weapon {{ $weapon -> name }}
 </div><!-- /.row -->
 
 <div class="row">
-    <div class="col-lg-7">
+    <div class="col-lg-12">
         <div class="well">
             {{ Form::open( array('url' => action('WeaponController@update', array('id' => $game -> id, 'weaponID' => $weapon -> id)), 'class' => 'form-horizontal', 'files' => true)) }}
             <fieldset>
@@ -38,7 +38,7 @@ Edit Weapon {{ $weapon -> name }}
                 </div>
                 <div class="form-group">
                     @foreach($attachmentsBySlot as $key => $slot)
-                    <div class="col-lg-3">
+                    <div class="col-lg-2">
                         <div>
                             {{ Form::label('', 'Slot ' . $key, array('class' => 'control-label')) }}
                         </div>

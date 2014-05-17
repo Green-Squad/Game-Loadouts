@@ -118,7 +118,7 @@ class UserController extends BaseController {
                 $data = array('token' => $user -> confirm_token);
                 Mail::send('emails.auth.confirm', $data, function($message) use ($user) {
 
-                    $message -> to($user -> email, $user -> username) -> subject('Confirm your email address for Basic GS.');
+                    $message -> to($user -> email, $user -> username) -> subject('Confirm your email address for Game Loadouts.');
                 });
                 $beta -> delete();
 

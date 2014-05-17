@@ -20,7 +20,7 @@ class RemindersController extends Controller {
     $response = Password::remind(Input::only('email'), function($message) {
       $message -> subject('Password Reminder');
     });
-
+    
     switch ($response) {
       case Password::INVALID_USER :
         return Redirect::back() -> with(array(

@@ -106,7 +106,7 @@
                 @if(Session::has('alert'))
                 <div class="alert alert-dismissable {{ Session::get('alert-class') }}">
                     <button type="button" class="close" data-dismiss="alert">
-                        ×
+                        <span class="glyphicon glyphicon-remove-sign"></span>
                     </button>
                     {{ Session::get('alert') }}
                 </div>

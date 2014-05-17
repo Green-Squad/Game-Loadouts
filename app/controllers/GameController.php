@@ -105,7 +105,7 @@ class GameController extends BaseController {
                 'alert-class' => 'alert-danger'
             ));
         }
-        return Redirect::route('adminDashboard') -> with(array(
+        return Redirect::route('admin.game.index') -> with(array(
             'alert' => 'Game has been successfully updated.',
             'alert-class' => 'alert-success'
         ));
@@ -117,12 +117,12 @@ class GameController extends BaseController {
             $gameID = $game -> id;
             $game -> delete();
         } catch(\Illuminate\Database\QueryException $e) {
-            return Redirect::to('admin/game') -> with(array(
+            return Redirect::back() -> with(array(
                 'alert' => 'Error: Failed to delete game.',
                 'alert-class' => 'alert-danger'
             ));
         }
-        return Redirect::to('admin/game') -> with(array(
+        return Redirect::to('admin.game.index') -> with(array(
             'alert' => "You have successfully deleted game $gameID.",
             'alert-class' => 'alert-success'
         ));

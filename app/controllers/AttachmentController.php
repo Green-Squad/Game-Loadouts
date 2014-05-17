@@ -27,6 +27,7 @@ class AttachmentController extends BaseController {
             $thumbPath = public_path() . '/uploads/thumb/';
             $fileExtension = $image -> getClientOriginalExtension();
             $fileName = $game -> id . '-' . $name . '-' . $slot . '.' . $fileExtension;
+            $fileName = preg_replace('/[\[\]]/', '', $fileName);
             $fileName = urlencode($fileName);
             
             $image -> move($destinationPath, $fileName);
@@ -49,7 +50,7 @@ class AttachmentController extends BaseController {
             $attachment -> thumb_url = "uploads/thumb/$fileName";
             $attachment -> save();
         } catch (\Illuminate\Database\QueryException $e) {
-            return Redirect::route('adminDashboard') -> with(array(
+            return Redirect::back() -> with(array(
                 'alert' => 'Error: Failed to create new attachment',
                 'alert-class' => 'alert-danger'
             ));
@@ -92,6 +93,7 @@ class AttachmentController extends BaseController {
                 $thumbPath = public_path() . '/uploads/thumb/';
                 $fileExtension = $image -> getClientOriginalExtension();
                 $fileName = $game -> id . '-' . $name . '-' . $slot . '.' . $fileExtension;
+                $fileName = preg_replace('/[\[\]]/', '', $fileName);
                 $fileName = urlencode($fileName);
                 
                 $image -> move($destinationPath, $fileName);

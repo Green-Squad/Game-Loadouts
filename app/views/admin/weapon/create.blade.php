@@ -24,7 +24,7 @@ Create Weapon
 </div><!-- /.row -->
 
 <div class="row">
-    <div class="col-lg-7">
+    <div class="col-lg-12">
         <div class="well">
             {{ Form::open( array('action' => array('WeaponController@store', $game -> id), 'class' => 'form-horizontal', 'files' => true)) }}
             <fieldset>
@@ -38,7 +38,7 @@ Create Weapon
                 </div>
                 <div class="form-group">
                     @foreach($attachmentsBySlot as $key => $slot)
-                    <div class="col-lg-3">
+                    <div class="col-lg-2">
                         <div>
                             {{ Form::label('', 'Slot ' . $key, array('class' => 'control-label')) }}
                         </div>
@@ -71,4 +71,12 @@ Create Weapon
     </div>
 </div><!-- /.row -->
 
+@stop
+@section('page-scripts')
+<script type="text/javascript">
+$('input[name=image]').change(function() {
+var name = $('input[name=image]').val().replace(/C:\\fakepath\\/i, '').replace(/.png|.jpg|.gif|.jpeg/,'');
+$('input[name=name]').val(name);
+});
+</script>
 @stop
