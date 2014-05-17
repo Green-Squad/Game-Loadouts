@@ -31,7 +31,7 @@
                             </li>
                             <li>
                                 <h6>
-                                <a href="{{ route('showGame', $game -> id) }}">
+                                <a href="{{ route('showGame', urlencode($game -> id)) }}">
                                     {{ $game -> id }}
                                 </a></h6>
                             </li>
@@ -40,7 +40,7 @@
                             </li>
                             <li>
                                 <h6>
-                                <a href="{{ route('showLoadouts', array($game -> id, $weapon -> name)) }}">    
+                                <a href="{{ route('showLoadouts', array(urlencode($game -> id), urlencode($weapon -> name))) }}">    
                                     {{ $weapon -> name }}
                                 </a>                                           
                                 </h6>

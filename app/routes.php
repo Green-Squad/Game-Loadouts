@@ -96,6 +96,7 @@ Route::group(array('before' => 'auth'), function() {
                     return View::make('admin.home');
                 }
             ));
+            Route::get('beta', 'BetaController@create');
 			Route::get('toggleAds', 'HelperController@toggleAds');
             Route::group(array('prefix' => 'user'), function() {
                 Route::get('create', array(
@@ -192,6 +193,8 @@ Route::group(array('before' => 'auth'), function() {
     });
 });
 
+Route::group(array('before' => 'auth'), function() {
+
 Route::get('games', array(
     'as' => 'showGames',
     'uses' => 'GameController@showGames'
@@ -223,3 +226,5 @@ Route::post('{game}/{weapon}/{loadout}/detach', array(
     'as' => 'detachLoadout',
     'uses' => 'LoadoutController@detach'
 ));
+
+});

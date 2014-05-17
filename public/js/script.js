@@ -5,7 +5,7 @@ $(document).ready(function() {
 	if($('.banner').length) {
 		var height=$('.homev2').length>0?447:415;
 		$('.banner').revolution({
-			delay:9000000,
+			delay:9001,
 			hideThumbs:1,
 			startwidth:1170,
 			startheight:500,

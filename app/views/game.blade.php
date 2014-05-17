@@ -59,7 +59,7 @@
 	<table class="table table-striped table-hover">
 		@foreach($weapons as $weapon)
 		<tr>
-			<td class="no-padding"><a class="block padding-8px flex" href="{{ route('showLoadouts', array($game -> id, $weapon -> name)) }}">
+			<td class="no-padding"><a class="block padding-8px flex" href="{{ route('showLoadouts', array(urlencode($game -> id), urlencode($weapon -> name))) }}">
 			<div class="col-md-3 vertical-center">
 				<img src="{{ asset($weapon -> thumb_url) }}" alt="{{ $weapon -> name }}" />
 			</div>
@@ -95,7 +95,7 @@
 	<span class="line"> <span class="sub-line"></span> </span>
 	@foreach($recentLoadouts as $loadout)
 	<?php $loadout = Loadout::findOrFail($loadout -> id); ?>
-	<a class="loadoutSmall block" href="{{ route('showLoadout', array($game -> id, Weapon::findOrFail($loadout -> weapon_id) -> name, $loadout ->id)) }}"> <h4 class="weaponSmall">{{ Weapon::findOrFail($loadout -> weapon_id) -> name }}</h4> @foreach($loadout -> attachments as $attachment)
+	<a class="loadoutSmall block" href="{{ route('showLoadout', array(urlencode($game -> id), urlencode(Weapon::findOrFail($loadout -> weapon_id) -> name), urlencode($loadout ->id))) }}"> <h4 class="weaponSmall">{{ Weapon::findOrFail($loadout -> weapon_id) -> name }}</h4> @foreach($loadout -> attachments as $attachment)
 	<div class="attachmentSmall">
 		<img src="{{ asset($attachment -> thumb_url) }}" alt="{{ $attachment -> name }}" />
 		{{ $attachment -> name }}

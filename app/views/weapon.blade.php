@@ -31,7 +31,7 @@
                             </li>
                             <li>
                                 <h6>
-                                <a href="{{ route('showGame', $game -> id) }}">
+                                <a href="{{ route('showGame', urlencode($game -> id)) }}">
                                     {{ $game -> id }}
                                 </a></h6>
                             </li>
@@ -90,7 +90,7 @@
         <span class="line"> <span class="sub-line"></span> </span>
         @foreach($loadouts as $loadout)
         <div class="loadout">
-            <a class="block" href="{{ route('showLoadout', array($game -> id, $weapon -> name, $loadout['id'])) }}">
+            <a class="block" href="{{ route('showLoadout', array(urlencode($game -> id), urlencode($weapon -> name), $loadout['id'])) }}">
                 <div class="col-md-2 rank theme-color">
                     {{ $count++ }}
                 </div>
@@ -118,7 +118,7 @@
                     <span class="glyphicon glyphicon-star-empty"></span> vote (<span id="count-{{ $loadout['id'] }}">{{ $loadout['count'] }}</span>)
                 </a>
                 @endif
-                <a class="btn btn-default comment" href="{{ route('showLoadout', array($game -> id, $weapon -> name, $loadout['id'])) }}" data-disqus-identifier="loadout-{{ $loadout['id'] }}">
+                <a class="btn btn-default comment" href="{{ route('showLoadout', array(urlencode($game -> id), urlencode($weapon -> name), $loadout['id'])) }}" data-disqus-identifier="loadout-{{ $loadout['id'] }}">
                     @if (!isset($loadout['comments']))
                     <span class="glyphicon glyphicon-comment"></span>  0 Comments
                     @elseif ($loadout['comments'] == 1)
@@ -127,7 +127,7 @@
                     <span class="glyphicon glyphicon-comment"></span>  {{ $loadout['comments'] }} Comments
                     @endif
                 </a>
-                <a class="btn btn-default" href="{{ route('showLoadout', array($game -> id, $weapon -> name, $loadout['id'])) }}" data-disqus-identifier="loadout-{{ $loadout['id'] }}">
+                <a class="btn btn-default" href="{{ route('showLoadout', array(urlencode($game -> id), urlencode($weapon -> name), $loadout['id'])) }}" data-disqus-identifier="loadout-{{ $loadout['id'] }}">
                     <span class="glyphicon glyphicon-screenshot"></span> View Loadout
                 </a>
             </div>
@@ -193,7 +193,6 @@
 			@endif
     	</div>
 	</div>
-</div>
 @stop
 
 @section('scripts')

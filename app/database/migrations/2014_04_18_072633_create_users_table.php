@@ -110,7 +110,7 @@ class CreateUsersTable extends Migration {
             $table -> engine = 'InnoDB';
         });
         
-        Schema::create('beta', function(Blueprint $table) {
+        Schema::create('betas', function(Blueprint $table) {
             $table -> string('id', 32) -> primary();
         });
 

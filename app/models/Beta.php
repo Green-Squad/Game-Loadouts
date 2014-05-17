@@ -2,6 +2,7 @@
 
 class Beta extends Eloquent {
 
-    protected $table = 'beta';
+    protected $table = 'betas';
+    public $timestamps = false;
 
 }

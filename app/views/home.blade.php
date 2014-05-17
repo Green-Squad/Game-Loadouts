@@ -87,7 +87,7 @@ Game Loadouts
             </div>
             <div class="form-group">
                 <div class="col-md-12">
-                    <label class="control-label" style="padding-top: 0" for="remember"> {{ Form::checkbox('remember', 'remember', false, array('class' => 'checkbox-inline')) }}
+                    <label class="control-label" style="padding-top: 0" for="remember"> {{ Form::checkbox('remember', 'remember', false, array('class' => 'checkbox-inline', 'id' => 'remember')) }}
                         Keep me logged in </label>
                 </div>
             </div>

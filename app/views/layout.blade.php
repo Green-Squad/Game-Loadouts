@@ -28,7 +28,7 @@
         <![endif]-->
     </head>
     <body>
-        
+
         <!-- Header -->
         <header>
             <!-- Top Bar -->
@@ -58,7 +58,7 @@
                                             <ul>
                                                 @foreach(GameController::listGames() as $game)
                                                 <li>
-                                                    <a href="{{ route('showGame', $game -> id) }}"> {{ $game -> id }} </a>
+                                                    <a href="{{ route('showGame', urlencode($game -> id)) }}"> {{ $game -> id }} </a>
                                                 </li>
                                                 @endforeach
                                             </ul>
@@ -75,6 +75,9 @@
                                         <li class="dropdown">
                                             <a href="#" class="dropdown-toggle" data-toggle="dropdown"> {{ Auth::user() -> username }} <b class="caret"></b> </a>
                                             <ul>
+                                                <li>
+                                                    {{ HTML::linkRoute('submissions', 'Submissions') }}
+                                                </li>
                                                 <li>
                                                     {{ HTML::linkRoute('account', 'Account') }}
                                                 </li>
@@ -130,16 +133,24 @@
                 <div class="row misc">
                     <div class="col-md-3" >
                         <h3>About Game Loadouts</h3>
-                        <p>Game Loadouts is a portal for finding the best ways to outfit your weapons in your favorite games.</p>
-        				<p>This website comes in handy when you need to complete challenges with various weapons and need to know the best attachment combination for that weapon.</p>
-        				<p>It is also great for fine-tuning your favorite gun to help improve your gameplay. This will save you rounds of trial and error to find the best loadout.</p>
+                        <p>
+                            Game Loadouts is a portal for finding the best ways to outfit your weapons in your favorite games.
+                        </p>
+                        <p>
+                            This website comes in handy when you need to complete challenges with various weapons and need to know the best attachment combination for that weapon.
+                        </p>
+                        <p>
+                            It is also great for fine-tuning your favorite gun to help improve your gameplay. This will save you rounds of trial and error to find the best loadout.
+                        </p>
                     </div>
                     <div class="col-md-3">
                         <h3>Feedback</h3>
                         <p>
                             Submit bug reports or suggest new features for the site!
                         </p>
-                        <p>Use the link below and then select "Submit New Idea" on the top left.</p>
+                        <p>
+                            Use the link below and then select "Submit New Idea" on the top left.
+                        </p>
                         <p>
                             <a class="button-gym" href="http://greensquad.ideascale.com/a/ideafactory.do?id=29675&amp;mode=top&amp;discussionFilter=byids&amp;discussionID=7136"> Submit Feedback </a>
                         </p>
@@ -151,19 +162,21 @@
                         </p>
                         <ul class="social" >
                             <li>
-                                <a href="#"><i class="entypo-facebook" ></i></a>
+                                <a href="http://www.facebook.com/GameLoadouts"><i class="entypo-facebook" ></i></a>
                             </li>
                             <li>
-                                <a href="https://twitter.com/GameLoadouts"><i class="entypo-twitter" ></i></a>
+                                <a href="https://www.twitter.com/GameLoadouts"><i class="entypo-twitter" ></i></a>
                             </li>
                         </ul>
                     </div>
                     <div class="col-md-3">
                         <h3>Games</h3>
-                         <p></p>  
-                         @foreach(GameController::listGames() as $game)
-                                <p><a class="button-gym" href="{{ route('showGame', $game -> id)  }}">{{ $game -> id  }}</a></p>
-                         @endforeach
+                        <p></p>
+                        @foreach(GameController::listGames() as $game)
+                        <p>
+                            <a class="button-gym" href="{{ route('showGame', urlencode($game -> id)) }}">{{ $game -> id  }}</a>
+                        </p>
+                        @endforeach
                     </div>
                 </div>
             </div>

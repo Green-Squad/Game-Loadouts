@@ -35,6 +35,11 @@ Join Us!
         </div>
         <div class="form-group">
             <div class="col-md-12">
+                {{ Form::text('beta', '', array('class' => 'form-control input-lg', 'placeholder' => 'Beta Key', 'required' => '')) }}
+            </div>
+        </div>
+        <div class="form-group">
+            <div class="col-md-12">
                 <button class="btn btn-default btn-lg" type="reset">
                     Cancel
                 </button>

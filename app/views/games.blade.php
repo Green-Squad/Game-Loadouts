@@ -18,7 +18,7 @@ Games
 			@foreach($games as $game)
 				@if($counter++ % 2 == 0)
 				<article class="post">
-					<a href="{{ route('showGame', $game -> id) }}"> <img src="{{ asset($game -> thumb_url) }}" alt="{{ $game -> id }}" />
+					<a href="{{ route('showGame', urlencode($game -> id)) }}"> <img src="{{ asset($game -> thumb_url) }}" alt="{{ $game -> id }}" />
 					<header>
 						<h3>{{ $game -> id }}</h3>
 					</header></a>
