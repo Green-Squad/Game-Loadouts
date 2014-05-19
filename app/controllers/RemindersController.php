@@ -30,7 +30,7 @@ class RemindersController extends Controller {
 
       case Password::REMINDER_SENT :
         return Redirect::back() -> with(array(
-          'alert' => 'A reminder has been sent!',
+          'alert' => 'A reminder has been sent! <strong>If you do not see it within 5 minutes, then please check your Spam folder.</strong>',
           'alert-class' => 'alert-info'
         ));
     }

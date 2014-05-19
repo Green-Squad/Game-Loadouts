@@ -142,21 +142,35 @@
                 </h3>
                 {{ Form::open( array('action' => array('LoadoutController@store', $game -> id, $weapon -> name), 'class' => 'form-horizontal', 'id' => 'storeForm')) }}
                 <div class="form-group">
-                    <? $slotCount = 1; ?>
+                    <ul class="nav nav-tabs nav-tabs-sec" id="myTab">
+                    <?php $counter = 0; ?>
+                        @foreach($attachmentsBySlot as $key => $slot)
+                            <li class="
+                            @if ($counter++ == 0)   
+                            active
+                            @endif
+                            "><a href="#{{ $key }}" data-toggle="tab">{{ $key }}</a></li>
+                        @endforeach
+                    </ul>
+                    <div class="tab-content nav-tabs-sec">
+                    <?php $counter = 0; ?>
                     @foreach($attachmentsBySlot as $key => $slot)
-                    <div class="col-md-4">
-                        <div>
-                            <h4>Slot {{ $slotCount++ }}</h4>
+                    
+                        <div class="tab-pane 
+                        @if ($counter++ == 0)   
+                        active
+                        @endif
+                        " id="{{ $key }}">
+                            <div class="btn-group-vertical" data-toggle="buttons">
+                                @foreach($slot as $attachment)
+                                <label class="btn btn-default">
+                                    <input type="radio" value="{{ $attachment -> id }}" name="{{ $key }}" required="">
+                                    {{ $attachment -> name }} </label>
+                                @endforeach
+                            </div>
                         </div>
-                        <div style="width: 100%" class="btn-group-vertical" data-toggle="buttons">
-                            @foreach($slot as $attachment)
-                            <label class="btn btn-primary">
-                                <input type="radio" value="{{ $attachment -> id }}" name="attachment{{ $key }}" required="">
-                                {{ $attachment -> name }} </label>
-                            @endforeach
-                        </div>
-                    </div>
                     @endforeach
+                    </div> 
                 </div>
                 <div class="form-group">
                     <div class="col-md-12">

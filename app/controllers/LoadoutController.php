@@ -10,6 +10,34 @@ class LoadoutController extends BaseController {
 
             $weapon_loadouts = Loadout::where('weapon_id', $weapon -> id) -> get();
 
+            // for each attachment
+            // if it isnt in possible attachments
+            // return error message
+            $possibleAttachments = $weapon -> attachments;
+            $possibleAttachments = $this -> getAttachmentsArray($possibleAttachments);
+            foreach ($attachments as $attachment) {
+                if (!in_array($attachment, $possibleAttachments)) {
+                    return Redirect::back() -> with(array(
+                        'alert' => 'This is not a valid loadout. Good attempt at hacking us though.',
+                        'alert-class' => 'alert-danger'
+                    ));
+                }
+            }
+
+            // for each attachment in slot
+            // if it isnt in possible attachments for slot
+            // return error message
+            $attachmentsBySlot = WeaponController::getAttachmentsBySlot($weapon);
+            foreach ($attachments as $key => $attachment) {
+                //return var_dump($attachment) . var_dump($this -> getAttachmentsArray($attachmentsBySlot[$key]));
+                if (!in_array($attachment, $this -> getAttachmentsArray($attachmentsBySlot[$key]))) {
+                    return Redirect::back() -> with(array(
+                        'alert' => 'This is not a valid loadout. Good attempt at hacking us though.',
+                        'alert-class' => 'alert-danger'
+                    ));
+                }
+            }
+
             // all loadouts for specific weapon
             $existingLoadout = NULL;
 

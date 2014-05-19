@@ -122,11 +122,11 @@ Game Administration
                         {{ $attachment -> updated_at }}
                     </td>
                     <td>
-                        <a href="{{ route('attachmentEdit', array('id' => $game -> id, 'name' => $attachment -> name)) }}" class="btn btn-default">
+                        <a href="{{ route('attachmentEdit', array('id' => $game -> id, 'name' => $attachment -> id)) }}" class="btn btn-default">
                             <span class="glyphicon glyphicon-pencil"></span>
                         </a>
                         &nbsp;
-                        <a href="{{ route('attachmentDelete', array('id' => $game -> id, 'name' => $attachment -> name)) }}" class="btn btn-danger">
+                        <a href="{{ route('attachmentDelete', array('id' => $game -> id, 'name' => $attachment -> id)) }}" class="btn btn-danger">
                             <span class="glyphicon glyphicon-trash"></span>
                         </a>
                     </td>

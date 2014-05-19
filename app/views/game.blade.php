@@ -95,7 +95,7 @@
 	<span class="line"> <span class="sub-line"></span> </span>
 	@foreach($recentLoadouts as $loadout)
 	<?php $loadout = Loadout::findOrFail($loadout -> id); ?>
-	<a class="loadoutSmall block" href="{{ route('showLoadout', array(urlencode($game -> id), urlencode(Weapon::findOrFail($loadout -> weapon_id) -> name), urlencode($loadout ->id))) }}"> <h4 class="weaponSmall">{{ Weapon::findOrFail($loadout -> weapon_id) -> name }}</h4> @foreach($loadout -> attachments as $attachment)
+	<a class="loadoutSmall block" href="{{ route('showLoadout', array(urlencode($game -> id), urlencode(Weapon::findOrFail($loadout -> weapon_id) -> name), urlencode($loadout ->id))) }}"> <h4 class="weaponSmall theme-color">{{ Weapon::findOrFail($loadout -> weapon_id) -> name }}</h4> @foreach($loadout -> attachments as $attachment)
 	<div class="attachmentSmall">
 		<img src="{{ asset($attachment -> thumb_url) }}" alt="{{ $attachment -> name }}" />
 		{{ $attachment -> name }}

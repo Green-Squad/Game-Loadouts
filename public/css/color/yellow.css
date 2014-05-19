@@ -385,6 +385,16 @@ header .top-bar ul li:hover a i {
     color: #e0b900;
 }
 
+.btn-primary {
+    background-color: #e0b900;
+    border-color: #ba9a00;
+}
+
+.btn-primary:hover {
+    background-color: #ba9a00;
+    border-color: #987e00;
+}
+
 
 
 

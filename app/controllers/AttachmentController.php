@@ -67,8 +67,8 @@ class AttachmentController extends BaseController {
      * @param  int  $id
      * @return Response
      */
-    public function edit(Game $game, $attachmentName) {
-        $attachment = Attachment::where('game_id', $game -> id, 'AND') -> where('name', $attachmentName) -> first();
+    public function edit(Game $game, $attachmentID) {
+        $attachment = Attachment::where('game_id', $game -> id, 'AND') -> where('id', $attachmentID) -> first();
         return View::make('admin.attachment.edit', compact('game', 'attachment'));
     }
 
@@ -124,8 +124,8 @@ class AttachmentController extends BaseController {
      * @param  int  $id
      * @return Response
      */
-    public function delete(Game $game, $attachmentName) {
-        $attachment = Attachment::where('game_id', $game -> id, 'AND') -> where('name', $attachmentName) -> first();
+    public function delete(Game $game, $attachmentID) {
+        $attachment = Attachment::where('game_id', $game -> id, 'AND') -> where('id', $attachmentID) -> first();
         return View::make('admin.attachment.delete', compact('game', 'attachment'));
     }
 

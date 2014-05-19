@@ -243,11 +243,21 @@ class WeaponController extends BaseController {
                 }
             }
         }
-
+        
         $loadouts = $loadouts -> toArray();
+        // sort by Loadout submission count
         uasort($loadouts, "WeaponController::countSort");
         
-        // sort by Loadout submission count
+        $attachmentsBySlot = WeaponController::getAttachmentsBySlot($weapon);
+
+        return View::make('weapon', compact('game', 'weapon', 'loadouts', 'attachmentsBySlot'));
+    }
+
+    public static function countSort($a, $b) {
+        return $b['count'] - $a['count'];
+    }
+    
+    public static function getAttachmentsBySlot($weapon) {
         $attachments = $weapon -> attachments -> sortBy('name');
 
         $attachmentsBySlot = array();
@@ -260,12 +270,7 @@ class WeaponController extends BaseController {
             }
         }
         ksort($attachmentsBySlot);
-
-        return View::make('weapon', compact('game', 'weapon', 'loadouts', 'attachmentsBySlot'));
-    }
-
-    public static function countSort($a, $b) {
-        return $b['count'] - $a['count'];
+        return $attachmentsBySlot;
     }
 
 }
