@@ -1,14 +1,13 @@
 @extends('admin.layout')
 
 @section('subtitle')
-Delete Weapon {{ $weapon -> name }}
+Delete Loadout {{ $loadout -> id }}
 @stop
 
 @section('content')
-
 <div class="row">
     <div class="col-lg-12">
-        <h1>{{ $weapon -> name }} <small>Delete</small></h1>
+        <h1>{{ $loadout -> id }} <small>Delete</small></h1>
         <ol class="breadcrumb">
             <li>
                 <i class="fa fa-dashboard"></i>
@@ -30,9 +29,12 @@ Delete Weapon {{ $weapon -> name }}
             </li>
             <li>
                 <i class="icon-file-alt"></i>
-                <a href="#">
+                <a href="{{ route('weaponLoadouts', array('id' => $game -> id, 'name' => $weapon -> name)) }}">
                     {{ $weapon -> name }}
                 </a>
+            </li>
+            <li>
+                <i class="icon-file-alt"></i> {{ $loadout -> id }}
             </li>
             <li class="active">
                 <i class="icon-file-alt"></i> Delete
@@ -44,11 +46,11 @@ Delete Weapon {{ $weapon -> name }}
 <div class="row">
     <div class="col-lg-7">
         <div class="well">
-            {{ Form::open( array('url' => action('WeaponController@destroy', array('id' => $game -> id, 'weaponID' => $weapon -> id)), 'class' => 'form-horizontal')) }}
+            {{ Form::open( array('url' => action('LoadoutController@delete', array('id' => $game -> id, 'weaponName' => $weapon -> name, 'loadoutID' => $loadout -> id)), 'class' => 'form-horizontal')) }}
             <fieldset>
                 <legend>
                     <p>
-                        Are you sure you want to delete Weapon {{ $weapon -> name }}? This process is irreversible.
+                        Are you sure you want to delete loadout {{ $loadout -> id }}? This process is irreversible.
                     </p>
                 </legend>
                 <div class="form-group">
@@ -66,5 +68,4 @@ Delete Weapon {{ $weapon -> name }}
         </div>
     </div>
 </div>
-
 @stop

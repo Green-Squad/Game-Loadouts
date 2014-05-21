@@ -192,5 +192,25 @@ class LoadoutController extends BaseController {
             return Response::json($response);
         }
     }
+    
+    public function showDelete(Game $game, $weaponName, Loadout $loadout) {
+        $weapon = Weapon::where('game_id', $game -> id, 'AND') -> where('name', $weaponName) -> first();
+        return View::make('admin.loadout.delete', compact('game', 'weapon', 'loadout'));
+    }
+
+    public function delete(Game $game, $weaponName, Loadout $loadout) {
+        try {
+            $loadout -> delete();
+            return Redirect::route('weaponLoadouts', array('id' => $game -> id, 'name' => $weaponName)) -> with(array(
+                'alert' => 'Successfully deleted loadout.',
+                'alert-class' => 'alert-success'
+            ));
+        } catch(\Illuminate\Database\QueryException $e) {
+            return Redirect::back() -> with(array(
+                'alert' => 'Error: Failed to delete loadout.',
+                'alert-class' => 'alert-danger'
+            ));
+        }
+    }
 
 }

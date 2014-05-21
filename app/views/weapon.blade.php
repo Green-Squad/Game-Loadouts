@@ -4,6 +4,10 @@
 {{ $game -> id . " - " . $weapon -> name }}
 @stop
 
+@section('description')
+Here are the best weapon loadouts for the {{ $weapon -> name }} in {{ $game -> id }}.
+@stop
+
 @section('css')
 <link rel="stylesheet" type="text/css" href="{{ asset('css/games/' . $game -> id . '.css') }}" />
 @stop
@@ -16,30 +20,30 @@
             <div class="row">
                 <ul class="sub-header-container">
                     <li>
-                        <h3 class="title"><span class="game-title">{{ $game -> id }} \</span> {{ $weapon -> name }}</h3>
+                        <h1 class="title"><span class="game-title">{{ $game -> id }} \</span> {{ $weapon -> name }}</h1>
                     </li>
                     <li>
                         <ul class="custom-breadcrumb">
                             <li>
-                                <h6>
+                                <h5>
                                 <a href="{{ route('home') }}">
                                     Home
-                                </a></h6>
+                                </a></h5>
                             </li>
                             <li>
                                 <i class="separator entypo-play"></i>
                             </li>
                             <li>
-                                <h6>
+                                <h5>
                                 <a href="{{ route('showGame', urlencode($game -> id)) }}">
                                     {{ $game -> id }}
-                                </a></h6>
+                                </a></h5>
                             </li>
                             <li>
                                 <i class="separator entypo-play"></i>
                             </li>
                             <li>
-                                <h6>{{ $weapon -> name }}</h6>
+                                <h5>{{ $weapon -> name }}</h5>
                             </li>
                         </ul>
                     </li>

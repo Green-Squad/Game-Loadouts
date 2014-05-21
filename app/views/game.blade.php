@@ -4,6 +4,10 @@
 {{ $game -> id }}
 @stop
 
+@section('description')
+{{ $game -> id }} weapon list. Find the best loadout for any {{ $game -> id }} gun.
+@stop
+
 @section('css')
 <link rel="stylesheet" type="text/css" href="{{ asset('css/games/' . $game -> id . '.css') }}" />
 @stop
@@ -16,18 +20,18 @@
 			<div class="row" >
 				<ul class="sub-header-container" >
 					<li>
-						<h3 class="title">{{ $game -> id }}</h3>
+						<h1 class="title">{{ $game -> id }}</h1>
 					</li>
 					<li>
 						<ul class="custom-breadcrumb" >
 							<li>
-								<h6><a href="{{ route('home') }}"> Home </a></h6>
+								<h5><a href="{{ route('home') }}"> Home </a></h5>
 							</li>
 							<li>
 								<i class="separator entypo-play" ></i>
 							</li>
 							<li>
-								<h6>{{ $game -> id }}</h6>
+								<h5>{{ $game -> id }}</h5>
 							</li>
 						</ul>
 					</li>

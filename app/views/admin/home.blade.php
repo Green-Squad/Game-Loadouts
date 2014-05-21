@@ -102,7 +102,7 @@ Dashboard
                         </div>
                     </div>
                 </div>
-                <a href="#">
+                <a href="#"> 
                 <div class="panel-footer announcement-bottom">
                     <div class="row">
                         <div class="col-xs-6">

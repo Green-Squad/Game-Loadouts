@@ -75,8 +75,11 @@ Route::group(array('before' => 'auth'), function() {
         'as' => 'logout',
         'uses' => 'UserController@logout'
     ));
-	
-	Route::get('submissions', array('as' => 'submissions', 'uses' => 'UserController@showSubmissions'));
+
+    Route::get('submissions', array(
+        'as' => 'submissions',
+        'uses' => 'UserController@showSubmissions'
+    ));
 
     Route::group(array('before' => 'standard'), function() {
         /* Standard users only */
@@ -95,9 +98,10 @@ Route::group(array('before' => 'auth'), function() {
                 function() {
                     return View::make('admin.home');
                 }
+
             ));
             Route::get('beta', 'BetaController@create');
-			Route::get('toggleAds', 'HelperController@toggleAds');
+            Route::get('toggleAds', 'HelperController@toggleAds');
             Route::group(array('prefix' => 'user'), function() {
                 Route::get('create', array(
                     'as' => 'createUser',
@@ -170,6 +174,18 @@ Route::group(array('before' => 'auth'), function() {
                 ));
                 Route::post('{weapon}/delete', 'WeaponController@destroy');
 
+                Route::get('{weapon}', array(
+                    'as' => 'weaponLoadouts',
+                    'uses' => 'WeaponController@show'
+                ));
+
+                Route::get('{weapon}/{loadout}/delete', array(
+                    'as' => 'deleteLoadout',
+                    'uses' => 'LoadoutController@showDelete'
+                ));
+                
+                Route::post('{weapon}/{loadout}/delete', 'LoadoutController@delete');
+
                 // ATTACHMENT
                 Route::get('attachment/create', array(
                     'as' => 'attachmentCreate',
@@ -195,36 +211,36 @@ Route::group(array('before' => 'auth'), function() {
 
 Route::group(array('before' => 'auth'), function() {
 
-Route::get('games', array(
-    'as' => 'showGames',
-    'uses' => 'GameController@showGames'
-));
+    Route::get('games', array(
+        'as' => 'showGames',
+        'uses' => 'GameController@showGames'
+    ));
 
-Route::get('{game}', array(
-    'as' => 'showGame',
-    'uses' => 'GameController@listWeapons'
-));
+    Route::get('{game}', array(
+        'as' => 'showGame',
+        'uses' => 'GameController@listWeapons'
+    ));
 
-Route::get('{game}/{weapon}', array(
-    'as' => 'showLoadouts',
-    'uses' => 'WeaponController@listLoadouts'
-));
+    Route::get('{game}/{weapon}', array(
+        'as' => 'showLoadouts',
+        'uses' => 'WeaponController@listLoadouts'
+    ));
 
-Route::post('{game}/{weapon}', 'LoadoutController@store');
+    Route::post('{game}/{weapon}', 'LoadoutController@store');
 
-Route::get('{game}/{weapon}/{loadout}', array(
-    'as' => 'showLoadout',
-    'uses' => 'LoadoutController@show'
-));
+    Route::get('{game}/{weapon}/{loadout}', array(
+        'as' => 'showLoadout',
+        'uses' => 'LoadoutController@show'
+    ));
 
-Route::post('{game}/{weapon}/{loadout}/upvote', array(
-    'as' => 'upvoteLoadout',
-    'uses' => 'LoadoutController@upvote'
-));
+    Route::post('{game}/{weapon}/{loadout}/upvote', array(
+        'as' => 'upvoteLoadout',
+        'uses' => 'LoadoutController@upvote'
+    ));
 
-Route::post('{game}/{weapon}/{loadout}/detach', array(
-    'as' => 'detachLoadout',
-    'uses' => 'LoadoutController@detach'
-));
+    Route::post('{game}/{weapon}/{loadout}/detach', array(
+        'as' => 'detachLoadout',
+        'uses' => 'LoadoutController@detach'
+    ));
 
 });

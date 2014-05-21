@@ -195,6 +195,12 @@ class WeaponController extends BaseController {
             'alert-class' => 'alert-success'
         ));
     }
+    
+    public function show(Game $game, $weaponName) {
+        $weapon = Weapon::where('game_id', $game -> id, 'AND') -> where('name', $weaponName) -> first();
+        $loadouts = Loadout::where('weapon_id', $weapon -> id) -> get();
+        return View::make('admin.weapon.show', compact('game', 'weapon', 'loadouts'));
+    }
 
     public static function fixJSON($json) {
         $pattern = '/[();]/';

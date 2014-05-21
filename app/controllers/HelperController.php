@@ -1,13 +1,45 @@
 <?php
 
 class HelperController extends BaseController {
-	
-	static $ads = 0;
-	
-	public static function adsEnabled() {
-		return self::$ads;
-	}
-	
+
+    public static function adsEnabled() {
+        return $_ENV['ads'];
+    }
+
+    public function toggleAds() {
+        if ($_ENV['ads']) {
+            $_ENV['ads'] = 0;
+        } else {
+            $_ENV['ads'] = 1;
+        }
+        return Redirect::back();
+    }
+
+    // $list is the collection
+    // $attribute is the attribute of the list item
+    public static function listToString($list, $attribute) {
+        $array = array();
+        $counter = 0;
+        $string = '';
+        foreach ($list as $key => $value) {
+            $array[$counter++] = $value -> $attribute;
+        }
+        if (count($array) > 1) {
+            for ($i = 0; $i < count($array); $i++) {
+                if ($i < count($array) - 2) {    
+                    $string .= $array[$i] . ', ';
+                } elseif ($i == count($array) - 2) {
+                    $string .= $array[$i] . ' ';
+                } elseif ($i == count($array) - 1) {
+                    $string .= 'and ' . $array[$i];
+                }
+            }
+        } elseif (count($array) == 1) {
+            $string = $array[$i];
+        }
+        return $string;
+    }
+
     public static function createThumbnail($thumb_url, $extension, $maxsize) {
 
         /* read the source image */
@@ -29,7 +61,7 @@ class HelperController extends BaseController {
 
         /* create a new, "virtual" image */
         $virtual_image = imagecreatetruecolor($desired_width, $desired_height);
-        
+
         imagealphablending($virtual_image, false);
         imagesavealpha($virtual_image, true);
 

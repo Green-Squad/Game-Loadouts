@@ -8,13 +8,31 @@ Delete Attachment {{ $attachment -> name }}
 
 <div class="row">
     <div class="col-lg-12">
-        <h1>Attachment <small>Delete</small></h1>
+        <h1>{{ $attachment -> name }} <small>Delete</small></h1>
         <ol class="breadcrumb">
             <li>
-                <i class="fa fa-dashboard"></i> Dashboard
+                <i class="fa fa-dashboard"></i>
+                <a href="{{ route('adminDashboard') }}">
+                    Dashboard
+                </a>
             </li>
             <li>
-                <i class="icon-file-alt"></i> Attachment
+                <i class="icon-file-alt"></i>
+                <a href="{{ route('admin.game.index') }}">
+                    Games
+                </a>
+            </li>
+            <li>
+                <i class="icon-file-alt"></i>
+                <a href="{{ action('GameController@show', array('id' => $game -> id)) }}">
+                    {{ $game -> id }}
+                </a>
+            </li>
+            <li>
+                <i class="icon-file-alt"></i>
+                <a href="#">
+                    {{ $attachment -> name }}
+                </a>
             </li>
             <li class="active">
                 <i class="icon-file-alt"></i> Delete
@@ -29,9 +47,8 @@ Delete Attachment {{ $attachment -> name }}
             {{ Form::open( array('url' => action('AttachmentController@destroy', array('id' => $game -> id, 'attachmentID' => $attachment -> id)), 'class' => 'form-horizontal')) }}
             <fieldset>
                 <legend>
-                    <h2>Delete Attachment</h2>
                     <p>
-                        Are you sure you want to delete Attachment {{ $attachment -> name }}? This process is irreversible.
+                        Are you sure you want to delete the attachment {{ $attachment -> name }}? This process is irreversible.
                     </p>
                 </legend>
                 <div class="form-group">

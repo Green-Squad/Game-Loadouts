@@ -1,7 +1,11 @@
 @extends('layout')
 
 @section('subtitle')
-Login
+Login to Game Loadouts
+@stop
+
+@section('description')
+Login with your Game Loadouts account here.
 @stop
 
 @section('content')

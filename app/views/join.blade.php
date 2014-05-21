@@ -1,7 +1,11 @@
 @extends('layout')
 
 @section('subtitle')
-Join Us!
+Join Game Loadouts
+@stop
+
+@section('description')
+Join Game Loadouts. You can sign up for free here.
 @stop
 
 @section('content')

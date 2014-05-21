@@ -8,13 +8,31 @@ Edit Weapon {{ $weapon -> name }}
 
 <div class="row">
     <div class="col-lg-12">
-        <h1>Weapon <small>Edit</small></h1>
+        <h1>{{ $weapon -> name }} <small>Edit</small></h1>
         <ol class="breadcrumb">
             <li>
-                <i class="fa fa-dashboard"></i> Dashboard
+                <i class="fa fa-dashboard"></i>
+                <a href="{{ route('adminDashboard') }}">
+                    Dashboard
+                </a>
             </li>
             <li>
-                <i class="icon-file-alt"></i> Weapon
+                <i class="icon-file-alt"></i>
+                <a href="{{ route('admin.game.index') }}">
+                    Games
+                </a>
+            </li>
+            <li>
+                <i class="icon-file-alt"></i>
+                <a href="{{ action('GameController@show', array('id' => $game -> id)) }}">
+                    {{ $game -> id }}
+                </a>
+            </li>
+            <li>
+                <i class="icon-file-alt"></i>
+                <a href="#">
+                    {{ $weapon -> name }}
+                </a>
             </li>
             <li class="active">
                 <i class="icon-file-alt"></i> Edit
@@ -28,9 +46,6 @@ Edit Weapon {{ $weapon -> name }}
         <div class="well">
             {{ Form::open( array('url' => action('WeaponController@update', array('id' => $game -> id, 'weaponID' => $weapon -> id)), 'class' => 'form-horizontal', 'files' => true)) }}
             <fieldset>
-                <legend>
-                    <h2>Edit Weapon</h2>
-                </legend>
                 <div class="form-group">
                     <div class="col-lg-12">
                         {{ Form::text('name', $weapon -> name, array('class' => 'form-control input-lg', 'placeholder' => 'Game Name', 'required' => '')) }}

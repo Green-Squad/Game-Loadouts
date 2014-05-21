@@ -1101,7 +1101,7 @@ section .row {
     display: inline-block;
 }
 
-.sub-header .custom-breadcrumb h6 {
+.sub-header .custom-breadcrumb h5 {
     margin: 0;
     line-height: 1;
 }
@@ -1112,7 +1112,7 @@ section .row {
     text-decoration: none;
     text-transform: uppercase;
 }
-.sub-header .custom-breadcrumb li h6 {
+.sub-header .custom-breadcrumb li h5 {
     color: #fff;
     font-weight: 600;
     text-transform: uppercase;

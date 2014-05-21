@@ -4,6 +4,10 @@
 {{ $game -> id }}
 @stop
 
+@section('description')
+The {{ $weapon -> name }} in {{ $game -> id }} with {{ HelperController::listToString(Loadout::findOrFail($loadout['id']) -> attachments, 'name') }}  has @if($loadout -> count == 1) 1 vote. @else{{ $loadout -> count }} votes.@endif
+@stop
+
 @section('css')
 <link rel="stylesheet" type="text/css" href="{{ asset('css/games/' . $game -> id . '.css') }}" />
 @stop
@@ -16,40 +20,40 @@
             <div class="row">
                 <ul class="sub-header-container">
                     <li>
-                        <h3 class="title"><span class="game-title">{{ $game -> id }} \</span> {{ $weapon -> name }}</h3>
+                        <h1 class="title"><span class="game-title">{{ $game -> id }} \</span> {{ $weapon -> name }}</h1>
                     </li>
                     <li>
                         <ul class="custom-breadcrumb">
                             <li>
-                                <h6>
+                                <h5>
                                 <a href="{{ route('home') }}">
                                     Home
-                                </a></h6>
+                                </a></h5>
                             </li>
                             <li>
                                 <i class="separator entypo-play"></i>
                             </li>
                             <li>
-                                <h6>
+                                <h5>
                                 <a href="{{ route('showGame', urlencode($game -> id)) }}">
                                     {{ $game -> id }}
-                                </a></h6>
+                                </a></h5>
                             </li>
                             <li>
                                 <i class="separator entypo-play"></i>
                             </li>
                             <li>
-                                <h6>
+                                <h5>
                                 <a href="{{ route('showLoadouts', array(urlencode($game -> id), urlencode($weapon -> name))) }}">    
                                     {{ $weapon -> name }}
                                 </a>                                           
-                                </h6>
+                                </h5>
                             </li>
                             <li>
                                 <i class="separator entypo-play"></i>
                             </li>
                             <li>
-                                <h6>Loadout</h6>
+                                <h5>Loadout</h5>
                             </li>
                         </ul>
                     </li>
@@ -138,8 +142,8 @@
 	    <div class="col-md-12">
 	        <div class="row">
 	            <?php
-	            define('DISQUS_SECRET_KEY', 'YswO6okCvBMxLMP0Gf2JHpymuW6Nxx8UYVEwE2h44Xxgej7dziGgEbet2GwokkUP');
-	            define('DISQUS_PUBLIC_KEY', 'COZqmFYdQiyinQ5MzXSOqRbxOQ8grhFvSd0dYb0Zc37wJSRxzDCCtIUhV83AyUM8');
+	            define('DISQUS_SECRET_KEY', $_ENV['DISQUS_SECRET_KEY']);
+	            define('DISQUS_PUBLIC_KEY', 'HXGfl9wP4NuXd15qCTPIprKv2rJhzqCp38NlZs5YmA2i3LOlFzTnBAiiWK8MQKI9');
 	
 	            if (Auth::check()) {
 	                $username = Auth::user() -> username;

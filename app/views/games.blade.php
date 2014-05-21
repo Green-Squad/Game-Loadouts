@@ -4,6 +4,10 @@
 Games
 @stop
 
+@section('description')
+Find the best weapon loadouts for {{ HelperController::listToString($games, 'id') }}.
+@stop
+
 @section('content')
 @if(HelperController::adsEnabled())
 <div class="col-md-8">

@@ -6,6 +6,8 @@
 
         <!-- Page Title -->
         <title>@yield('subtitle', 'Game Loadouts')</title>
+        <meta name="description" content="@yield('description')" />
+        
 
         <!-- Responsive Metatag -->
         <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1" />
@@ -46,7 +48,9 @@
                                         <span class="icon-bar"></span>
                                         <span class="icon-bar"></span>
                                     </button>
-                                    <h1 class="logo"><a href="{{ route('home') }}"> Game Loadouts </a></h1>
+                                    <div class="logo h1">
+                                        <a href="{{ route('home') }}"> Game Loadouts </a>
+                                    </div>
                                 </div>
 
                                 <!-- Collect the nav links, forms, and other content for toggling -->

@@ -8,16 +8,28 @@ Create Attachment
 
 <div class="row">
     <div class="col-lg-12">
-        <h1>Attachment <small>Create New</small></h1>
+        <h1>Attachment <small>New</small></h1>
         <ol class="breadcrumb">
             <li>
-                <i class="fa fa-dashboard"></i> Dashboard
+                <i class="fa fa-dashboard"></i>
+                <a href="{{ route('adminDashboard') }}">
+                    Dashboard
+                </a>
             </li>
             <li>
-                <i class="icon-file-alt"></i> Attachment
+                <i class="icon-file-alt"></i>
+                <a href="{{ route('admin.game.index') }}">
+                    Games
+                </a>
+            </li>
+            <li>
+                <i class="icon-file-alt"></i>
+                <a href="{{ action('GameController@show', array('id' => $game -> id)) }}">
+                    {{ $game -> id }}
+                </a>
             </li>
             <li class="active">
-                <i class="icon-file-alt"></i> Create
+                <i class="icon-file-alt"></i> Create Attachment
             </li>
         </ol>
     </div>
@@ -28,9 +40,6 @@ Create Attachment
         <div class="well">
             {{ Form::open( array('action' => array('AttachmentController@store', $game -> id), 'class' => 'form-horizontal', 'files' => true)) }}
             <fieldset>
-                <legend>
-                    <h2>New Attachment for {{ $game -> id }}</h2>
-                </legend>
                 <div class="form-group">
                     <div class="col-lg-12">
                         {{ Form::text('name', '', array('class' => 'form-control input-lg', 'placeholder' => 'Attachment Name', 'required' => '')) }}

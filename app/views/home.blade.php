@@ -4,6 +4,10 @@
 Game Loadouts
 @stop
 
+@section('description')
+Game Loadouts is a portal for finding the best ways to outfit your weapons in your favorite games like Titanfall and Battlefield 4.
+@stop
+
 @section('sub-header')
 <section id="home" >
     <!-- Sub Header -->

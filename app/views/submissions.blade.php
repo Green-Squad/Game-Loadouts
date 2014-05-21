@@ -82,9 +82,8 @@ Submissions
     <script type="text/javascript">
         $('.clickable').click(function() {
             var game_id = $(this).data('game_id');
-            ;
             var weapon_name = $(this).data('weapon_name');
-            ;
+            
             var loadout_id = $(this).data('loadout_id');
             $.post('/' + game_id + '/' + weapon_name + '/' + loadout_id + '/detach', function(data) {
                 $('#loadout-' + loadout_id).fadeOut();

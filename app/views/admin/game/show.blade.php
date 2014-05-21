@@ -38,6 +38,7 @@ Game Administration
                     <th> ID <i class="fa fa-sort"></i></th>
                     <th> Name <i class="fa fa-sort"></i></th>
                     <th> Attachments <i class="fa fa-sort"></i></th>
+                    <th> Loadouts <i class="fa fa-sort"></i></th>
                     <th> Image_URL <i class="fa fa-sort"></i></th>
                     <th> Created at <i class="fa fa-sort"></i></th>
                     <th> Updated at <i class="fa fa-sort"></i></th>
@@ -51,10 +52,15 @@ Game Administration
                         {{ $weapon -> id }}
                     </td>
                     <td>
-                        {{ $weapon -> name }}
+                        <a href="{{ route('weaponLoadouts', array('id' => $game -> id, 'name' => $weapon -> name)) }}">
+                            {{ $weapon -> name }}
+                        </a>
                     </td>
                     <td>
                         {{ count($weapon -> attachments) }}
+                    </td>
+                    <td>
+                        {{ count(Loadout::where('weapon_id', $weapon -> id) -> get()) }}
                     </td>
                     <td>
                         <a href="{{ asset($weapon -> image_url) }}">
