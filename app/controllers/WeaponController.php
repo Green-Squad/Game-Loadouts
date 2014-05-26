@@ -34,6 +34,9 @@ class WeaponController extends BaseController {
         $name = Input::get('name');
         $image = Input::file('image');
         $attachments = Input::get('attachments');
+        $min_attachments = Input::get('min_attachments');
+        $max_attachments = Input::get('max_attachments');
+        $type = Input::get('type');
         $game_id = $game -> id;
 
         if (Input::hasFile('image')) {
@@ -59,6 +62,9 @@ class WeaponController extends BaseController {
             $weapon = new Weapon;
             $weapon -> name = $name;
             $weapon -> game_id = $game_id;
+            $weapon -> min_attachments = $min_attachments;
+            $weapon -> max_attachments = $max_attachments;
+            $weapon -> type = $type;
             $weapon -> image_url = "uploads/$fileName";
             $weapon -> thumb_url = "uploads/thumb/$fileName";
             $weapon -> save();
@@ -122,11 +128,17 @@ class WeaponController extends BaseController {
         $name = Input::get('name');
         $attachments = Input::get('attachments');
         $image = Input::file('image');
-
+        $min_attachments = Input::get('min_attachments');
+        $max_attachments = Input::get('max_attachments');
+        $type = Input::get('type');
+        
         try {
             $weapon = Weapon::findOrFail($weaponID);
             $weapon -> attachments() -> detach();
             $weapon -> name = $name;
+            $weapon -> min_attachments = $min_attachments;
+            $weapon -> max_attachments = $max_attachments;
+            $weapon -> type = $type;
 
             if (Input::hasFile('image')) {
                 $destinationPath = public_path() . '/uploads/';
@@ -139,7 +151,7 @@ class WeaponController extends BaseController {
 
                 copy($destinationPath . $fileName, $thumbPath . $fileName);
                 HelperController::createThumbnail($thumbPath . $fileName, $fileExtension, 128);
-
+                
                 $weapon -> thumb_url = "uploads/thumb/$fileName";
                 $weapon -> image_url = "uploads/$fileName";
             }

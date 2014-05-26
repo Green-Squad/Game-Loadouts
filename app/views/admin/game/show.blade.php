@@ -40,6 +40,9 @@ Game Administration
                     <th> Attachments <i class="fa fa-sort"></i></th>
                     <th> Loadouts <i class="fa fa-sort"></i></th>
                     <th> Image_URL <i class="fa fa-sort"></i></th>
+                    <th> Min Attachments </th>
+                    <th> Max Attachments </th>
+                    <th> Type </th>
                     <th> Created at <i class="fa fa-sort"></i></th>
                     <th> Updated at <i class="fa fa-sort"></i></th>
                     <th> Actions </th>
@@ -66,6 +69,15 @@ Game Administration
                         <a href="{{ asset($weapon -> image_url) }}">
                             <img src="{{ asset($weapon -> thumb_url) }}" alt="thumb URL" class="thumbnail" />
                         </a>
+                    </td>
+                    <td>
+                        {{ $weapon -> min_attachments }}
+                    </td>
+                    <td>
+                        {{ $weapon -> max_attachments }}
+                    </td>
+                    <td>
+                        {{ $weapon -> type }}
                     </td>
                     <td>
                         {{ $weapon -> created_at }}

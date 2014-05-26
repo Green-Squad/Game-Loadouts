@@ -11,7 +11,6 @@ class UserController extends BaseController {
     public function login() {
         try {
             $foundUser = User::where('email', Input::get('emailOrUsername')) -> orWhere('username', Input::get('emailOrUsername')) -> first();
-
             if ($foundUser != NULL) {
 
                 $failedAttempts = $foundUser -> failed_attempts;
@@ -30,6 +29,11 @@ class UserController extends BaseController {
                             'alert' => 'You are successfully logged in.',
                             'alert-class' => 'alert-success'
                         ));
+                    } elseif ($foundUser -> confirm_token != 1) {
+                        return Redirect::back() -> with(array(
+                            'alert' => 'Your email address has not been confirmed. <strong>If you do not see it within 5 minutes, then please check your Spam folder.</strong>',
+                            'alert-class' => 'alert-warning'
+                        )) -> withInput();
                     } else {
                         $foundUser -> failed_attempts = $failedAttempts + 1;
                         $foundUser -> save();
@@ -45,7 +49,7 @@ class UserController extends BaseController {
                             ));
                         }
                         return Redirect::back() -> with(array(
-                            'alert' => 'Your username/email and password combination was incorrect or you have not confirmed your email. You have ' . (5 - $failedAttempts) . ' login attempts remaining.',
+                            'alert' => 'Your username/email and password combination was incorrect. You have ' . (5 - $failedAttempts) . ' login attempts remaining.',
                             'alert-class' => 'alert-danger'
                         )) -> withInput();
                     }
@@ -97,7 +101,6 @@ class UserController extends BaseController {
             $betaKey = Input::get('beta');
             try {
                 $beta = Beta::findOrFail($betaKey);
-                
 
                 // Attempt to saved a new user to the database
                 $hashed_password = Hash::make($password);
@@ -114,7 +117,7 @@ class UserController extends BaseController {
 
                 // WTF laravel? Why do I need to find the user I just saved to access the email
                 $user = User::findOrFail($email);
-                
+
                 $data = array('token' => $user -> confirm_token);
                 Mail::send('emails.auth.confirm', $data, function($message) use ($user) {
 
@@ -232,7 +235,7 @@ class UserController extends BaseController {
     }
 
     public static function recentUsers($num) {
-        $recentUsers = User::all() -> reverse() -> take($num);
+        $recentUsers = User::all() -> sortBy('created_at') -> reverse() -> take($num);
         return $recentUsers;
     }
 
@@ -269,6 +272,11 @@ class UserController extends BaseController {
     public function showSubmissions() {
         $loadouts = Auth::user() -> loadouts;
         return View::make('submissions', compact('loadouts'));
+    }
+    
+    public function dashboardSubmissions(User $user) {
+        $loadouts = $user -> loadouts;
+        return View::make('admin.user.submissions', compact('user', 'loadouts'));
     }
 
 }

@@ -26,7 +26,7 @@ class HelperController extends BaseController {
         }
         if (count($array) > 1) {
             for ($i = 0; $i < count($array); $i++) {
-                if ($i < count($array) - 2) {    
+                if ($i < count($array) - 2) {
                     $string .= $array[$i] . ', ';
                 } elseif ($i == count($array) - 2) {
                     $string .= $array[$i] . ' ';
@@ -35,7 +35,7 @@ class HelperController extends BaseController {
                 }
             }
         } elseif (count($array) == 1) {
-            $string = $array[$i];
+            $string = $array[0];
         }
         return $string;
     }
@@ -77,6 +77,45 @@ class HelperController extends BaseController {
             imagegif($virtual_image, $thumb_url);
         }
 
+    }
+
+    public function sitemap() {
+        // use this package for the easy sitemap creation in Laravel 4.*: https://github.com/RoumenDamianoff/laravel4-sitemap
+        // then, do something like this for all your dynamic and static content:
+
+        // Place the following code in a route or controller that should return a sitemap
+        $sitemap = App::make("sitemap");
+        
+        $time = '2014-05-20T12:30:00+02:00';
+        // Add static pages like this:
+        $sitemap -> add(URL::to('/'), $time, '1.0', 'daily');
+        $sitemap -> add(URL::to('login'), $time, '0.8', 'weekly');
+        $sitemap -> add(URL::to('join'), $time, '0.8', 'weekly');
+        $sitemap -> add(URL::to('games'), $time, '0.8', 'weekly');
+
+        $games = Game::all();
+
+        foreach ($games as $game) {
+            $sitemap -> add(URL::route('showGame', array(urlencode($game -> id))), $time, '0.8', 'daily');
+            $weapons = Weapon::where('game_id', $game -> id) -> get();
+            foreach ($weapons as $weapon) {
+                $sitemap -> add(URL::route('showLoadouts', array(
+                    urlencode($game -> id),
+                    urlencode($weapon -> name)
+                )), $time, '0.8', 'weekly');
+                $loadouts = Loadout::where('weapon_id', $weapon -> id) -> get();
+                foreach ($loadouts as $loadout) {
+                    $sitemap -> add(URL::route('showLoadout', array(
+                        urlencode($game -> id),
+                        urlencode($weapon -> name),
+                        urlencode($loadout -> id)
+                    )), $time, '0.5', 'weekly');
+                }
+            }
+        }
+
+        // Now, output the sitemap:
+        return $sitemap -> render('xml');
     }
 
 }

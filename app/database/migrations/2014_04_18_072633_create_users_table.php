@@ -41,6 +41,9 @@ class CreateUsersTable extends Migration {
             $table -> string('game_id', 128);
             $table -> string('image_url', 128);
             $table -> string('thumb_url', 128);
+            $table -> integer('min_attachments');
+            $table -> integer('max_attachments');
+            $table -> string('type', 64);
             $table -> timestamps();
 
             $table -> foreign('game_id') -> references('id') -> on('games') -> onUpdate('cascade') -> onDelete('cascade');

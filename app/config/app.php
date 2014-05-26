@@ -78,7 +78,7 @@ return array(
 	|
 	*/
 
-	'key' => '3rScBkIp4zUncGGdxKkJhUAkSpi2xuWt',
+	'key' => '',
 
 	/*
 	|--------------------------------------------------------------------------
@@ -119,6 +119,7 @@ return array(
 		'Illuminate\Validation\ValidationServiceProvider',
 		'Illuminate\View\ViewServiceProvider',
 		'Illuminate\Workbench\WorkbenchServiceProvider',
+		'Roumen\Sitemap\SitemapServiceProvider',
 
 	),
 

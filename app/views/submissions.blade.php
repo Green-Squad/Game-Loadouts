@@ -23,7 +23,7 @@ Submissions
                     <th>Game <i class="fa fa-sort"></i></th>
                     <th>Weapon <i class="fa fa-sort"></i></th>
                     <th>Attachments <i class="fa fa-sort"></i></th>
-                    <th>Delete</th>
+                    <th>Actions</th>
                 </tr>
             </thead>
             <tbody>
@@ -32,18 +32,30 @@ Submissions
                 $weapon = Weapon::findOrFail($loadout -> weapon_id);
                 ?>
                 <tr id="loadout-{{ $loadout -> id }}">
-                    <td>{{ $weapon -> game_id }}</td>
-                    <td>{{ $weapon -> name }}</td>
                     <td>
-                    <ul>
-                        @foreach(Loadout::findOrFail($loadout -> id) -> attachments as $attachment)
-                        <li>
-                            {{ $attachment -> name }}
-                        </li>
-                        @endforeach
-                    </ul></td>
-                    <td><a class="clickable btn btn-danger" href="javascript:void(0)" data-game_id="{{ $weapon -> game_id }}" data-weapon_name="{{ $weapon -> name }}" data-loadout_id="{{ $loadout -> id }}"> <span class="glyphicon glyphicon-trash"></span></a></td>
-
+                        {{ $weapon -> game_id }}
+                    </td>
+                    <td>
+                        {{ $weapon -> name }}
+                    </td>
+                    <td>
+                        <ul>
+                            @foreach(Loadout::findOrFail($loadout -> id) -> attachments as $attachment)
+                            <li>
+                                {{ $attachment -> name }}
+                            </li>
+                            @endforeach
+                        </ul>
+                    </td>
+                    <td>
+                        <a class="btn btn-default viewLoadout" data-toggle="tooltip" data-placement="top" title="View Loadout" href="{{ route('showLoadout', array(urlencode($weapon -> game_id), urlencode($weapon -> name), $loadout -> id)) }}">
+                            <span class="glyphicon glyphicon-search"></span>
+                        </a>
+                        &nbsp;
+                        <a class="clickable btn btn-danger removeVote" href="javascript:void(0)" data-toggle="tooltip" data-placement="top" title="Remove Vote" data-game_id="{{ $weapon -> game_id }}" data-weapon_name="{{ $weapon -> name }}" data-loadout_id="{{ $loadout -> id }}">
+                            <span class="glyphicon glyphicon-trash"></span>
+                        </a>
+                    </td>
                 </tr>
                 @endforeach
             </tbody>
@@ -83,15 +95,14 @@ Submissions
         $('.clickable').click(function() {
             var game_id = $(this).data('game_id');
             var weapon_name = $(this).data('weapon_name');
-            
             var loadout_id = $(this).data('loadout_id');
             $.post('/' + game_id + '/' + weapon_name + '/' + loadout_id + '/detach', function(data) {
                 $('#loadout-' + loadout_id).fadeOut();
             }, 'json');
-
         });
+        
+        $('.viewLoadout, .removeVote').tooltip();
     </script>
     <script src="{{ asset('js/tablesorter/jquery.tablesorter.js') }}"></script>
     <script src="{{ asset('js/tablesorter/tables.js') }}"></script>
-    
     @stop

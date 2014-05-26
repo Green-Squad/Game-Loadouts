@@ -129,7 +129,10 @@ class GameController extends BaseController {
     }
 
     public function showGames() {
-        $games = Game::where('live', 1) -> get();
+        //$games = Game::where('live', 1) -> get();
+        $games = Cache::remember('games_page', $_ENV['week'], function() {
+            return Game::where('live', 1) -> get();
+        });
         return View::make('games', compact('games'));
     }
 
@@ -146,17 +149,54 @@ class GameController extends BaseController {
     // lists the games for the public navigation
     // It only returns 'live' games
     public static function listGames() {
-        $games = Game::where('live', 1) -> get();
+        //$games = Game::where('live', 1) -> get();
+        $games = Cache::remember('games_nav', $_ENV['week'], function() {
+            return Game::where('live', 1) -> get();
+        });
         return $games;
     }
 
-    public static function listWeapons(Game $game) {
-        $weapons = Weapon::where('game_id', $game -> id) -> orderBy('name') -> get();
-        //$recentLoadouts = DB::table('loadouts') -> join('weapons', 'loadouts.weapon_id', '=', 'weapons.id') -> where('game_id',$game -> id) -> distinct() -> get();
-        //$recentLoadouts = Loadout::join('weapons', 'loadout.weapon_id', '=', 'weapons.id') -> where('game_id',$game -> id) -> take(5) -> get();
+    public function listWeapons(Game $game) {
+        $weaponsByType = $this -> getWeaponsByType($game);
         $recentLoadouts = DB::select('SELECT * FROM weapons w JOIN loadouts l ON l.weapon_id = w.id WHERE game_id = \'' . $game -> id . '\' ORDER BY l.updated_at DESC LIMIT 5');
-        //return var_dump($recentLoadouts);
-        return View::make('game', compact('game', 'weapons', 'recentLoadouts'));
+        $topLoadouts = DB::select('SELECT lu.loadout_id, l.id , COUNT( lu.loadout_id ) as count
+                                        FROM weapons w
+                                        JOIN loadouts l ON l.weapon_id = w.id
+                                        JOIN loadout_user lu ON l.id = lu.loadout_id
+                                        WHERE game_id =  \'' . $game -> id . '\'
+                                        GROUP BY lu.loadout_id
+                                        ORDER BY COUNT( lu.loadout_id ) DESC 
+                                        LIMIT 5');
+        return View::make('game', compact('game', 'weaponsByType', 'recentLoadouts', 'topLoadouts'));
+    }
+
+    public function listWeapons2(Game $game) {
+        $weaponsByType = $this -> getWeaponsByType($game);
+        $recentLoadouts = DB::select('SELECT * FROM weapons w JOIN loadouts l ON l.weapon_id = w.id WHERE game_id = \'' . $game -> id . '\' ORDER BY l.updated_at DESC LIMIT 5');
+        $topLoadouts = DB::select('SELECT lu.loadout_id, l.id , COUNT( lu.loadout_id ) as count
+                                        FROM weapons w
+                                        JOIN loadouts l ON l.weapon_id = w.id
+                                        JOIN loadout_user lu ON l.id = lu.loadout_id
+                                        WHERE game_id =  \'' . $game -> id . '\'
+                                        GROUP BY lu.loadout_id
+                                        ORDER BY COUNT( lu.loadout_id ) DESC 
+                                        LIMIT 5');
+        return View::make('game2', compact('game', 'weaponsByType', 'recentLoadouts', 'topLoadouts'));
+    }
+
+    public function getWeaponsByType(Game $game) {
+        $weapons = Weapon::where('game_id', $game -> id) -> orderBy('name') -> get();
+        $weaponsByType = array();
+        foreach ($weapons as $weapon) {
+            $type = $weapon -> type;
+            if (isset($weaponsByType[$type])) {
+                array_push($weaponsByType[$type], $weapon);
+            } else {
+                $weaponsByType[$type] = array($weapon);
+            }
+        }
+        ksort($weaponsByType);
+        return $weaponsByType;
     }
 
 }

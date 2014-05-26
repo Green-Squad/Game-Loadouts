@@ -26,7 +26,7 @@ Game Loadouts is a portal for finding the best ways to outfit your weapons in yo
                         <a href="{{ route('showGame', urlencode($game -> id)) }}">
                             <div
                             class="caption lfb ltb"
-                            data-x="600"
+                            data-x="525"
                             data-y="120"
                             data-start="500"
                             data-easing="easeOutBack"
@@ -35,7 +35,7 @@ Game Loadouts is a portal for finding the best ways to outfit your weapons in yo
                             </div>
                             <div
                             class="caption lfb ltb"
-                            data-x="600"
+                            data-x="525"
                             data-y="104"
                             data-start="500"
                             >
@@ -56,7 +56,6 @@ Game Loadouts is a portal for finding the best ways to outfit your weapons in yo
 @stop
 
 @section('content')
-<!-- Example row of columns -->
 <div class="row">
     <div class="col-md-4">
         <h2>What is Game Loadouts?</h2>
@@ -122,6 +121,6 @@ Game Loadouts is a portal for finding the best ways to outfit your weapons in yo
 @stop
 
 @section('scripts')
-<script type="text/javascript" src="{{ asset('rs-plugin/pluginsources/jquery.themepunch.plugins.min.js') }}"></script>
+<script type="text/javascript" src="{{ asset('rs-plugin/js/jquery.themepunch.plugins.min.js') }}"></script>
 <script type="text/javascript" src="{{ asset('rs-plugin/js/jquery.themepunch.revolution.min.js') }}"></script>
 @stop

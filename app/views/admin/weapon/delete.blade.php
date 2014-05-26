@@ -29,10 +29,7 @@ Delete Weapon {{ $weapon -> name }}
                 </a>
             </li>
             <li>
-                <i class="icon-file-alt"></i>
-                <a href="#">
-                    {{ $weapon -> name }}
-                </a>
+                <i class="icon-file-alt"></i> {{ $weapon -> name }}
             </li>
             <li class="active">
                 <i class="icon-file-alt"></i> Delete

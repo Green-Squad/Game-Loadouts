@@ -9,7 +9,7 @@ The {{ $weapon -> name }} in {{ $game -> id }} with {{ HelperController::listToS
 @stop
 
 @section('css')
-<link rel="stylesheet" type="text/css" href="{{ asset('css/games/' . $game -> id . '.css') }}" />
+<link rel="stylesheet" type="text/css" href="{{ asset('css/games/' . urlencode($game -> id) . '.css') }}" />
 @stop
 
 @section('sub-header')

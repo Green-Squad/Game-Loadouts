@@ -41,8 +41,21 @@ Create Weapon
             {{ Form::open( array('action' => array('WeaponController@store', $game -> id), 'class' => 'form-horizontal', 'files' => true)) }}
             <fieldset>
                 <div class="form-group">
-                    <div class="col-lg-12">
-                        {{ Form::text('name', '', array('class' => 'form-control input-lg', 'placeholder' => 'Weapon Name', 'required' => '')) }}
+                    <div class="col-lg-6">
+                        {{ Form::label('name', 'Weapon Name:', array('class' => 'control-label')) }}
+                        {{ Form::text('name', '', array('class' => 'form-control input-lg', 'placeholder' => 'Name', 'required' => '')) }}
+                    </div>
+                    <div class="col-lg-2">
+                        {{ Form::label('type', 'Weapon Type:', array('class' => 'control-label')) }}
+                        {{ Form::text('type', '', array('class' => 'form-control input-lg', 'placeholder' => 'Type', 'required' => '')) }}
+                    </div>
+                    <div class="col-lg-2">
+                        {{ Form::label('min_attachments', 'Min Attachments:', array('class' => 'control-label')) }}
+                        {{ Form::text('min_attachments', '', array('class' => 'form-control input-lg', 'placeholder' => 'Min', 'required' => '')) }}
+                    </div>
+                    <div class="col-lg-2">
+                        {{ Form::label('max_attachments', 'Max Attachments:', array('class' => 'control-label')) }}
+                        {{ Form::text('max_attachments', '', array('class' => 'form-control input-lg', 'placeholder' => 'Max', 'required' => '')) }}
                     </div>
                 </div>
                 <div class="form-group">

@@ -5,7 +5,6 @@ Create User
 @stop
 
 @section('content')
-
 <div class="row">
     <div class="col-lg-12">
         <h1>User <small>Create New</small></h1>
@@ -64,5 +63,4 @@ Create User
         </div>
     </div>
 </div><!-- /.row -->
-
 @stop

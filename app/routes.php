@@ -24,10 +24,23 @@ HTML::macro('navLink', function($route, $text) {
     return '<li ' . $active . '>' . link_to($route, $text) . '</li>';
 });
 
+
+
+App::missing(function($exception) {
+    return Response::view('errors.missing', array(), 404);
+});
+App::error(function(Exception $exception) {
+    return Response::view('errors.missing', array(), 404);
+});
+
+Route::get('sitemap.xml', 'HelperController@sitemap');
+
 Route::get('/', array(
     'as' => 'home',
     function() {
-        $games = Game::where('live', 1) -> orderBy(DB::raw('RAND()')) -> take(4) -> get();
+        $games = Cache::remember('games_slider', $_ENV['week'], function() {
+            return Game::where('live', 1) -> orderBy(DB::raw('RAND()')) -> take(4) -> get();
+        });
         return View::make('home', compact('games'));
     }
 
@@ -92,6 +105,10 @@ Route::group(array('before' => 'auth'), function() {
     Route::post('account', 'UserController@saveAccount');
 
     Route::group(array('before' => 'admin'), function() {
+        
+        //used for updating live site
+        Route::get('test/{game}/', 'GameController@listWeapons2');
+        
         Route::group(array('prefix' => 'admin'), function() {
             Route::get('/', array(
                 'as' => 'adminDashboard',
@@ -132,6 +149,11 @@ Route::group(array('before' => 'auth'), function() {
                 ));
 
                 Route::post('delete/{user}', 'UserController@delete');
+
+                Route::get('submissions/{user}', array(
+                    'as' => 'userSubmissions',
+                    'uses' => 'UserController@dashboardSubmissions'
+                ));
             });
 
             Route::get('users', array(
@@ -154,6 +176,24 @@ Route::group(array('before' => 'auth'), function() {
             });
 
             Route::group(array('prefix' => '{game}'), function() {
+                // ATTACHMENT
+                Route::get('attachment/create', array(
+                    'as' => 'attachmentCreate',
+                    'uses' => 'AttachmentController@create'
+                ));
+                Route::post('attachment/create', 'AttachmentController@store');
+
+                Route::get('attachment/{attachment}/edit', array(
+                    'as' => 'attachmentEdit',
+                    'uses' => 'AttachmentController@edit'
+                ));
+                Route::post('attachment/{attachment}/edit', 'AttachmentController@update');
+
+                Route::get('attachment/{attachment}/delete', array(
+                    'as' => 'attachmentDelete',
+                    'uses' => 'AttachmentController@delete'
+                ));
+                Route::post('attachment/{attachment}/delete', 'AttachmentController@destroy');
 
                 // WEAPON
                 Route::get('weapon/create', array(
@@ -183,27 +223,8 @@ Route::group(array('before' => 'auth'), function() {
                     'as' => 'deleteLoadout',
                     'uses' => 'LoadoutController@showDelete'
                 ));
-                
+
                 Route::post('{weapon}/{loadout}/delete', 'LoadoutController@delete');
-
-                // ATTACHMENT
-                Route::get('attachment/create', array(
-                    'as' => 'attachmentCreate',
-                    'uses' => 'AttachmentController@create'
-                ));
-                Route::post('attachment/create', 'AttachmentController@store');
-
-                Route::get('attachment/{attachment}/edit', array(
-                    'as' => 'attachmentEdit',
-                    'uses' => 'AttachmentController@edit'
-                ));
-                Route::post('attachment/{attachment}/edit', 'AttachmentController@update');
-
-                Route::get('attachment/{attachment}/delete', array(
-                    'as' => 'attachmentDelete',
-                    'uses' => 'AttachmentController@delete'
-                ));
-                Route::post('attachment/{attachment}/delete', 'AttachmentController@destroy');
             });
         });
     });
@@ -242,5 +263,4 @@ Route::group(array('before' => 'auth'), function() {
         'as' => 'detachLoadout',
         'uses' => 'LoadoutController@detach'
     ));
-
 });

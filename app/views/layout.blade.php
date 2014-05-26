@@ -8,14 +8,13 @@
         <title>@yield('subtitle', 'Game Loadouts')</title>
         <meta name="description" content="@yield('description')" />
         
-
         <!-- Responsive Metatag -->
         <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1" />
-
+        
         <!-- CSS -->
         <link href="{{ asset('css/bootstrap.min.css') }}" rel="stylesheet" />
-        <link rel="stylesheet" type="text/css" href="{{ asset('rs-plugin/css/settings.css') }}" media="screen" />
-        <link href="{{ asset('css/styles.css') }}" rel="stylesheet" />
+        <link rel="stylesheet" type="text/css" href="{{ asset('rs-plugin/css/settings.min.css') }}" media="screen" />
+        <link href="{{ asset('css/styles.min.css') }}" rel="stylesheet" />
         @yield('css', '<link href="/css/color/green.css" rel="stylesheet" />')
         <link href="{{ asset('css/media-queries.css') }}" rel="stylesheet" />
 
@@ -28,9 +27,9 @@
         <!--[if lt IE 9]>
         <script src="http://css3-mediaqueries-js.googlecode.com/svn/trunk/css3-mediaqueries.js"></script>
         <![endif]-->
+        <!-- End CSS -->
     </head>
     <body>
-
         <!-- Header -->
         <header>
             <!-- Top Bar -->
@@ -225,30 +224,12 @@
         <!-- End footer -->
 
         <a href="#" class="scrollup"><i class="entypo-up-open"></i></a>
+        
+        <!-- Javascript -->
+        <!-- Minified Site JS -->
+        <script src="{{ asset('js/script.min.js') }}" type="text/javascript" ></script>
 
-        <!-- Javascript Files -->
-        <!-- jQuery -->
-        <script src="{{ asset('js/jquery-1.9.1.min.js') }}" type="text/javascript" ></script>
-
-        <!-- Respond media queries for IE8 -->
-        <script src="{{ asset('js/respond.min.js') }}"></script>
-
-        <!-- Bootstrap -->
-        <script src="{{ asset('js/bootstrap.min.js') }}" type="text/javascript" ></script>
-
-        <!-- Easing -->
-        <script type="text/javascript" src="{{ asset('js/jquery.easing.min.js') }}" ></script>
-
-        <!-- Placeholder.js http://widgetulous.com/placeholderjs/ -->
-        <script type="text/javascript" src="{{ asset('js/placeholder.js') }}" ></script>
-
-        <!-- Retina Display -->
-        <script type="text/javascript" src="{{ asset('js/retina.js') }}" ></script>
-
-        <!-- Custom site js-->
-        <script src="{{ asset('js/script.js') }}" type="text/javascript" ></script>
-        <!-- End Javascript Files -->
-
+        <!-- Google Analytics -->
         @if(Auth::guest() || Auth::user() -> role != 'Admin')
         <script>
             (function(i, s, o, g, r, a, m) {
@@ -270,6 +251,7 @@
         @endif
 
         @yield('scripts')
+        <!-- End Javascript -->
 
     </body>
 </html>

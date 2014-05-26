@@ -9,7 +9,7 @@ Here are the best weapon loadouts for the {{ $weapon -> name }} in {{ $game -> i
 @stop
 
 @section('css')
-<link rel="stylesheet" type="text/css" href="{{ asset('css/games/' . $game -> id . '.css') }}" />
+<link rel="stylesheet" type="text/css" href="{{ asset('css/games/' . urlencode($game -> id) . '.css') }}" />
 @stop
 
 @section('sub-header')
@@ -92,57 +92,72 @@ Here are the best weapon loadouts for the {{ $weapon -> name }} in {{ $game -> i
 
         <h2>Top voted loadouts</h2>
         <span class="line"> <span class="sub-line"></span> </span>
-        @foreach($loadouts as $loadout)
-        <div class="loadout">
-            <a class="block" href="{{ route('showLoadout', array(urlencode($game -> id), urlencode($weapon -> name), $loadout['id'])) }}">
-                <div class="col-md-2 rank theme-color">
-                    {{ $count++ }}
-                </div>
-                <div class="col-md-10">
-                    @foreach(Loadout::findOrFail($loadout['id']) -> attachments as $attachment)
-                    <div class="attachment">
-                        <img src="{{ asset($attachment -> thumb_url) }}" alt="{{ $attachment -> name }}" />
-                        {{ $attachment -> name }}
+        @if(empty($loadouts))
+            <p>There are no loadouts yet for the {{ $weapon -> name }}. Be the first to submit your favorite loadout!</p>
+        @else
+            @foreach($loadouts as $loadout)
+            <div class="loadout">
+                <a class="block" href="{{ route('showLoadout', array(urlencode($game -> id), urlencode($weapon -> name), $loadout['id'])) }}">
+                    <div class="col-md-2 rank theme-color">
+                        {{ $count++ }}
                     </div>
-                    @endforeach
-                </div>
-                <div class="clearfix"></div>
-            </a>
-            <div class="col-md-12 loadoutButtons">
-                @if (Auth::guest())
-                <a class="btn btn-default" href="{{ route('login') }}">
-                    <span class="glyphicon glyphicon-star-empty"></span> vote (<span id="count-{{ $loadout['id'] }}">{{ $loadout['count'] }}</span>)
+                    <div class="col-md-10">
+                        @foreach(Loadout::findOrFail($loadout['id']) -> attachments as $attachment)
+                        <div class="attachment">
+                            <img src="{{ asset($attachment -> thumb_url) }}" alt="{{ $attachment -> name }}" />
+                            {{ $attachment -> name }}
+                        </div>
+                        @endforeach
+                    </div>
+                    <div class="clearfix"></div>
                 </a>
-                @elseif ($loadout['upvoted'])
-                <a class="btn btn-primary clickable" href="javascript:void(0)" id="upvote-{{ $loadout['id'] }}" data-loadout_id="{{ $loadout['id'] }}">
-                    <span class="glyphicon glyphicon-star"></span> vote (<span id="count-{{ $loadout['id'] }}">{{ $loadout['count'] }}</span>)
-                </a>
-                @else
-                <a class="btn btn-default clickable" href="javascript:void(0)" id="upvote-{{ $loadout['id'] }}" data-loadout_id="{{ $loadout['id'] }}">
-                    <span class="glyphicon glyphicon-star-empty"></span> vote (<span id="count-{{ $loadout['id'] }}">{{ $loadout['count'] }}</span>)
-                </a>
-                @endif
-                <a class="btn btn-default comment" href="{{ route('showLoadout', array(urlencode($game -> id), urlencode($weapon -> name), $loadout['id'])) }}" data-disqus-identifier="loadout-{{ $loadout['id'] }}">
-                    @if (!isset($loadout['comments']))
-                    <span class="glyphicon glyphicon-comment"></span>  0 Comments
-                    @elseif ($loadout['comments'] == 1)
-                    <span class="glyphicon glyphicon-comment"></span>  1 Comment
+                <div class="col-md-12 loadoutButtons">
+                    @if (Auth::guest())
+                    <a class="btn btn-default" href="{{ route('login') }}">
+                        <span class="glyphicon glyphicon-star-empty"></span> vote (<span id="count-{{ $loadout['id'] }}">{{ $loadout['count'] }}</span>)
+                    </a>
+                    @elseif ($loadout['upvoted'])
+                    <a class="btn btn-primary clickable" href="javascript:void(0)" id="upvote-{{ $loadout['id'] }}" data-loadout_id="{{ $loadout['id'] }}">
+                        <span class="glyphicon glyphicon-star"></span> vote (<span id="count-{{ $loadout['id'] }}">{{ $loadout['count'] }}</span>)
+                    </a>
                     @else
-                    <span class="glyphicon glyphicon-comment"></span>  {{ $loadout['comments'] }} Comments
+                    <a class="btn btn-default clickable" href="javascript:void(0)" id="upvote-{{ $loadout['id'] }}" data-loadout_id="{{ $loadout['id'] }}">
+                        <span class="glyphicon glyphicon-star-empty"></span> vote (<span id="count-{{ $loadout['id'] }}">{{ $loadout['count'] }}</span>)
+                    </a>
                     @endif
-                </a>
-                <a class="btn btn-default" href="{{ route('showLoadout', array(urlencode($game -> id), urlencode($weapon -> name), $loadout['id'])) }}" data-disqus-identifier="loadout-{{ $loadout['id'] }}">
-                    <span class="glyphicon glyphicon-screenshot"></span> View Loadout
-                </a>
+                    <a class="btn btn-default comment" href="{{ route('showLoadout', array(urlencode($game -> id), urlencode($weapon -> name), $loadout['id'])) }}" data-disqus-identifier="loadout-{{ $loadout['id'] }}">
+                        @if (!isset($loadout['comments']))
+                        <span class="glyphicon glyphicon-comment"></span>  0 Comments
+                        @elseif ($loadout['comments'] == 1)
+                        <span class="glyphicon glyphicon-comment"></span>  1 Comment
+                        @else
+                        <span class="glyphicon glyphicon-comment"></span>  {{ $loadout['comments'] }} Comments
+                        @endif
+                    </a>
+                    <a class="btn btn-default" href="{{ route('showLoadout', array(urlencode($game -> id), urlencode($weapon -> name), $loadout['id'])) }}" data-disqus-identifier="loadout-{{ $loadout['id'] }}">
+                        <span class="glyphicon glyphicon-screenshot"></span> View Loadout
+                    </a>
+                </div>
             </div>
-        </div>
-        @endforeach
+            @endforeach
+        @endif
     </div>
     <div class="col-md-6">
         <h2>Submit your own loadout!</h2>
         <span class="line"> <span class="sub-line"></span> </span>
                 <h3>
-                    Select one attachment for each slot.
+                    @if ($weapon -> min_attachments == $weapon -> max_attachments)
+                        @if ($weapon -> min_attachments == 1)
+                            Select 1 attachment.
+                        @else
+                            Select {{ $weapon -> min_attachments }} attachments.
+                        @endif
+                    @elseif ($weapon -> max_attachments - $weapon -> min_attachments == 1)
+                        Select {{ $weapon -> min_attachments }} or {{ $weapon -> max_attachments }} attachments.
+                    @else
+                        Select between {{ $weapon -> min_attachments }} and {{ $weapon -> max_attachments }} attachments.
+                    @endif
+                    <small>Maximum of one attachment per tab.</small>
                 </h3>
                 {{ Form::open( array('action' => array('LoadoutController@store', $game -> id, $weapon -> name), 'class' => 'form-horizontal', 'id' => 'storeForm')) }}
                 <div class="form-group">
@@ -167,8 +182,9 @@ Here are the best weapon loadouts for the {{ $weapon -> name }} in {{ $game -> i
                         " id="{{ $key }}">
                             <div class="btn-group-vertical" data-toggle="buttons">
                                 @foreach($slot as $attachment)
-                                <label class="btn btn-default">
-                                    <input type="radio" value="{{ $attachment -> id }}" name="{{ $key }}" required="">
+                                <label class="btn btn-default" style="text-align: left;">
+                                    <img src="{{ asset($attachment -> thumb_url) }}" style="margin-right: 10px">
+                                    <input type="radio" value="{{ $attachment -> id }}" name="{{ $key }}">
                                     {{ $attachment -> name }} </label>
                                 @endforeach
                             </div>
