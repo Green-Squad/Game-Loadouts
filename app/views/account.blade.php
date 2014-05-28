@@ -12,6 +12,7 @@ Account
     <span class="line"> <span class="sub-line"></span> </span>
 </div>
 <div class="col-md-7">
+    <p>You can change your password here.</p>
     {{ Form::open( array('route' => 'account', 'class' => 'form-horizontal')) }}
     <fieldset>
         <div class="form-group">

@@ -41,13 +41,15 @@ Login with your Game Loadouts account here.
                 <button type="submit" class="btn btn-primary">
                     Login
                 </button>
-                <a href="{{ route('reminder') }}" class="btn btn-primary pull-right">
-                    Forgot Password
-                </a>
+                <a href="{{ route('reminder') }}" class="btn btn-primary pull-right"> Forgot Password </a>
             </div>
         </div>
     </fieldset>
     {{ Form::close() }}
+    <h3>Don't have an account?</h3>
+    <p>
+        You can <a href="{{ route('join') }}">register</a> for free.
+    </p>
 </div>
 
 @stop

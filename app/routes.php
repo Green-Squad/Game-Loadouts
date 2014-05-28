@@ -24,13 +24,15 @@ HTML::macro('navLink', function($route, $text) {
     return '<li ' . $active . '>' . link_to($route, $text) . '</li>';
 });
 
-
-
 App::missing(function($exception) {
-    return Response::view('errors.missing', array(), 404);
+    if (Auth::guest() || Auth::user() -> role != 'Admin') {
+        return Response::view('errors.missing', array(), 404);
+    }
 });
 App::error(function(Exception $exception) {
-    return Response::view('errors.missing', array(), 404);
+    if (Auth::guest() || Auth::user() -> role != 'Admin') {
+        return Response::view('errors.missing', array(), 404);
+    }
 });
 
 Route::get('sitemap.xml', 'HelperController@sitemap');
@@ -43,8 +45,16 @@ Route::get('/', array(
         });
         return View::make('home', compact('games'));
     }
-
 ));
+
+Route::get('stats', array(
+    'as' => 'stats',
+    'uses' => 'HelperController@stats'
+));
+
+Route::get('terms', array('as' => 'terms', function() {
+    return View::make('termsofservice');
+}));
 
 Route::group(array('before' => 'guest'), function() {
     Route::get('login', array(
@@ -105,10 +115,10 @@ Route::group(array('before' => 'auth'), function() {
     Route::post('account', 'UserController@saveAccount');
 
     Route::group(array('before' => 'admin'), function() {
-        
+
         //used for updating live site
         Route::get('test/{game}/', 'GameController@listWeapons2');
-        
+
         Route::group(array('prefix' => 'admin'), function() {
             Route::get('/', array(
                 'as' => 'adminDashboard',
@@ -230,37 +240,34 @@ Route::group(array('before' => 'auth'), function() {
     });
 });
 
-Route::group(array('before' => 'auth'), function() {
+Route::get('games', array(
+    'as' => 'showGames',
+    'uses' => 'GameController@showGames'
+));
 
-    Route::get('games', array(
-        'as' => 'showGames',
-        'uses' => 'GameController@showGames'
-    ));
+Route::get('{game}', array(
+    'as' => 'showGame',
+    'uses' => 'GameController@listWeapons'
+));
 
-    Route::get('{game}', array(
-        'as' => 'showGame',
-        'uses' => 'GameController@listWeapons'
-    ));
+Route::get('{game}/{weapon}', array(
+    'as' => 'showLoadouts',
+    'uses' => 'WeaponController@listLoadouts'
+));
 
-    Route::get('{game}/{weapon}', array(
-        'as' => 'showLoadouts',
-        'uses' => 'WeaponController@listLoadouts'
-    ));
+Route::post('{game}/{weapon}', 'LoadoutController@store');
 
-    Route::post('{game}/{weapon}', 'LoadoutController@store');
+Route::get('{game}/{weapon}/{loadout}', array(
+    'as' => 'showLoadout',
+    'uses' => 'LoadoutController@show'
+));
 
-    Route::get('{game}/{weapon}/{loadout}', array(
-        'as' => 'showLoadout',
-        'uses' => 'LoadoutController@show'
-    ));
+Route::post('{game}/{weapon}/{loadout}/upvote', array(
+    'as' => 'upvoteLoadout',
+    'uses' => 'LoadoutController@upvote'
+));
 
-    Route::post('{game}/{weapon}/{loadout}/upvote', array(
-        'as' => 'upvoteLoadout',
-        'uses' => 'LoadoutController@upvote'
-    ));
-
-    Route::post('{game}/{weapon}/{loadout}/detach', array(
-        'as' => 'detachLoadout',
-        'uses' => 'LoadoutController@detach'
-    ));
-});
+Route::post('{game}/{weapon}/{loadout}/detach', array(
+    'as' => 'detachLoadout',
+    'uses' => 'LoadoutController@detach'
+));

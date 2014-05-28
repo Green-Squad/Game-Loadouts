@@ -85,7 +85,7 @@ class HelperController extends BaseController {
 
         // Place the following code in a route or controller that should return a sitemap
         $sitemap = App::make("sitemap");
-        
+
         $time = '2014-05-20T12:30:00+02:00';
         // Add static pages like this:
         $sitemap -> add(URL::to('/'), $time, '1.0', 'daily');
@@ -116,6 +116,80 @@ class HelperController extends BaseController {
 
         // Now, output the sitemap:
         return $sitemap -> render('xml');
+    }
+
+    public function stats() {
+        $submissionsPerGame = Cache::remember('submissionsPerGame', $_ENV['hour'], function() {
+            return DB::select('SELECT A.game_id as game, A.votes as votes, B.loadouts as loadouts
+                                            FROM (
+                                            
+                                            SELECT w.game_id, COUNT( lu.loadout_id ) AS votes
+                                            FROM weapons w
+                                            JOIN loadouts l ON l.weapon_id = w.id
+                                            JOIN loadout_user lu ON l.id = lu.loadout_id
+                                            GROUP BY w.game_id
+                                            ) AS A
+                                            JOIN (
+                                            
+                                            SELECT w.game_id, COUNT( l.id ) AS loadouts
+                                            FROM weapons w
+                                            JOIN loadouts l ON l.weapon_id = w.id
+                                            GROUP BY w.game_id
+                                            ) AS B ON A.game_id = B.game_id');
+        });
+        
+        $submissions = Cache::remember('submissionsStats', $_ENV['hour'], function() {
+            return DB::select('SELECT w.game_id AS game, DATE( lu.created_at ) AS date, COUNT( lu.loadout_id ) AS votes
+                                            FROM weapons w
+                                            JOIN loadouts l ON l.weapon_id = w.id
+                                            JOIN loadout_user lu ON l.id = lu.loadout_id
+                                            WHERE DATE(lu.created_at) >= DATE_SUB(CURDATE(), INTERVAL 30 DAY)
+                                            GROUP BY w.game_id, DATE( lu.created_at ) 
+                                            ORDER BY DATE( lu.created_at )');
+        });
+
+        $submissionsPerDay = array();
+        $games = array();
+
+        foreach ($submissions as $submission) {
+            $game = $submission -> game;
+            $submissionsPerDay[$submission -> date][$game] = intval($submission -> votes);
+            if (!in_array($game, $games)) {
+                array_push($games, $game);
+            }
+        }
+        $days = array_keys($submissionsPerDay);
+
+        $gamesVotes = array();
+        foreach ($days as $day) {
+            foreach ($games as $game) {
+                if (!isset($gamesVotes[$game])) {
+                    $gamesVotes[$game] = array();
+                }
+                if (isset($submissionsPerDay[$day][$game])) {
+                    array_push($gamesVotes[$game], $submissionsPerDay[$day][$game]);
+                } else {
+                    array_push($gamesVotes[$game], 0);
+                }
+
+            }
+        }
+        $daysJSON = json_encode($days);
+        $gamesVotesJSON = json_encode($gamesVotes);
+        $colors = array(
+            "rgba(27,130,212,1)",
+            "rgba(165,191,114,1)",
+            "rgba(176,50,50,1)",
+            "rgba(199,182,37,1)",
+            "rgba(191,43,133,1)",
+            "rgba(90,190,202,1)",
+            "rgba(200,200,200,1)",
+            "rgba(29,187,133,1)",
+            "rgba(100,95,170,1)",
+            "rgba(140,100,27,1)"
+        );
+
+        return View::make('stats', compact('submissionsPerGame', 'daysJSON', 'gamesVotes', 'colors'));
     }
 
 }

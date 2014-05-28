@@ -98,10 +98,7 @@ class UserController extends BaseController {
             $email = Input::get('email');
             $password = Input::get('password');
 
-            $betaKey = Input::get('beta');
             try {
-                $beta = Beta::findOrFail($betaKey);
-
                 // Attempt to saved a new user to the database
                 $hashed_password = Hash::make($password);
 
@@ -123,16 +120,10 @@ class UserController extends BaseController {
 
                     $message -> to($user -> email, $user -> username) -> subject('Confirm your email address for Game Loadouts.');
                 });
-                $beta -> delete();
 
             } catch (\Illuminate\Database\QueryException $e) {
                 return Redirect::back() -> with(array(
                     'alert' => 'Error: Failed to register user in database.',
-                    'alert-class' => 'alert-danger'
-                ));
-            } catch(ModelNotFoundException $e) {
-                return Redirect::back() -> with(array(
-                    'alert' => $betaKey . ' is not a valid beta key.',
                     'alert-class' => 'alert-danger'
                 ));
             }

@@ -197,6 +197,12 @@
                         <li>
                             {{ HTML::linkRoute('showGames', 'Games') }}
                         </li>
+                        <li>
+                            {{ HTML::linkRoute('stats', 'Stats') }}
+                        </li>
+                        <li>
+                            {{ HTML::linkRoute('terms', 'Terms of Service') }}
+                        </li>
                         @if(Auth::guest())
                         <li>
                             {{ HTML::linkRoute('join', 'Join') }}
@@ -245,6 +251,7 @@
             })(window, document, 'script', '//www.google-analytics.com/analytics.js', 'ga');
 
             ga('create', 'UA-50909901-1', 'gameloadouts.com');
+            ga('require', 'displayfeatures');
             ga('send', 'pageview');
 
         </script>

@@ -39,7 +39,7 @@ Join Game Loadouts. You can sign up for free here.
         </div>
         <div class="form-group">
             <div class="col-md-12">
-                {{ Form::text('beta', '', array('class' => 'form-control input-lg', 'placeholder' => 'Beta Key', 'required' => '')) }}
+                <p>By registering, you are agreeing to our <a href="{{ route('terms') }}">Terms of Use</a>.</p>
             </div>
         </div>
         <div class="form-group">
