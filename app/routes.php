@@ -266,16 +266,6 @@ Route::get('{game}', array (
     'uses' => 'GameController@listWeapons' 
 ));
 
-Route::get('/dev/{game}/{weapon}', array (
-    'as' => 'showLoadouts',
-    'uses' => 'WeaponController@listLoadouts2' 
-));
-
-Route::get('/dev/{game}/{weapon}/{loadout}', array (
-'as' => 'showLoadout',
-'uses' => 'LoadoutController@show2'
-));
-
 Route::post('{game}/{weapon}/{loadout}/upvoteGuest', array (
     'as' => 'upvoteGuestLoadout',
     'uses' => 'LoadoutController@upvoteGuest' 
@@ -287,7 +277,6 @@ Route::get('{game}/{weapon}', array (
 ));
 
 Route::post('{game}/{weapon}', 'LoadoutController@store');
-Route::post('/dev/{game}/{weapon}', 'LoadoutController@store2');
 
 Route::get('{game}/{weapon}/{loadout}', array (
     'as' => 'showLoadout',

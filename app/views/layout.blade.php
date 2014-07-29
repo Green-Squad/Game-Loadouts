@@ -57,9 +57,9 @@
                                 <div class="collapse navbar-collapse navbar-ex1-collapse">
                                     <ul class="nav navbar-nav navbar-right">
                                         {{ HTML::navLink("/", 'Home') }}
-                                        <!-- li>
+                                        <li>
                                             <a href="http://blog.gameloadouts.com">Blog</a>
-                                        </li> -->
+                                        </li>
                                         <li class="dropdown">
                                             <a href="{{ route('showGames') }}" class="dropdown-toggle"> Games <b class="caret"></b> </a>
                                             <ul>

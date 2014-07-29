@@ -1,11 +1,11 @@
 @extends('layout')
-
+<?php $prettyAttachments = HelperController::listToString(Loadout::findOrFail($loadout['id']) -> attachments, 'name') ?>
 @section('subtitle')
-{{ $game -> id }}
+{{ $game -> id . " - " . $weapon -> name . " - " . $prettyAttachments }}
 @stop
 
 @section('description')
-The {{ $weapon -> name }} in {{ $game -> id }} with {{ HelperController::listToString(Loadout::findOrFail($loadout['id']) -> attachments, 'name') }}  has @if($loadout -> count == 1) 1 vote. @else{{ $loadout -> count }} votes.@endif
+The {{ $weapon -> name }} in {{ $game -> id }} with {{ $prettyAttachments }}  has @if($loadout -> count == 1) 1 vote. @else{{ $loadout -> count }} votes.@endif
 @stop
 
 @section('css')
@@ -101,8 +101,14 @@ The {{ $weapon -> name }} in {{ $game -> id }} with {{ HelperController::listToS
                         @endif
                     </div>
                     <div class="col-md-6 vertical-center margin-50px">
-                        @if (Auth::guest())
-                        <a href="{{ route('login') }}" class="big-button button-gym nowrap">Vote</a>
+                        @if (Auth::guest() || Auth::user() -> role == 'Guest')
+                            @if ($loadout -> upvoted == 1)
+                            {{ Form::open(array('id' => "guestUnvote", 'url' => '/' . $game -> id . '/' . $weapon -> name . '/' . $loadout['id'] . '/upvote2')) }}
+                            <button style="margin: 0 25% 0;" type="submit" class="big-button button-gym nowrap">Remove Vote</button>
+                            {{ Form::close() }}
+                            @else
+                            <a href="javascript:void(0)"  data-toggle="modal" data-target="#guest" class="big-button button-gym nowrap">Vote</a>
+                            @endif
                         @elseif ($loadout -> upvoted == 1)
                         <a href="javascript:void(0)" class="big-button button-gym nowrap clickable" id="loadout-{{ $loadout -> id }}" data-loadout_id="{{ $loadout -> id }}">Remove Vote</a>
                         @else
@@ -145,7 +151,7 @@ The {{ $weapon -> name }} in {{ $game -> id }} with {{ HelperController::listToS
 	            define('DISQUS_SECRET_KEY', $_ENV['DISQUS_SECRET_KEY']);
 	            define('DISQUS_PUBLIC_KEY', 'HXGfl9wP4NuXd15qCTPIprKv2rJhzqCp38NlZs5YmA2i3LOlFzTnBAiiWK8MQKI9');
 	
-	            if (Auth::check()) {
+	            if (Auth::check() && Auth::user() -> role != 'Guest') {
 	                $username = Auth::user() -> username;
 	                $email = Auth::user() -> email;
 	                $id = Auth::user() -> email;
@@ -243,9 +249,65 @@ The {{ $weapon -> name }} in {{ $game -> id }} with {{ HelperController::listToS
 	</script>
 </div>
 @endif
+
+	<div class="modal fade" id="guest" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-lg">
+  {{ Form::open(array('id' => "guestVote", 'url' => '/' . $game -> id . '/' . $weapon -> name . '/' . $loadout['id'] . '/upvote2')) }}
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button>
+        <h4 class="modal-title" id="myModalLabel">
+        You are not logged in
+        </h4>
+      </div>
+      <div class="modal-body">
+        <div class="col-lg-4">
+            <p><strong>Use an account</strong></p>
+            <p>
+                <a href="{{route('login')}}" class="btn btn-primary">Login</a>
+                <a href="{{route('join')}}" class="btn btn-primary">Join</a>
+            </p>
+            <p><strong>Benefits of an account</strong></p>
+            <ul style="padding-left: 20px">
+                <li>No CAPTCHA</li>
+                <li>Faster voting</li>
+                <li>View your submissions</li>
+                <li>Custom username</li>
+                <li>Comment on loadouts</li>
+            </ul>
+        </div>
+        <div class="col-lg-8">
+            <p><strong>Continue as guest</strong></p>
+            <p>You can submit your vote without registering by entering the CAPTCHA below.</p>
+            <div id="recaptcha"></div>
+       </div>
+        
+        <div style="clear:both;"></div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+        <button type="submit" class="btn btn-primary">Vote</button>
+      </div>
+    </div>
+    {{ Form::close() }}    
+  </div>
+</div>
 @stop
 
 @section('scripts')
+<script type="text/javascript" src="http://www.google.com/recaptcha/api/js/recaptcha_ajax.js"></script>
+<style>
+@media (max-width: 444px) {
+    #recaptcha_challenge_image {
+        margin: 0 !important;
+        width: 200px !important;
+    }
+    
+    .recaptchatable .recaptcha_r1_c1, .recaptchatable .recaptcha_r3_c1, .recaptchatable .recaptcha_r3_c2, .recaptchatable .recaptcha_r7_c1, .recaptchatable .recaptcha_r8_c1, .recaptchatable .recaptcha_r3_c3, .recaptchatable .recaptcha_r2_c1, .recaptchatable .recaptcha_r4_c1, .recaptchatable .recaptcha_r4_c2, .recaptchatable .recaptcha_r4_c4, .recaptchatable .recaptcha_r2_c2, .recaptchatable .recaptcha_image_cell {
+        background: none !important;
+    }
+}
+</style>
 <script type="text/javascript">
     $('.clickable').click(function() {
         var game_id = '<?php echo $game -> id; ?>';
@@ -264,5 +326,11 @@ The {{ $weapon -> name }} in {{ $game -> id }} with {{ HelperController::listToS
             }, 'json');
         }
     });
+    Recaptcha.create("6Lf9-_YSAAAAAJ9k2G_qXohJi74-pDe8V4NuUdzJ",
+            "recaptcha",
+            {
+        	 theme: "white",
+            }
+          );
 </script>
 @stop
