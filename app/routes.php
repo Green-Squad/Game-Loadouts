@@ -1,21 +1,13 @@
 <?php
 
 /*
- |--------------------------------------------------------------------------
- | Application Routes
- |--------------------------------------------------------------------------
- |
- | Here is where you can register all of the routes for an application.
- | It's a breeze. Simply tell Laravel the URIs it should respond to
- | and give it the Closure to execute when that URI is requested.
- |
+ * |-------------------------------------------------------------------------- | Application Routes |-------------------------------------------------------------------------- | | Here is where you can register all of the routes for an application. | It's a breeze. Simply tell Laravel the URIs it should respond to | and give it the Closure to execute when that URI is requested. |
  */
-
 Route::model('user', 'User');
 Route::model('game', 'Game');
 Route::model('loadout', 'Loadout');
 
-HTML::macro('navLink', function($route, $text) {
+HTML::macro('navLink', function ($route, $text) {
     if (Request::path() == $route) {
         $active = "class = 'active'";
     } else {
@@ -23,251 +15,277 @@ HTML::macro('navLink', function($route, $text) {
     }
     return '<li ' . $active . '>' . link_to($route, $text) . '</li>';
 });
-
-App::missing(function($exception) {
+/*
+App::missing(function ($exception) {
     if (Auth::guest() || Auth::user() -> role != 'Admin') {
-        return Response::view('errors.missing', array(), 404);
+        return Response::view('errors.missing', array (), 404);
     }
 });
-App::error(function(Exception $exception) {
+App::error(function (Exception $exception) {
     if (Auth::guest() || Auth::user() -> role != 'Admin') {
-        return Response::view('errors.missing', array(), 404);
+        return Response::view('errors.missing', array (), 404);
     }
 });
-
+*/
 Route::get('sitemap.xml', 'HelperController@sitemap');
 
-Route::get('/', array(
+Route::get('/', array (
     'as' => 'home',
-    function() {
-        $games = Cache::remember('games_slider', $_ENV['week'], function() {
+    function () {
+        $games = Cache::remember('games_slider', $_ENV ['week'], function () {
             return Game::where('live', 1) -> orderBy(DB::raw('RAND()')) -> take(4) -> get();
         });
         return View::make('home', compact('games'));
-    }
+    } 
 ));
 
-Route::get('stats', array(
+Route::get('stats', array (
     'as' => 'stats',
-    'uses' => 'HelperController@stats'
+    'uses' => 'HelperController@stats' 
 ));
 
-Route::get('terms', array('as' => 'terms', function() {
-    return View::make('termsofservice');
-}));
+Route::get('terms', array (
+    'as' => 'terms',
+    function () {
+        return View::make('termsofservice');
+    } 
+));
 
-Route::group(array('before' => 'guest'), function() {
-    Route::get('login', array(
+Route::group(array (
+    'before' => 'guest' 
+), function () {
+    Route::get('login', array (
         'as' => 'login',
-        function() {
+        function () {
             return View::make('login');
-        }
-
+        } 
     ));
     Route::post('login', 'UserController@login');
-
-    Route::get('join', array(
+    
+    Route::get('join', array (
         'as' => 'join',
-        function() {
+        function () {
             return View::make('join');
-        }
-
+        } 
     ));
     Route::post('join', 'UserController@join');
-
-    Route::get('reminder', array(
+    
+    Route::get('reminder', array (
         'as' => 'reminder',
-        'uses' => 'RemindersController@getRemind'
+        'uses' => 'RemindersController@getRemind' 
     ));
     Route::post('reminder', 'RemindersController@postRemind');
-
-    Route::get('password/reset/{token}', array(
+    
+    Route::get('password/reset/{token}', array (
         'as' => 'reset',
-        'uses' => 'RemindersController@getReset'
+        'uses' => 'RemindersController@getReset' 
     ));
     Route::post('password/reset', 'RemindersController@postReset');
-
-    Route::get('user/confirm/{token}', array(
+    
+    Route::get('user/confirm/{token}', array (
         'as' => 'confirm',
-        'uses' => 'UserController@confirm'
+        'uses' => 'UserController@confirm' 
     ));
 });
 
-Route::group(array('before' => 'auth'), function() {
-    Route::get('logout', array(
+Route::group(array (
+    'before' => 'auth' 
+), function () {
+    Route::get('logout', array (
         'as' => 'logout',
-        'uses' => 'UserController@logout'
+        'uses' => 'UserController@logout' 
     ));
-
-    Route::get('submissions', array(
+    
+    Route::get('submissions', array (
         'as' => 'submissions',
-        'uses' => 'UserController@showSubmissions'
+        'uses' => 'UserController@showSubmissions' 
     ));
-
-    Route::group(array('before' => 'standard'), function() {
+    
+    Route::group(array (
+        'before' => 'standard' 
+    ), function () {
         /* Standard users only */
     });
-
-    Route::get('account', array(
+    
+    Route::get('account', array (
         'as' => 'account',
-        'uses' => 'UserController@showAccount'
+        'uses' => 'UserController@showAccount' 
     ));
     Route::post('account', 'UserController@saveAccount');
-
-    Route::group(array('before' => 'admin'), function() {
-
-        //used for updating live site
+    
+    Route::group(array (
+        'before' => 'admin' 
+    ), function () {
+        
+        // used for updating live site
         Route::get('test/{game}/', 'GameController@listWeapons2');
-
-        Route::group(array('prefix' => 'admin'), function() {
-            Route::get('/', array(
+        
+        Route::group(array (
+            'prefix' => 'admin' 
+        ), function () {
+            Route::get('/', array (
                 'as' => 'adminDashboard',
-                function() {
+                function () {
                     return View::make('admin.home');
-                }
-
+                } 
             ));
             Route::get('beta', 'BetaController@create');
             Route::get('toggleAds', 'HelperController@toggleAds');
-            Route::group(array('prefix' => 'user'), function() {
-                Route::get('create', array(
+            Route::group(array (
+                'prefix' => 'user' 
+            ), function () {
+                Route::get('create', array (
                     'as' => 'createUser',
-                    function() {
+                    function () {
                         return View::make('admin.user.create');
-                    }
-
+                    } 
                 ));
-
+                
                 Route::post('create', 'UserController@create');
-
-                Route::get('edit/{user}', array(
+                
+                Route::get('edit/{user}', array (
                     'as' => 'editUser',
-                    function(User $user) {
+                    function (User $user) {
                         return View::make('admin.user.edit', compact('user'));
-                    }
-
+                    } 
                 ));
-
+                
                 Route::post('edit/{user}', 'UserController@save');
-
-                Route::get('delete/{user}', array(
+                
+                Route::get('delete/{user}', array (
                     'as' => 'deleteUser',
-                    function(User $user) {
+                    function (User $user) {
                         return View::make('admin.user.delete', compact('user'));
-                    }
-
+                    } 
                 ));
-
+                
                 Route::post('delete/{user}', 'UserController@delete');
-
-                Route::get('submissions/{user}', array(
+                
+                Route::get('submissions/{user}', array (
                     'as' => 'userSubmissions',
-                    'uses' => 'UserController@dashboardSubmissions'
+                    'uses' => 'UserController@dashboardSubmissions' 
                 ));
             });
-
-            Route::get('users', array(
+            
+            Route::get('users', array (
                 'as' => 'modUsers',
-                'uses' => 'UserController@listUsers'
+                'uses' => 'UserController@listUsers' 
             ));
-
+            
             Route::resource('game', 'GameController');
-
-            Route::group(array('prefix' => 'game'), function() {
-
-                Route::get('{game}/delete', array(
+            
+            Route::group(array (
+                'prefix' => 'game' 
+            ), function () {
+                
+                Route::get('{game}/delete', array (
                     'as' => 'gameDelete',
-                    function(Game $game) {
+                    function (Game $game) {
                         return View::make('admin.game.delete', compact('game'));
-                    }
-
+                    } 
                 ));
-
             });
-
-            Route::group(array('prefix' => '{game}'), function() {
+            
+            Route::group(array (
+                'prefix' => '{game}' 
+            ), function () {
                 // ATTACHMENT
-                Route::get('attachment/create', array(
+                Route::get('attachment/create', array (
                     'as' => 'attachmentCreate',
-                    'uses' => 'AttachmentController@create'
+                    'uses' => 'AttachmentController@create' 
                 ));
                 Route::post('attachment/create', 'AttachmentController@store');
-
-                Route::get('attachment/{attachment}/edit', array(
+                
+                Route::get('attachment/{attachment}/edit', array (
                     'as' => 'attachmentEdit',
-                    'uses' => 'AttachmentController@edit'
+                    'uses' => 'AttachmentController@edit' 
                 ));
                 Route::post('attachment/{attachment}/edit', 'AttachmentController@update');
-
-                Route::get('attachment/{attachment}/delete', array(
+                
+                Route::get('attachment/{attachment}/delete', array (
                     'as' => 'attachmentDelete',
-                    'uses' => 'AttachmentController@delete'
+                    'uses' => 'AttachmentController@delete' 
                 ));
                 Route::post('attachment/{attachment}/delete', 'AttachmentController@destroy');
-
+                
                 // WEAPON
-                Route::get('weapon/create', array(
+                Route::get('weapon/create', array (
                     'as' => 'weaponCreate',
-                    'uses' => 'WeaponController@create'
+                    'uses' => 'WeaponController@create' 
                 ));
                 Route::post('weapon/create', 'WeaponController@store');
-
-                Route::get('{weapon}/edit', array(
+                
+                Route::get('{weapon}/edit', array (
                     'as' => 'weaponEdit',
-                    'uses' => 'WeaponController@edit'
+                    'uses' => 'WeaponController@edit' 
                 ));
                 Route::post('{weapon}/edit', 'WeaponController@update');
-
-                Route::get('{weapon}/delete', array(
+                
+                Route::get('{weapon}/delete', array (
                     'as' => 'weaponDelete',
-                    'uses' => 'WeaponController@delete'
+                    'uses' => 'WeaponController@delete' 
                 ));
                 Route::post('{weapon}/delete', 'WeaponController@destroy');
-
-                Route::get('{weapon}', array(
+                
+                Route::get('{weapon}', array (
                     'as' => 'weaponLoadouts',
-                    'uses' => 'WeaponController@show'
+                    'uses' => 'WeaponController@show' 
                 ));
-
-                Route::get('{weapon}/{loadout}/delete', array(
+                
+                Route::get('{weapon}/{loadout}/delete', array (
                     'as' => 'deleteLoadout',
-                    'uses' => 'LoadoutController@showDelete'
+                    'uses' => 'LoadoutController@showDelete' 
                 ));
-
+                
                 Route::post('{weapon}/{loadout}/delete', 'LoadoutController@delete');
             });
         });
     });
 });
 
-Route::get('games', array(
+Route::get('games', array (
     'as' => 'showGames',
-    'uses' => 'GameController@showGames'
+    'uses' => 'GameController@showGames' 
 ));
 
-Route::get('{game}', array(
+Route::get('{game}', array (
     'as' => 'showGame',
-    'uses' => 'GameController@listWeapons'
+    'uses' => 'GameController@listWeapons' 
 ));
 
-Route::get('{game}/{weapon}', array(
+Route::get('/dev/{game}/{weapon}', array (
     'as' => 'showLoadouts',
-    'uses' => 'WeaponController@listLoadouts'
+    'uses' => 'WeaponController@listLoadouts2' 
+));
+
+Route::get('/dev/{game}/{weapon}/{loadout}', array (
+'as' => 'showLoadout',
+'uses' => 'LoadoutController@show2'
+));
+
+Route::post('{game}/{weapon}/{loadout}/upvote2', array (
+    'as' => 'upvoteLoadout2',
+    'uses' => 'LoadoutController@upvote2' 
+));
+
+Route::get('{game}/{weapon}', array (
+    'as' => 'showLoadouts',
+    'uses' => 'WeaponController@listLoadouts' 
 ));
 
 Route::post('{game}/{weapon}', 'LoadoutController@store');
 
-Route::get('{game}/{weapon}/{loadout}', array(
+Route::get('{game}/{weapon}/{loadout}', array (
     'as' => 'showLoadout',
-    'uses' => 'LoadoutController@show'
+    'uses' => 'LoadoutController@show' 
 ));
 
-Route::post('{game}/{weapon}/{loadout}/upvote', array(
+Route::post('{game}/{weapon}/{loadout}/upvote', array (
     'as' => 'upvoteLoadout',
-    'uses' => 'LoadoutController@upvote'
+    'uses' => 'LoadoutController@upvote' 
 ));
 
-Route::post('{game}/{weapon}/{loadout}/detach', array(
+Route::post('{game}/{weapon}/{loadout}/detach', array (
     'as' => 'detachLoadout',
-    'uses' => 'LoadoutController@detach'
+    'uses' => 'LoadoutController@detach' 
 ));

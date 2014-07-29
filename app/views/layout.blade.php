@@ -10,6 +10,7 @@
         
         <!-- Responsive Metatag -->
         <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1" />
+        <meta name="google-site-verification" content="IcSSxczl-uweXXUf6CZMqlr_zHyqh19xpP2F2vkBZC8" />
         
         <!-- CSS -->
         <link href="{{ asset('css/bootstrap.min.css') }}" rel="stylesheet" />
@@ -66,7 +67,7 @@
                                                 @endforeach
                                             </ul>
                                         </li>
-                                        @if(Auth::guest())
+                                        @if(Auth::guest() || Auth::user() -> role == 'Guest')
                                         {{ HTML::navLink("join", 'Join') }}
                                         {{ HTML::navLink("login", 'Login') }}
                                         @elseif(Auth::check())
@@ -203,7 +204,7 @@
                         <li>
                             {{ HTML::linkRoute('terms', 'Terms of Service') }}
                         </li>
-                        @if(Auth::guest())
+                        @if(Auth::guest() || Auth::user() -> role == 'Guest')
                         <li>
                             {{ HTML::linkRoute('join', 'Join') }}
                         </li>
@@ -233,7 +234,7 @@
         
         <!-- Javascript -->
         <!-- Minified Site JS -->
-        <script src="{{ asset('js/script.min.js') }}" type="text/javascript" ></script>
+        <script src="{{ asset('js/script.min.js') }}" type="text/javascript"></script>
 
         <!-- Google Analytics -->
         @if(Auth::guest() || Auth::user() -> role != 'Admin')

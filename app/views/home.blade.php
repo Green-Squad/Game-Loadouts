@@ -73,7 +73,7 @@ Game Loadouts is a portal for finding the best ways to outfit your weapons in yo
 
     </div>
     <div class="col-md-4">
-    	@if(Auth::guest())
+    	@if(Auth::guest() || Auth::user() -> role == 'Guest')
         <h2>Login</h2>
         <span class="line"> <span class="sub-line"></span> </span>
         {{ Form::open(array('action' => 'UserController@login', 'id' => 'logInForm', 'class' => 'form-horizontal')) }}

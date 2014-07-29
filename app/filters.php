@@ -31,7 +31,7 @@ App::after(function($request, $response) {
  */
 
 Route::filter('auth', function() {
-  if (Auth::guest())
+  if (Auth::guest() || Auth::user() -> role == 'Guest')
     return Redirect::guest('login');
 });
 
@@ -85,7 +85,7 @@ Route::filter('standard', function() {
  */
 
 Route::filter('guest', function() {
-  if (Auth::check())
+  if (Auth::check() && Auth::user() -> role != 'Guest')
     return Redirect::to('/');
 });
 
