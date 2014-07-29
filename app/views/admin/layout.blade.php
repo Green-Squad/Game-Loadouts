@@ -53,6 +53,16 @@
                                         Users List
                                     </a>
                                 </li>
+                                <li>
+                                    <a href="{{ route('modGuests') }}">
+                                        Guests List
+                                    </a>
+                                </li>
+                                <li>
+                                    <a href="{{ route('modConverted') }}">
+                                        Converted Guests List
+                                    </a>
+                                </li>
                             </ul>
                         </li>
                         <li class="dropdown">

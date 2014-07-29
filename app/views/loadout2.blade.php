@@ -1,11 +1,11 @@
 @extends('layout')
-
+<?php $prettyAttachments = HelperController::listToString(Loadout::findOrFail($loadout['id']) -> attachments, 'name') ?>
 @section('subtitle')
-{{ $game -> id }}
+{{ $game -> id . " - " . $weapon -> name . " - " . $prettyAttachments }}
 @stop
 
 @section('description')
-The {{ $weapon -> name }} in {{ $game -> id }} with {{ HelperController::listToString(Loadout::findOrFail($loadout['id']) -> attachments, 'name') }}  has @if($loadout -> count == 1) 1 vote. @else{{ $loadout -> count }} votes.@endif
+The {{ $weapon -> name }} in {{ $game -> id }} with {{ $prettyAttachments }}  has @if($loadout -> count == 1) 1 vote. @else{{ $loadout -> count }} votes.@endif
 @stop
 
 @section('css')
@@ -151,7 +151,7 @@ The {{ $weapon -> name }} in {{ $game -> id }} with {{ HelperController::listToS
 	            define('DISQUS_SECRET_KEY', $_ENV['DISQUS_SECRET_KEY']);
 	            define('DISQUS_PUBLIC_KEY', 'HXGfl9wP4NuXd15qCTPIprKv2rJhzqCp38NlZs5YmA2i3LOlFzTnBAiiWK8MQKI9');
 	
-	            if (Auth::check()) {
+	            if (Auth::check() && Auth::user() -> role != 'Guest') {
 	                $username = Auth::user() -> username;
 	                $email = Auth::user() -> email;
 	                $id = Auth::user() -> email;
@@ -273,7 +273,7 @@ The {{ $weapon -> name }} in {{ $game -> id }} with {{ HelperController::listToS
                 <li>Faster voting</li>
                 <li>View your submissions</li>
                 <li>Custom username</li>
-                <li>More features coming later</li>
+                <li>Comment on loadouts</li>
             </ul>
         </div>
         <div class="col-lg-8">

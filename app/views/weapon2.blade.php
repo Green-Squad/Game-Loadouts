@@ -10,6 +10,19 @@ Here are the best weapon loadouts for the {{ $weapon -> name }} in {{ $game -> i
 
 @section('css')
 <link rel="stylesheet" type="text/css" href="{{ asset('css/games/' . urlencode($game -> id) . '.css') }}" />
+<script type="text/javascript" src="http://www.google.com/recaptcha/api/js/recaptcha_ajax.js"></script>
+<style>
+@media (max-width: 444px) {
+    #recaptcha_challenge_image {
+        margin: 0 !important;
+        width: 200px !important;
+    }
+    
+    .recaptchatable .recaptcha_r1_c1, .recaptchatable .recaptcha_r3_c1, .recaptchatable .recaptcha_r3_c2, .recaptchatable .recaptcha_r7_c1, .recaptchatable .recaptcha_r8_c1, .recaptchatable .recaptcha_r3_c3, .recaptchatable .recaptcha_r2_c1, .recaptchatable .recaptcha_r4_c1, .recaptchatable .recaptcha_r4_c2, .recaptchatable .recaptcha_r4_c4, .recaptchatable .recaptcha_r2_c2, .recaptchatable .recaptcha_image_cell {
+        background: none !important;
+    }
+}
+</style>
 @stop
 
 @section('sub-header')
@@ -115,7 +128,7 @@ Here are the best weapon loadouts for the {{ $weapon -> name }} in {{ $game -> i
                     @if (Auth::guest() || Auth::user() -> role == 'Guest')
                    
                         @if($loadout['upvoted'])
-                            {{ Form::open(array('id' => "guestUnvote", 'class' => 'pull-left', 'style' => 'margin-right: 4px','url' => '/' . $game -> id . '/' . $weapon -> name . '/' . $loadout['id'] . '/upvote2')) }}
+                            {{ Form::open(array('id' => "guestUnvote", 'class' => 'pull-left', 'style' => 'margin-right: 4px','url' => '/' . $game -> id . '/' . $weapon -> name . '/' . $loadout['id'] . '/upvoteGuest')) }}
                             <button type="submit" class="btn btn-primary"><span class="glyphicon glyphicon-star-empty"></span> vote (<span id="count-{{ $loadout['id'] }}">{{ $loadout['count'] }}</span>)</button>
                             {{ Form::close() }}
                         @else
@@ -166,7 +179,7 @@ Here are the best weapon loadouts for the {{ $weapon -> name }} in {{ $game -> i
                     @endif
                     <small>Maximum of one attachment per tab.</small>
                 </h3>
-                {{ Form::open( array('action' => array('LoadoutController@store', $game -> id, $weapon -> name), 'class' => 'form-horizontal', 'id' => 'storeForm')) }}
+                {{ Form::open( array('action' => array('LoadoutController@store2', $game -> id, $weapon -> name), 'class' => 'form-horizontal', 'id' => 'storeForm')) }}
                 <div class="form-group">
                     <ul class="nav nav-tabs nav-tabs-sec" id="myTab">
                     <?php $counter = 0; ?>
@@ -190,7 +203,7 @@ Here are the best weapon loadouts for the {{ $weapon -> name }} in {{ $game -> i
                             <div class="btn-group-vertical" data-toggle="buttons">
                                 @foreach($slot as $attachment)
                                 <label class="btn btn-default" style="text-align: left;">
-                                    <img src="{{ asset($attachment -> thumb_url) }}" style="margin-right: 10px">
+                                    <img src="{{ asset($attachment -> thumb_url) }}" alt="{{ $attachment -> name }}" style="margin-right: 10px">
                                     <input type="radio" value="{{ $attachment -> id }}" name="{{ $key }}">
                                     {{ $attachment -> name }} </label>
                                 @endforeach
@@ -201,11 +214,59 @@ Here are the best weapon loadouts for the {{ $weapon -> name }} in {{ $game -> i
                 </div>
                 <div class="form-group">
                     <div class="col-md-12">
+                        @if (Auth::guest() || Auth::user() -> role == 'Guest')
+                            <button class="btn button-gym" data-toggle="modal" data-target="#guestLoadout" onclick="guestSubmitLoadout()">Submit Loadout</button>
+                        @else
                         <button type="submit" class="btn button-gym">
                             Submit Loadout
                         </button>
+                        @endif
                     </div>
                 </div>
+                
+                @if (Auth::guest() || Auth::user() -> role == 'Guest')
+                <div class="modal fade" id="guestLoadout" tabindex="-1" role="dialog" aria-labelledby="guestSubmitModal" aria-hidden="true">
+                  <div class="modal-dialog modal-lg">
+                    <div class="modal-content">
+                      <div class="modal-header">
+                        <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button>
+                        <h4 class="modal-title" id="guestSubmitModal">
+                        You are not logged in
+                        </h4>
+                      </div>
+                      <div class="modal-body">
+                        <div class="col-lg-4">
+                            <p><strong>Use an account</strong></p>
+                            <p>
+                                <a href="{{route('login')}}" class="btn btn-primary">Login</a>
+                                <a href="{{route('join')}}" class="btn btn-primary">Join</a>
+                            </p>
+                            <p><strong>Benefits of an account</strong></p>
+                            <ul style="padding-left: 20px">
+                                <li>No CAPTCHA</li>
+                                <li>Faster voting</li>
+                                <li>View your submissions</li>
+                                <li>Custom username</li>
+                                <li>Comment on loadouts</li>
+                            </ul>
+                        </div>
+                        <div class="col-lg-8">
+                            <p><strong>Continue as guest</strong></p>
+                            <p>You can submit your vote without registering by entering the CAPTCHA below.</p>
+                            <div id="recaptchaSubmit"></div>
+                       </div>
+                        
+                        <div style="clear:both;"></div>
+                      </div>
+                      <div class="modal-footer">
+                        <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                        <button type="submit" class="btn btn-primary">Submit Loadout</button>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                @endif
+                
                 {{ Form::close() }}
             @if(HelperController::adsEnabled())
     		<h2>Advertisement</h2>
@@ -234,13 +295,13 @@ Here are the best weapon loadouts for the {{ $weapon -> name }} in {{ $game -> i
 			@endif
     	</div>
 	</div>
-	<div class="modal fade" id="guest" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+	<div class="modal fade" id="guest" tabindex="-1" role="dialog" aria-labelledby="guestVoteModal" aria-hidden="true">
   <div class="modal-dialog modal-lg">
   {{ Form::open(array('id' => "guestVote")) }}
     <div class="modal-content">
       <div class="modal-header">
         <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button>
-        <h4 class="modal-title" id="myModalLabel">
+        <h4 class="modal-title" id="guestVoteModal">
         You are not logged in
         </h4>
       </div>
@@ -257,13 +318,13 @@ Here are the best weapon loadouts for the {{ $weapon -> name }} in {{ $game -> i
                 <li>Faster voting</li>
                 <li>View your submissions</li>
                 <li>Custom username</li>
-                <li>More features coming later</li>
+                <li>Comment on loadouts</li>
             </ul>
         </div>
         <div class="col-lg-8">
             <p><strong>Continue as guest</strong></p>
             <p>You can submit your vote without registering by entering the CAPTCHA below.</p>
-            <div id="recaptcha"></div>
+            <div id="recaptchaVote"></div>
        </div>
         
         <div style="clear:both;"></div>
@@ -273,27 +334,15 @@ Here are the best weapon loadouts for the {{ $weapon -> name }} in {{ $game -> i
         <button type="submit" class="btn btn-primary">Vote</button>
       </div>
     </div>
+    
     {{ Form::close() }}    
   </div>
 </div>
 @stop
 
 @section('scripts')
-<script type="text/javascript" src="http://www.google.com/recaptcha/api/js/recaptcha_ajax.js"></script>
-<style>
-@media (max-width: 444px) {
-    #recaptcha_challenge_image {
-        margin: 0 !important;
-        width: 200px !important;
-    }
-    
-    .recaptchatable .recaptcha_r1_c1, .recaptchatable .recaptcha_r3_c1, .recaptchatable .recaptcha_r3_c2, .recaptchatable .recaptcha_r7_c1, .recaptchatable .recaptcha_r8_c1, .recaptchatable .recaptcha_r3_c3, .recaptchatable .recaptcha_r2_c1, .recaptchatable .recaptcha_r4_c1, .recaptchatable .recaptcha_r4_c2, .recaptchatable .recaptcha_r4_c4, .recaptchatable .recaptcha_r2_c2, .recaptchatable .recaptcha_image_cell {
-        background: none !important;
-    }
-}
-</style>
 <script type="text/javascript">
-
+var modal_type;
     $('.comment').each(function() {
         var _href = $(this).attr('href');
         $(this).attr('href', _href + '#disqus_thread');
@@ -317,18 +366,27 @@ Here are the best weapon loadouts for the {{ $weapon -> name }} in {{ $game -> i
         }
     });
 
-     Recaptcha.create("6Lf9-_YSAAAAAJ9k2G_qXohJi74-pDe8V4NuUdzJ",
-        "recaptcha",
-        {
-    	 theme: "white",
-        }
-      );
+     
 
      function guestLoadoutId(id) {
     	    var game_id = '<?php echo $game -> id; ?>';
     	    var weapon_name = '<?php echo $weapon -> name; ?>';
-    		$('#guestVote').attr("action", '/' + game_id + '/' + weapon_name + '/' + id + '/upvote2');
+    		$('#guestVote').attr("action", '/' + game_id + '/' + weapon_name + '/' + id + '/upvoteGuest');
+    		Recaptcha.create("6Lf9-_YSAAAAAJ9k2G_qXohJi74-pDe8V4NuUdzJ",
+      	        "recaptchaVote",
+      	        {
+      	    	 theme: "white",
+      	        }
+      	      );
     	}
-        
+
+  	function guestSubmitLoadout() {
+  		Recaptcha.create("6Lf9-_YSAAAAAJ9k2G_qXohJi74-pDe8V4NuUdzJ",
+            "recaptchaSubmit",
+            {
+        	 theme: "white",
+            }
+  	   );
+  	}
 </script>
 @stop

@@ -101,8 +101,14 @@ class UserController extends BaseController {
             try {
                 // Attempt to saved a new user to the database
                 $hashed_password = Hash::make($password);
-
-                $user = new User;
+                
+                if (Auth::check() && Auth::user() -> role == 'Guest') {
+                    $user = Auth::user();
+                    $user -> converted_guest = 1;
+                } else {
+                    $user = new User;
+                    $user -> converted_guest = 0;                    
+                }
                 $user -> email = $email;
                 $user -> username = $username;
                 $user -> password = $hashed_password;
@@ -216,17 +222,37 @@ class UserController extends BaseController {
     }
 
     public function listUsers() {
-        $users = User::all() -> reverse();
+        $users = User::where('role', '!=', 'Guest') -> get() -> reverse();
         return View::make('admin.users', compact('users'));
     }
 
     public static function userCount() {
-        $userCount = User::all() -> count();
+        $userCount = User::where('role', '!=', 'Guest') -> count();
+        return $userCount;
+    }
+    
+    public function listGuests() {
+        $users = User::where('role', 'Guest') -> get() -> reverse();
+        return View::make('admin.users', compact('users'));
+    }
+    
+    public static function guestCount() {
+        $userCount = User::where('role', 'Guest') -> count();
+        return $userCount;
+    }
+    
+    public function listConverted() {
+        $users = User::where('converted_guest', '1') -> get() -> reverse();
+        return View::make('admin.users', compact('users'));
+    }
+    
+    public static function convertedCount() {
+        $userCount = User::where('converted_guest', '1') -> count();
         return $userCount;
     }
 
     public static function recentUsers($num) {
-        $recentUsers = User::all() -> sortBy('created_at') -> reverse() -> take($num);
+        $recentUsers = User::where('role', '!=', 'Guest') -> get() -> sortBy('created_at') -> reverse() -> take($num);
         return $recentUsers;
     }
 

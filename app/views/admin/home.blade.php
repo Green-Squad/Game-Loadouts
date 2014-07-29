@@ -18,11 +18,11 @@ Dashboard
 
 <div class="row">
     <div class="col-lg-3">
-        <div class="panel panel-info">
+        <div class="panel panel-primary">
             <div class="panel-heading">
                 <div class="row">
                     <div class="col-xs-6">
-                        <i class="fa fa-user fa-5x"></i>
+                        <i class="fa fa-users fa-5x"></i>
                     </div>
                     <div class="col-xs-6 text-right">
                         <p class="announcement-heading">
@@ -35,10 +35,41 @@ Dashboard
                 </div>
             </div>
             <a href="{{ route('modUsers') }}">
+                <div class="panel-footer announcement-bottom">
+                    <div class="row">
+                        <div class="col-xs-6">
+                            View Users
+                        </div>
+                        <div class="col-xs-6 text-right">
+                            <i class="fa fa-arrow-circle-right"></i>
+                        </div>
+                    </div>
+                </div>
+            </a>
+        </div>
+    </div>
+    <div class="col-lg-3">
+        <div class="panel panel-info">
+            <div class="panel-heading">
+                <div class="row">
+                    <div class="col-xs-6">
+                        <i class="fa fa-user fa-5x"></i>
+                    </div>
+                    <div class="col-xs-6 text-right">
+                        <p class="announcement-heading">
+                            {{ UserController::guestCount() }}
+                        </p>
+                        <p class="announcement-text">
+                            Guests
+                        </p>
+                    </div>
+                </div>
+            </div>
+            <a href="{{ route('modGuests') }}">
             <div class="panel-footer announcement-bottom">
                 <div class="row">
                     <div class="col-xs-6">
-                        View Users
+                        View Guests
                     </div>
                     <div class="col-xs-6 text-right">
                         <i class="fa fa-arrow-circle-right"></i>
@@ -48,11 +79,42 @@ Dashboard
         </div>
     </div>
     <div class="col-lg-3">
+        <div class="panel panel-warning">
+            <div class="panel-heading">
+                <div class="row">
+                    <div class="col-xs-6">
+                        <i class="fa fa-refresh fa-5x"></i>
+                    </div>
+                    <div class="col-xs-6 text-right">
+                        <p class="announcement-heading">
+                            {{ UserController::convertedCount() }}
+                        </p>
+                        <p class="announcement-text">
+                            Converted Guests
+                        </p>
+                    </div>
+                </div>
+            </div>
+            <a href="{{ route('modConverted') }}">
+                <div class="panel-footer announcement-bottom">
+                    <div class="row">
+                        <div class="col-xs-6">
+                            View Converted Guests
+                        </div>
+                        <div class="col-xs-6 text-right">
+                            <i class="fa fa-arrow-circle-right"></i>
+                        </div>
+                    </div>
+                </div>
+            </a>
+        </div>
+    </div>
+    <div class="col-lg-3">
         <div class="panel panel-success">
             <div class="panel-heading">
                 <div class="row">
                     <div class="col-xs-6">
-                        <i class="fa fa-play fa-5x"></i>
+                        <i class="fa fa-gamepad fa-5x"></i>
                     </div>
                     <div class="col-xs-6 text-right">
                         <p class="announcement-heading">
@@ -86,7 +148,7 @@ Dashboard
                 <div class="panel-heading">
                     <div class="row">
                         <div class="col-xs-6">
-                            <i class="fa fa-stop fa-5x"></i>
+                            <i class="fa fa-usd fa-5x"></i>
                         </div>
                         <div class="col-xs-6 text-right">
                             <p class="announcement-heading">
@@ -102,41 +164,11 @@ Dashboard
                         </div>
                     </div>
                 </div>
-                <a href="#"> 
+                <a href="http://www.google.com/adsense"> 
                 <div class="panel-footer announcement-bottom">
                     <div class="row">
                         <div class="col-xs-6">
-
-                        </div>
-                        <div class="col-xs-6 text-right">
-                            <i class="fa fa-arrow-circle-right"></i>
-                        </div>
-                    </div>
-                </div> </a>
-            </div>
-        </div>
-        <div class="col-lg-3">
-            <div class="panel panel-success">
-                <div class="panel-heading">
-                    <div class="row">
-                        <div class="col-xs-6">
-                            <i class="fa fa-play fa-5x"></i>
-                        </div>
-                        <div class="col-xs-6 text-right">
-                            <p class="announcement-heading">
-                                {{ UserController::userCount() }}
-                            </p>
-                            <p class="announcement-text">
-                                Beta Users
-                            </p>
-                        </div>
-                    </div>
-                </div>
-                <a href="{{ action('BetaController@create') }}">
-                <div class="panel-footer announcement-bottom">
-                    <div class="row">
-                        <div class="col-xs-6">
-                            Generate Beta Key
+                            Adsense
                         </div>
                         <div class="col-xs-6 text-right">
                             <i class="fa fa-arrow-circle-right"></i>
@@ -151,7 +183,7 @@ Dashboard
         <div class="col-lg-6">
             <div class="panel panel-primary">
                 <div class="panel-heading">
-                    <h3 class="panel-title"><i class="fa fa-money"></i> Recent Users</h3>
+                    <h3 class="panel-title"><i class="fa fa-users"></i> Recent Users</h3>
                 </div>
                 <div class="panel-body">
                     <div class="table-responsive">
@@ -185,7 +217,7 @@ Dashboard
         <div class="col-lg-6">
             <div class="panel panel-primary">
                 <div class="panel-heading">
-                    <h3 class="panel-title"><i class="fa fa-money"></i> Recent Games</h3>
+                    <h3 class="panel-title"><i class="fa fa-gamepad"></i> Recent Games</h3>
                 </div>
                 <div class="panel-body">
                     <div class="table-responsive">

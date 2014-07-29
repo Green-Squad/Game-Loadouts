@@ -28,6 +28,7 @@ User Administration
                     <th> Username <i class="fa fa-sort"></i></th>
                     <th> Email <i class="fa fa-sort"></i></th>
                     <th> Role <i class="fa fa-sort"></i></th>
+                    <th> Converted <i class="fa fa-sort"></i></th>
                     <th> Confirmed <i class="fa fa-sort"></i></th>
                     <th> Created at <i class="fa fa-sort"></i></th>
                     <th> Updated at <i class="fa fa-sort"></i></th>
@@ -42,14 +43,25 @@ User Administration
                 <tr>
                     <td>
                         <a href="{{ route('userSubmissions', $user -> email) }}">
+                            @if (strlen($user -> username) <= 25)
                             {{ $user -> username }}
+                            @else
+                            {{ substr($user -> username, 0, 24) }}...
+                            @endif
                         </a>
                     </td>
                     <td>
+                        @if (strlen($user -> email) <= 30)
                         {{ $user -> email }}
+                        @else
+                        {{ substr($user -> email, 0, 29) }}...
+                        @endif
                     </td>
                     <td>
                         {{ $user -> role }}
+                    </td>
+                    <td>
+                        {{ $user -> converted_guest }}
                     </td>
                     <td>
                         @if($user -> confirm_token == 1)

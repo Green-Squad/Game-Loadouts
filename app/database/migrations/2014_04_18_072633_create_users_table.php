@@ -16,6 +16,7 @@ class CreateUsersTable extends Migration {
             $table -> string('username', 128);
             $table -> string('password', 64);
             $table -> string('role', 16);
+            $table -> integer('converted_guest');
             $table -> string('remember_token', 100);
             $table -> dateTime('disabled_until');
             $table -> integer('failed_attempts');

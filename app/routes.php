@@ -129,8 +129,11 @@ Route::group(array (
                     return View::make('admin.home');
                 } 
             ));
-            Route::get('beta', 'BetaController@create');
+            
+            //Route::get('beta', 'BetaController@create');
+            
             Route::get('toggleAds', 'HelperController@toggleAds');
+            
             Route::group(array (
                 'prefix' => 'user' 
             ), function () {
@@ -170,6 +173,16 @@ Route::group(array (
             Route::get('users', array (
                 'as' => 'modUsers',
                 'uses' => 'UserController@listUsers' 
+            ));
+            
+            Route::get('guests', array (
+                'as' => 'modGuests',
+                'uses' => 'UserController@listGuests'
+            ));
+            
+            Route::get('converted', array (
+                'as' => 'modConverted',
+                'uses' => 'UserController@listConverted'
             ));
             
             Route::resource('game', 'GameController');
@@ -263,9 +276,9 @@ Route::get('/dev/{game}/{weapon}/{loadout}', array (
 'uses' => 'LoadoutController@show2'
 ));
 
-Route::post('{game}/{weapon}/{loadout}/upvote2', array (
-    'as' => 'upvoteLoadout2',
-    'uses' => 'LoadoutController@upvote2' 
+Route::post('{game}/{weapon}/{loadout}/upvoteGuest', array (
+    'as' => 'upvoteGuestLoadout',
+    'uses' => 'LoadoutController@upvoteGuest' 
 ));
 
 Route::get('{game}/{weapon}', array (
@@ -274,6 +287,7 @@ Route::get('{game}/{weapon}', array (
 ));
 
 Route::post('{game}/{weapon}', 'LoadoutController@store');
+Route::post('/dev/{game}/{weapon}', 'LoadoutController@store2');
 
 Route::get('{game}/{weapon}/{loadout}', array (
     'as' => 'showLoadout',
