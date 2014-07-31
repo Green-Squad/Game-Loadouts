@@ -40,17 +40,6 @@ Route::get('/', array (
     } 
 ));
 
-Route::get('/dev', array (
-'as' => 'home',
-function () {
-    $games = Cache::remember('games_slider', $_ENV ['week'], function () {
-        return Game::where('live', 1) -> orderBy(DB::raw('RAND()')) -> take(4) -> get();
-    });
-    $items = FeedReader::read('http://blog.gameloadouts.com/feed/') -> get_items();
-    return View::make('home2', compact('games', 'items'));
-}
-));
-
 Route::get('stats', array (
     'as' => 'stats',
     'uses' => 'HelperController@stats' 
