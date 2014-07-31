@@ -395,6 +395,11 @@ header .top-bar ul li:hover a i {
     border-color: #987e00;
 }
 
+#guestAlert {
+    background-color: #ba9a00;
+    border-color: #987e00;
+}
+
 
 
 

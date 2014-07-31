@@ -6,7 +6,8 @@
 	"require": {
 		"laravel/framework": "4.1.*",
 		"roumen/sitemap": "dev-master",
-		"recaptcha/php5": "v1.1.0"
+		"recaptcha/php5": "v1.1.0",
+		"awjudd/feed-reader": "dev-master"
 	},
 	"autoload": {
 		"classmap": [
@@ -35,5 +36,7 @@
 	"config": {
 		"preferred-install": "dist"
 	},
-	"minimum-stability": "stable"
+	"minimum-stability": "dev",
+	"prefer-stable" : true
+	
 }

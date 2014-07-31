@@ -5,7 +5,7 @@
 @stop
 
 @section('description')
-Here are the best weapon loadouts for the {{ $weapon -> name }} in {{ $game -> id }}.
+{{ $game -> id }} {{ $weapon -> name }} loadouts are located on this page. Find the best setup for the {{ $game -> id }} {{ $weapon -> name }} here.
 @stop
 
 @section('css')

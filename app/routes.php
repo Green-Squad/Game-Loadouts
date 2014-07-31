@@ -15,7 +15,7 @@ HTML::macro('navLink', function ($route, $text) {
     }
     return '<li ' . $active . '>' . link_to($route, $text) . '</li>';
 });
-/*
+
 App::missing(function ($exception) {
     if (Auth::guest() || Auth::user() -> role != 'Admin') {
         return Response::view('errors.missing', array (), 404);
@@ -26,7 +26,7 @@ App::error(function (Exception $exception) {
         return Response::view('errors.missing', array (), 404);
     }
 });
-*/
+
 Route::get('sitemap.xml', 'HelperController@sitemap');
 
 Route::get('/', array (
@@ -35,8 +35,20 @@ Route::get('/', array (
         $games = Cache::remember('games_slider', $_ENV ['week'], function () {
             return Game::where('live', 1) -> orderBy(DB::raw('RAND()')) -> take(4) -> get();
         });
-        return View::make('home', compact('games'));
+        $items = FeedReader::read('http://blog.gameloadouts.com/feed/') -> get_items();
+        return View::make('home', compact('games', 'items'));
     } 
+));
+
+Route::get('/dev', array (
+'as' => 'home',
+function () {
+    $games = Cache::remember('games_slider', $_ENV ['week'], function () {
+        return Game::where('live', 1) -> orderBy(DB::raw('RAND()')) -> take(4) -> get();
+    });
+    $items = FeedReader::read('http://blog.gameloadouts.com/feed/') -> get_items();
+    return View::make('home2', compact('games', 'items'));
+}
 ));
 
 Route::get('stats', array (
