@@ -5,7 +5,7 @@
 @stop
 
 @section('description')
-{{ $game -> id }} weapon list. Find the best loadout for any {{ $game -> id }} gun.
+{{ $game -> id }}@if($game -> short_name) ({{ $game -> short_name }})@endif weapon list. Find the best loadout for any {{ $game -> id }}@if($game -> short_name) ({{ $game -> short_name }})@endif gun.
 @stop
 
 @section('css')

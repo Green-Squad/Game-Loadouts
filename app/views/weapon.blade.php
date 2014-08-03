@@ -5,7 +5,7 @@
 @stop
 
 @section('description')
-{{ $game -> id }} {{ $weapon -> name }} loadouts are located on this page. Find the best setup for the {{ $game -> id }} {{ $weapon -> name }} here.
+{{ $game -> id }}@if($game -> short_name) ({{ $game -> short_name }})@endif {{ $weapon -> name }} loadouts are located on this page. Find the best setup for the {{ $game -> id }}@if($game -> short_name) ({{ $game -> short_name }})@endif {{ $weapon -> name }} here.
 @stop
 
 @section('css')

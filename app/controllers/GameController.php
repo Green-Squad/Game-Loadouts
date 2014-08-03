@@ -20,6 +20,7 @@ class GameController extends BaseController {
         $id = Input::get('id');
         $live = Input::get('live');
         $image = Input::file('image');
+        $short_name = Input::get('short_name');
 
         if (Input::hasFile('image')) {
             $destinationPath = public_path() . '/uploads/';
@@ -45,6 +46,7 @@ class GameController extends BaseController {
             $game -> live = $live;
             $game -> image_url = "uploads/$fileName";
             $game -> thumb_url = "uploads/thumb/$fileName";
+            $game -> short_name = $short_name;
             $game -> save();
         } catch (\Illuminate\Database\QueryException $e) {
             return Redirect::back() -> with(array(
@@ -79,6 +81,7 @@ class GameController extends BaseController {
         $id = Input::get('id');
         $live = Input::get('live');
         $image = Input::file('image');
+        $short_name = Input::get('short_name');
 
         try {
             $game -> id = $id;
@@ -97,7 +100,8 @@ class GameController extends BaseController {
                 $game -> thumb_url = "uploads/thumb/$fileName";
                 $game -> image_url = "uploads/$fileName";
             }
-
+            
+            $game -> short_name = $short_name;
             $game -> save();
         } catch (\Illuminate\Database\QueryException $e) {
             return Redirect::back() -> with(array(
@@ -122,7 +126,7 @@ class GameController extends BaseController {
                 'alert-class' => 'alert-danger'
             ));
         }
-        return Redirect::to('admin.game.index') -> with(array(
+        return Redirect::route('admin.game.index') -> with(array(
             'alert' => "You have successfully deleted game $gameID.",
             'alert-class' => 'alert-success'
         ));

@@ -5,7 +5,7 @@
 @stop
 
 @section('description')
-The {{ $weapon -> name }} in {{ $game -> id }} with {{ $prettyAttachments }}  has @if($loadout -> count == 1) 1 vote. @else{{ $loadout -> count }} votes.@endif
+The {{ $weapon -> name }} in {{ $game -> id }}@if($game -> short_name) ({{ $game -> short_name }})@endif with {{ $prettyAttachments }}  has @if($loadout -> count == 1) 1 vote. @else{{ $loadout -> count }} votes.@endif
 @stop
 
 @section('css')

@@ -31,6 +31,7 @@ class CreateUsersTable extends Migration {
             $table -> integer('live');
             $table -> string('image_url', 128);
             $table -> string('thumb_url', 128);
+            $table -> string('short_name', 32);
             $table -> timestamps();
 
             $table -> engine = 'InnoDB';

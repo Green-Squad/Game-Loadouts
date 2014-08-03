@@ -36,7 +36,10 @@ Create Game
                     </div>
                 </div>
                 <div class="form-group">
-                    <div class="col-lg-12">
+                    <div class="col-lg-6">
+                        {{ Form::text('short_name', '', array('class' => 'form-control input-lg', 'placeholder' => 'Short Name')) }}
+                    </div>
+                    <div class="col-lg-6">
                         {{ Form::text('live', '0', array('class' => 'form-control input-lg', 'placeholder' => 'Live', 'required' => '')) }}
                     </div>
                 </div>

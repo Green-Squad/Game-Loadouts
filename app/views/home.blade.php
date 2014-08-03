@@ -5,7 +5,7 @@ Game Loadouts
 @stop
 
 @section('description')
-Game Loadouts is a portal for finding the best ways to outfit your weapons in your favorite games like Titanfall and Battlefield 4.
+Game Loadouts contains Titanfall, Battlefield 4 (BF4), and Call of Duty Ghosts (COD Ghosts) loadouts for which you can find the best way to outfit your favorite weapons.
 @stop
 
 @section('sub-header')
