@@ -1,5 +1,4 @@
 <?php
-
 class AttachmentController extends BaseController {
 
     /**
@@ -21,7 +20,7 @@ class AttachmentController extends BaseController {
         $slot = Input::get('slot');
         $image = Input::file('image');
         $game_id = $game -> id;
-
+        
         if (Input::hasFile('image')) {
             $destinationPath = public_path() . '/uploads/';
             $thumbPath = public_path() . '/uploads/thumb/';
@@ -31,40 +30,42 @@ class AttachmentController extends BaseController {
             $fileName = urlencode($fileName);
             
             $image -> move($destinationPath, $fileName);
-
+            
             copy($destinationPath . $fileName, $thumbPath . $fileName);
             HelperController::createThumbnail($thumbPath . $fileName, $fileExtension, 64);
         } else {
-            return Redirect::back() -> with(array(
+            return Redirect::back() -> with(array (
                 'alert' => 'Error: Failed to upload image',
-                'alert-class' => 'alert-danger'
+                'alert-class' => 'alert-danger' 
             ));
         }
-
+        
         try {
-            $attachment = new Attachment;
+            $attachment = new Attachment();
             $attachment -> name = $name;
             $attachment -> slot = $slot;
             $attachment -> game_id = $game_id;
             $attachment -> image_url = "uploads/$fileName";
             $attachment -> thumb_url = "uploads/thumb/$fileName";
             $attachment -> save();
-        } catch (\Illuminate\Database\QueryException $e) {
-            return Redirect::back() -> with(array(
+        } catch ( \Illuminate\Database\QueryException $e ) {
+            return Redirect::back() -> with(array (
                 'alert' => 'Error: Failed to create new attachment',
-                'alert-class' => 'alert-danger'
+                'alert-class' => 'alert-danger' 
             ));
         }
-        return Redirect::route('admin.game.show', array('game' => $game_id)) -> with(array(
+        return Redirect::route('admin.game.show', array (
+            'game' => $game_id 
+        )) -> with(array (
             'alert' => 'Attachment has been successfully created.',
-            'alert-class' => 'alert-success'
+            'alert-class' => 'alert-success' 
         ));
     }
 
     /**
      * Show the form for editing the specified resource.
      *
-     * @param  int  $id
+     * @param int $id            
      * @return Response
      */
     public function edit(Game $game, $attachmentID) {
@@ -75,19 +76,19 @@ class AttachmentController extends BaseController {
     /**
      * Update the specified resource in storage.
      *
-     * @param  int  $id
+     * @param int $id            
      * @return Response
      */
     public function update(Game $game, $attachmentID) {
         $name = Input::get('name');
         $slot = Input::get('slot');
         $image = Input::file('image');
-
+        
         try {
             $attachment = Attachment::findOrFail($attachmentID);
             $attachment -> name = $name;
             $attachment -> slot = $slot;
-
+            
             if (Input::hasFile('image')) {
                 $destinationPath = public_path() . '/uploads/';
                 $thumbPath = public_path() . '/uploads/thumb/';
@@ -97,31 +98,31 @@ class AttachmentController extends BaseController {
                 $fileName = urlencode($fileName);
                 
                 $image -> move($destinationPath, $fileName);
-
+                
                 copy($destinationPath . $fileName, $thumbPath . $fileName);
                 HelperController::createThumbnail($thumbPath . $fileName, $fileExtension, 64);
-
+                
                 $attachment -> image_url = "uploads/$fileName";
                 $attachment -> thumb_url = "uploads/thumb/$fileName";
             }
-
+            
             $attachment -> save();
-        } catch (\Illuminate\Database\QueryException $e) {
-            return Redirect::back() -> with(array(
+        } catch ( \Illuminate\Database\QueryException $e ) {
+            return Redirect::back() -> with(array (
                 'alert' => 'Error: Failed to update attachment',
-                'alert-class' => 'alert-danger'
+                'alert-class' => 'alert-danger' 
             ));
         }
-        return Redirect::route('admin.game.show', $game -> id) -> with(array(
+        return Redirect::route('admin.game.show', $game -> id) -> with(array (
             'alert' => 'Attachment has been successfully updated.',
-            'alert-class' => 'alert-success'
+            'alert-class' => 'alert-success' 
         ));
     }
 
     /**
      * Show the form for deleting the specified resource.
      *
-     * @param  int  $id
+     * @param int $id            
      * @return Response
      */
     public function delete(Game $game, $attachmentID) {
@@ -132,7 +133,7 @@ class AttachmentController extends BaseController {
     /**
      * Remove the specified resource from storage.
      *
-     * @param  int  $id
+     * @param int $id            
      * @return Response
      */
     public function destroy(Game $game, $attachmentID) {
@@ -141,22 +142,21 @@ class AttachmentController extends BaseController {
             
             $loadouts = $attachment -> loadouts;
             
-            foreach($loadouts as $loadout) {
+            foreach ( $loadouts as $loadout ) {
                 $loadout -> delete();
             }
-                        
+            
             $attachmentName = $attachment -> name;
             $attachment -> delete();
-        } catch(\Illuminate\Database\QueryException $e) {
-            return Redirect::back() -> with(array(
+        } catch ( \Illuminate\Database\QueryException $e ) {
+            return Redirect::back() -> with(array (
                 'alert' => 'Error: Failed to delete attachment.',
-                'alert-class' => 'alert-danger'
+                'alert-class' => 'alert-danger' 
             ));
         }
-        return Redirect::route('admin.game.show', $game -> id) -> with(array(
+        return Redirect::route('admin.game.show', $game -> id) -> with(array (
             'alert' => "You have successfully deleted attachment $attachmentName.",
-            'alert-class' => 'alert-success'
+            'alert-class' => 'alert-success' 
         ));
     }
-
 }

@@ -1,7 +1,5 @@
 <?php
-
 class GameController extends BaseController {
-
     private $thumb_dimension = 525;
 
     public function index() {
@@ -21,42 +19,42 @@ class GameController extends BaseController {
         $live = Input::get('live');
         $image = Input::file('image');
         $short_name = Input::get('short_name');
-
+        
         if (Input::hasFile('image')) {
             $destinationPath = public_path() . '/uploads/';
             $thumbPath = public_path() . '/uploads/thumb/';
-
+            
             $fileExtension = $image -> getClientOriginalExtension();
             $fileName = urlencode($id) . '.' . $fileExtension;
-
+            
             $image -> move($destinationPath, $fileName);
-
+            
             copy($destinationPath . $fileName, $thumbPath . $fileName);
             HelperController::createThumbnail($thumbPath . $fileName, $fileExtension, $this -> thumb_dimension);
         } else {
-            return Redirect::back() -> with(array(
+            return Redirect::back() -> with(array (
                 'alert' => 'Error: Failed to upload image',
-                'alert-class' => 'alert-danger'
+                'alert-class' => 'alert-danger' 
             ));
         }
-
+        
         try {
-            $game = new Game;
+            $game = new Game();
             $game -> id = $id;
             $game -> live = $live;
             $game -> image_url = "uploads/$fileName";
             $game -> thumb_url = "uploads/thumb/$fileName";
             $game -> short_name = $short_name;
             $game -> save();
-        } catch (\Illuminate\Database\QueryException $e) {
-            return Redirect::back() -> with(array(
+        } catch ( \Illuminate\Database\QueryException $e ) {
+            return Redirect::back() -> with(array (
                 'alert' => 'Error: Failed to create new game',
-                'alert-class' => 'alert-danger'
+                'alert-class' => 'alert-danger' 
             ));
         }
-        return Redirect::route('admin.game.index') -> with(array(
+        return Redirect::route('admin.game.index') -> with(array (
             'alert' => 'Game has been successfully created.',
-            'alert-class' => 'alert-success'
+            'alert-class' => 'alert-success' 
         ));
     }
 
@@ -64,10 +62,10 @@ class GameController extends BaseController {
         // Return a view of a specific game (GET)
         $weapons = Weapon::where('game_id', $game -> id) -> get();
         $attachments = Attachment::where('game_id', $game -> id) -> get();
-        return View::make('admin.game.show', array(
+        return View::make('admin.game.show', array (
             'game' => $game,
             'weapons' => $weapons,
-            'attachments' => $attachments
+            'attachments' => $attachments 
         ));
     }
 
@@ -82,36 +80,36 @@ class GameController extends BaseController {
         $live = Input::get('live');
         $image = Input::file('image');
         $short_name = Input::get('short_name');
-
+        
         try {
             $game -> id = $id;
             $game -> live = $live;
-
+            
             if (Input::hasFile('image')) {
                 $destinationPath = public_path() . '/uploads/';
                 $thumbPath = public_path() . '/uploads/thumb/';
                 $fileExtension = $image -> getClientOriginalExtension();
                 $fileName = urlencode($id) . '.' . $fileExtension;
                 $image -> move($destinationPath, $fileName);
-
+                
                 copy($destinationPath . $fileName, $thumbPath . $fileName);
                 HelperController::createThumbnail($thumbPath . $fileName, $fileExtension, $this -> thumb_dimension);
-
+                
                 $game -> thumb_url = "uploads/thumb/$fileName";
                 $game -> image_url = "uploads/$fileName";
             }
             
             $game -> short_name = $short_name;
             $game -> save();
-        } catch (\Illuminate\Database\QueryException $e) {
-            return Redirect::back() -> with(array(
+        } catch ( \Illuminate\Database\QueryException $e ) {
+            return Redirect::back() -> with(array (
                 'alert' => 'Error: Failed to update game',
-                'alert-class' => 'alert-danger'
+                'alert-class' => 'alert-danger' 
             ));
         }
-        return Redirect::route('admin.game.index') -> with(array(
+        return Redirect::route('admin.game.index') -> with(array (
             'alert' => 'Game has been successfully updated.',
-            'alert-class' => 'alert-success'
+            'alert-class' => 'alert-success' 
         ));
     }
 
@@ -120,21 +118,21 @@ class GameController extends BaseController {
         try {
             $gameID = $game -> id;
             $game -> delete();
-        } catch(\Illuminate\Database\QueryException $e) {
-            return Redirect::back() -> with(array(
+        } catch ( \Illuminate\Database\QueryException $e ) {
+            return Redirect::back() -> with(array (
                 'alert' => 'Error: Failed to delete game.',
-                'alert-class' => 'alert-danger'
+                'alert-class' => 'alert-danger' 
             ));
         }
-        return Redirect::route('admin.game.index') -> with(array(
+        return Redirect::route('admin.game.index') -> with(array (
             'alert' => "You have successfully deleted game $gameID.",
-            'alert-class' => 'alert-success'
+            'alert-class' => 'alert-success' 
         ));
     }
 
     public function showGames() {
-        //$games = Game::where('live', 1) -> get();
-        $games = Cache::remember('games_page', $_ENV['week'], function() {
+        // $games = Game::where('live', 1) -> get();
+        $games = Cache::remember('games_page', $_ENV ['week'], function () {
             return Game::where('live', 1) -> get();
         });
         return View::make('games', compact('games'));
@@ -149,12 +147,12 @@ class GameController extends BaseController {
         $recentGames = Game::all() -> reverse() -> take($num);
         return $recentGames;
     }
-
+    
     // lists the games for the public navigation
     // It only returns 'live' games
     public static function listGames() {
-        //$games = Game::where('live', 1) -> get();
-        $games = Cache::remember('games_nav', $_ENV['week'], function() {
+        // $games = Game::where('live', 1) -> get();
+        $games = Cache::remember('games_nav', $_ENV ['week'], function () {
             return Game::where('live', 1) -> get();
         });
         return $games;
@@ -174,33 +172,20 @@ class GameController extends BaseController {
         return View::make('game', compact('game', 'weaponsByType', 'recentLoadouts', 'topLoadouts'));
     }
 
-    public function listWeapons2(Game $game) {
-        $weaponsByType = $this -> getWeaponsByType($game);
-        $recentLoadouts = DB::select('SELECT * FROM weapons w JOIN loadouts l ON l.weapon_id = w.id WHERE game_id = \'' . $game -> id . '\' ORDER BY l.updated_at DESC LIMIT 5');
-        $topLoadouts = DB::select('SELECT lu.loadout_id, l.id , COUNT( lu.loadout_id ) as count
-                                        FROM weapons w
-                                        JOIN loadouts l ON l.weapon_id = w.id
-                                        JOIN loadout_user lu ON l.id = lu.loadout_id
-                                        WHERE game_id =  \'' . $game -> id . '\'
-                                        GROUP BY lu.loadout_id
-                                        ORDER BY COUNT( lu.loadout_id ) DESC 
-                                        LIMIT 5');
-        return View::make('game2', compact('game', 'weaponsByType', 'recentLoadouts', 'topLoadouts'));
-    }
-
     public function getWeaponsByType(Game $game) {
         $weapons = Weapon::where('game_id', $game -> id) -> orderBy('name') -> get();
-        $weaponsByType = array();
-        foreach ($weapons as $weapon) {
+        $weaponsByType = array ();
+        foreach ( $weapons as $weapon ) {
             $type = $weapon -> type;
-            if (isset($weaponsByType[$type])) {
-                array_push($weaponsByType[$type], $weapon);
+            if (isset($weaponsByType [$type])) {
+                array_push($weaponsByType [$type], $weapon);
             } else {
-                $weaponsByType[$type] = array($weapon);
+                $weaponsByType [$type] = array (
+                    $weapon 
+                );
             }
         }
         ksort($weaponsByType);
         return $weaponsByType;
     }
-
 }

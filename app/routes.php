@@ -1,7 +1,5 @@
 <?php
 
-
-
 /*
  * |-------------------------------------------------------------------------- | Application Routes |-------------------------------------------------------------------------- | | Here is where you can register all of the routes for an application. | It's a breeze. Simply tell Laravel the URIs it should respond to | and give it the Closure to execute when that URI is requested. |
  */
@@ -120,9 +118,6 @@ Route::group(array (
         'before' => 'admin' 
     ), function () {
         
-        // used for updating live site
-        Route::get('test/{game}/', 'GameController@listWeapons2');
-        
         Route::group(array (
             'prefix' => 'admin' 
         ), function () {
@@ -133,7 +128,7 @@ Route::group(array (
                 } 
             ));
             
-            //Route::get('beta', 'BetaController@create');
+            // Route::get('beta', 'BetaController@create');
             
             Route::get('toggleAds', 'HelperController@toggleAds');
             
@@ -180,23 +175,23 @@ Route::group(array (
             
             Route::get('guests', array (
                 'as' => 'modGuests',
-                'uses' => 'UserController@listGuests'
+                'uses' => 'UserController@listGuests' 
             ));
             
             Route::get('converted', array (
                 'as' => 'modConverted',
-                'uses' => 'UserController@listConverted'
+                'uses' => 'UserController@listConverted' 
             ));
             
             Route::get('votes', array (
                 'as' => 'modVotes',
-                'uses' => 'LoadoutController@listVotes'
+                'uses' => 'LoadoutController@listVotes' 
             ));
             
             Route::get('loadouts', array (
-            'as' => 'modLoadouts',
-            'uses' => 'LoadoutController@listLoadouts'
-                    ));
+                'as' => 'modLoadouts',
+                'uses' => 'LoadoutController@listLoadouts' 
+            ));
             
             Route::resource('game', 'GameController');
             

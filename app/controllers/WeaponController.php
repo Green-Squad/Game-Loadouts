@@ -1,5 +1,4 @@
 <?php
-
 class WeaponController extends BaseController {
 
     /**
@@ -9,19 +8,21 @@ class WeaponController extends BaseController {
      */
     public function create(Game $game) {
         $attachments = Attachment::where('game_id', $game -> id) -> orderBy('name') -> get();
-
-        $attachmentsBySlot = array();
-        foreach ($attachments as $attachment) {
+        
+        $attachmentsBySlot = array ();
+        foreach ( $attachments as $attachment ) {
             $slot = $attachment -> slot;
-            if (isset($attachmentsBySlot[$slot])) {
-                array_push($attachmentsBySlot[$slot], $attachment);
+            if (isset($attachmentsBySlot [$slot])) {
+                array_push($attachmentsBySlot [$slot], $attachment);
             } else {
-                $attachmentsBySlot[$slot] = array($attachment);
+                $attachmentsBySlot [$slot] = array (
+                    $attachment 
+                );
             }
         }
-
+        
         ksort($attachmentsBySlot);
-
+        
         return View::make('admin.weapon.create', compact('game', 'attachmentsBySlot'));
     }
 
@@ -38,28 +39,28 @@ class WeaponController extends BaseController {
         $max_attachments = Input::get('max_attachments');
         $type = Input::get('type');
         $game_id = $game -> id;
-
+        
         if (Input::hasFile('image')) {
             $destinationPath = public_path() . '/uploads/';
             $thumbPath = public_path() . '/uploads/thumb/';
-
+            
             $fileExtension = $image -> getClientOriginalExtension();
             $fileName = $game -> id . '-' . $name . '.' . $fileExtension;
             $fileName = urlencode($fileName);
             
             $image -> move($destinationPath, $fileName);
-
+            
             copy($destinationPath . $fileName, $thumbPath . $fileName);
             HelperController::createThumbnail($thumbPath . $fileName, $fileExtension, 128);
         } else {
-            return Redirect::back() -> with(array(
+            return Redirect::back() -> with(array (
                 'alert' => 'Error: Failed to upload image',
-                'alert-class' => 'alert-danger'
+                'alert-class' => 'alert-danger' 
             ));
         }
-
+        
         try {
-            $weapon = new Weapon;
+            $weapon = new Weapon();
             $weapon -> name = $name;
             $weapon -> game_id = $game_id;
             $weapon -> min_attachments = $min_attachments;
@@ -68,60 +69,64 @@ class WeaponController extends BaseController {
             $weapon -> image_url = "uploads/$fileName";
             $weapon -> thumb_url = "uploads/thumb/$fileName";
             $weapon -> save();
-
-            foreach ($attachments as $attachment) {
+            
+            foreach ( $attachments as $attachment ) {
                 $attachment = Attachment::findOrFail($attachment);
                 $weapon -> attachments() -> save($attachment);
             }
-        } catch (\Illuminate\Database\QueryException $e) {
-            return Redirect::back() -> with(array(
+        } catch ( \Illuminate\Database\QueryException $e ) {
+            return Redirect::back() -> with(array (
                 'alert' => 'Error: Failed to create new weapon',
-                'alert-class' => 'alert-danger'
+                'alert-class' => 'alert-danger' 
             ));
         }
-        return Redirect::route('admin.game.show', array('game' => $game_id)) -> with(array(
+        return Redirect::route('admin.game.show', array (
+            'game' => $game_id 
+        )) -> with(array (
             'alert' => 'Weapon has been successfully created.',
-            'alert-class' => 'alert-success'
+            'alert-class' => 'alert-success' 
         ));
     }
 
     /**
      * Show the form for editing the specified resource.
      *
-     * @param  int  $id
+     * @param int $id            
      * @return Response
      */
     public function edit(Game $game, $weaponName) {
         $weapon = Weapon::where('game_id', $game -> id, 'AND') -> where('name', $weaponName) -> first();
         $attachments = Attachment::where('game_id', $game -> id) -> orderBy('name') -> get();
-
-        $attachmentsBySlot = array();
-        foreach ($attachments as $attachment) {
+        
+        $attachmentsBySlot = array ();
+        foreach ( $attachments as $attachment ) {
             $slot = $attachment -> slot;
-
+            
             $active = DB::table('attachment_weapon') -> where('attachment_id', $attachment -> id, 'AND') -> where('weapon_id', $weapon -> id) -> get();
-
+            
             if ($active) {
                 $attachment -> checked = "active";
             } else {
                 $attachment -> checked = "";
             }
-            if (isset($attachmentsBySlot[$slot])) {
-                array_push($attachmentsBySlot[$slot], $attachment);
+            if (isset($attachmentsBySlot [$slot])) {
+                array_push($attachmentsBySlot [$slot], $attachment);
             } else {
-                $attachmentsBySlot[$slot] = array($attachment);
+                $attachmentsBySlot [$slot] = array (
+                    $attachment 
+                );
             }
         }
-
+        
         ksort($attachmentsBySlot);
-
+        
         return View::make('admin.weapon.edit', compact('game', 'weapon', 'attachmentsBySlot'));
     }
 
     /**
      * Update the specified resource in storage.
      *
-     * @param  int  $id
+     * @param int $id            
      * @return Response
      */
     public function update(Game $game, $weaponID) {
@@ -139,7 +144,7 @@ class WeaponController extends BaseController {
             $weapon -> min_attachments = $min_attachments;
             $weapon -> max_attachments = $max_attachments;
             $weapon -> type = $type;
-
+            
             if (Input::hasFile('image')) {
                 $destinationPath = public_path() . '/uploads/';
                 $thumbPath = public_path() . '/uploads/thumb/';
@@ -148,36 +153,36 @@ class WeaponController extends BaseController {
                 $fileName = urlencode($fileName);
                 
                 $image -> move($destinationPath, $fileName);
-
+                
                 copy($destinationPath . $fileName, $thumbPath . $fileName);
                 HelperController::createThumbnail($thumbPath . $fileName, $fileExtension, 128);
                 
                 $weapon -> thumb_url = "uploads/thumb/$fileName";
                 $weapon -> image_url = "uploads/$fileName";
             }
-
+            
             $weapon -> save();
-
-            foreach ($attachments as $attachment) {
+            
+            foreach ( $attachments as $attachment ) {
                 $attachment = Attachment::findOrFail($attachment);
                 $weapon -> attachments() -> save($attachment);
             }
-        } catch (\Illuminate\Database\QueryException $e) {
-            return Redirect::back() -> with(array(
+        } catch ( \Illuminate\Database\QueryException $e ) {
+            return Redirect::back() -> with(array (
                 'alert' => 'Error: Failed to update weapon',
-                'alert-class' => 'alert-danger'
+                'alert-class' => 'alert-danger' 
             ));
         }
-        return Redirect::route('admin.game.show', $game -> id) -> with(array(
+        return Redirect::route('admin.game.show', $game -> id) -> with(array (
             'alert' => 'Weapon has been successfully updated.',
-            'alert-class' => 'alert-success'
+            'alert-class' => 'alert-success' 
         ));
     }
 
     /**
      * Show the form for deleting the specified resource.
      *
-     * @param  int  $id
+     * @param int $id            
      * @return Response
      */
     public function delete(Game $game, $weaponName) {
@@ -188,7 +193,7 @@ class WeaponController extends BaseController {
     /**
      * Remove the specified resource from storage.
      *
-     * @param  int  $id
+     * @param int $id            
      * @return Response
      */
     public function destroy(Game $game, $weaponID) {
@@ -196,18 +201,18 @@ class WeaponController extends BaseController {
             $weapon = Weapon::findOrFail($weaponID);
             $weaponName = $weapon -> name;
             $weapon -> delete();
-        } catch(\Illuminate\Database\QueryException $e) {
-            return Redirect::back() -> with(array(
+        } catch ( \Illuminate\Database\QueryException $e ) {
+            return Redirect::back() -> with(array (
                 'alert' => 'Error: Failed to delete weapon.',
-                'alert-class' => 'alert-danger'
+                'alert-class' => 'alert-danger' 
             ));
         }
-        return Redirect::route('admin.game.show', $game -> id) -> with(array(
+        return Redirect::route('admin.game.show', $game -> id) -> with(array (
             'alert' => "You have successfully deleted weapon $weaponName.",
-            'alert-class' => 'alert-success'
+            'alert-class' => 'alert-success' 
         ));
     }
-    
+
     public function show(Game $game, $weaponName) {
         $weapon = Weapon::where('game_id', $game -> id, 'AND') -> where('name', $weaponName) -> first();
         $loadouts = Loadout::where('weapon_id', $weapon -> id) -> get();
@@ -221,41 +226,39 @@ class WeaponController extends BaseController {
     }
 
     public static function listLoadouts(Game $game, $weaponName) {
-
         $weapon = Weapon::where('game_id', $game -> id, 'AND') -> where('name', $weaponName) -> first();
         $loadouts = Loadout::where('weapon_id', $weapon -> id) -> get();
-
+        
         $shortname = 'tryharddev';
         $count_js = 'http://' . $shortname . '.disqus.com/count-data.js?';
-
-        foreach ($loadouts as $loadout) {
-
+        
+        foreach ( $loadouts as $loadout ) {
+            
             $count_js .= '&1=loadout-' . $loadout -> id;
-
+            
             $loadout -> count = LoadoutController::countSubmissions($loadout -> id);
             if (Auth::check() && LoadoutController::userHasLoadout(Auth::user() -> loadouts, $loadout -> id)) {
                 $loadout -> upvoted = 1;
             } else {
                 $loadout -> upvoted = 0;
             }
-
         }
         
         $count_js = @file_get_contents($count_js);
-
-        //Strip it of spaces, hard to parse later on
+        
+        // Strip it of spaces, hard to parse later on
         str_replace(' ', '', $count_js);
-
+        
         if (preg_match('/DISQUSWIDGETS.displayCount((.*))/', $count_js, $matches)) {
-            $newJson = WeaponController::fixJSON($matches[1]);
+            $newJson = WeaponController::fixJSON($matches [1]);
             $count_json = @json_decode($newJson, TRUE);
-
-            foreach ($count_json['counts'] as $count) {
-                $loadout_id = $count['id'];
+            
+            foreach ( $count_json ['counts'] as $count ) {
+                $loadout_id = $count ['id'];
                 $loadout_id = preg_replace('/loadout-/', '', $loadout_id);
-                foreach ($loadouts as $loadout) {
+                foreach ( $loadouts as $loadout ) {
                     if ($loadout_id == $loadout -> id) {
-                        $loadout -> comments = $count['comments'];
+                        $loadout -> comments = $count ['comments'];
                         break;
                     }
                 }
@@ -267,79 +270,29 @@ class WeaponController extends BaseController {
         uasort($loadouts, "WeaponController::countSort");
         
         $attachmentsBySlot = WeaponController::getAttachmentsBySlot($weapon);
-
+        
         return View::make('weapon', compact('game', 'weapon', 'loadouts', 'attachmentsBySlot'));
-    }
-    
-    public static function listLoadouts2(Game $game, $weaponName) {
-    
-        $weapon = Weapon::where('game_id', $game -> id, 'AND') -> where('name', $weaponName) -> first();
-        $loadouts = Loadout::where('weapon_id', $weapon -> id) -> get();
-    
-        $shortname = 'tryharddev';
-        $count_js = 'http://' . $shortname . '.disqus.com/count-data.js?';
-    
-        foreach ($loadouts as $loadout) {
-    
-            $count_js .= '&1=loadout-' . $loadout -> id;
-    
-            $loadout -> count = LoadoutController::countSubmissions($loadout -> id);
-            if (Auth::check() && LoadoutController::userHasLoadout(Auth::user() -> loadouts, $loadout -> id)) {
-                $loadout -> upvoted = 1;
-            } else {
-                $loadout -> upvoted = 0;
-            }
-    
-        }
-    
-        $count_js = @file_get_contents($count_js);
-    
-        //Strip it of spaces, hard to parse later on
-        str_replace(' ', '', $count_js);
-    
-        if (preg_match('/DISQUSWIDGETS.displayCount((.*))/', $count_js, $matches)) {
-            $newJson = WeaponController::fixJSON($matches[1]);
-            $count_json = @json_decode($newJson, TRUE);
-    
-            foreach ($count_json['counts'] as $count) {
-                $loadout_id = $count['id'];
-                $loadout_id = preg_replace('/loadout-/', '', $loadout_id);
-                foreach ($loadouts as $loadout) {
-                    if ($loadout_id == $loadout -> id) {
-                        $loadout -> comments = $count['comments'];
-                        break;
-                    }
-                }
-            }
-        }
-    
-        $loadouts = $loadouts -> toArray();
-        // sort by Loadout submission count
-        uasort($loadouts, "WeaponController::countSort");
-    
-        $attachmentsBySlot = WeaponController::getAttachmentsBySlot($weapon);
-    
-        return View::make('weapon2', compact('game', 'weapon', 'loadouts', 'attachmentsBySlot'));
     }
 
     public static function countSort($a, $b) {
-        return $b['count'] - $a['count'];
+        return $b ['count'] - $a ['count'];
     }
-    
+
     public static function getAttachmentsBySlot($weapon) {
         $attachments = $weapon -> attachments -> sortBy('name');
-
-        $attachmentsBySlot = array();
-        foreach ($attachments as $attachment) {
+        
+        $attachmentsBySlot = array ();
+        foreach ( $attachments as $attachment ) {
             $slot = $attachment -> slot;
-            if (isset($attachmentsBySlot[$slot])) {
-                array_push($attachmentsBySlot[$slot], $attachment);
+            if (isset($attachmentsBySlot [$slot])) {
+                array_push($attachmentsBySlot [$slot], $attachment);
             } else {
-                $attachmentsBySlot[$slot] = array($attachment);
+                $attachmentsBySlot [$slot] = array (
+                    $attachment 
+                );
             }
         }
         ksort($attachmentsBySlot);
         return $attachmentsBySlot;
     }
-
 }

@@ -1,5 +1,6 @@
 <?php
 class LoadoutController extends BaseController {
+
     public function store(Game $game, $weaponName) {
         if (Auth::guest()) {
             $this -> validateGuest();
@@ -146,6 +147,7 @@ class LoadoutController extends BaseController {
             return false;
         }
     }
+
     public function getAttachmentsArray($attachments) {
         $attachmentsArray = array ();
         foreach ( $attachments as $attachment ) {
@@ -153,6 +155,7 @@ class LoadoutController extends BaseController {
         }
         return $attachmentsArray;
     }
+
     public static function userHasLoadout($loadouts, $id) {
         foreach ( $loadouts as $loadout ) {
             if ($loadout ['id'] == $id) {
@@ -161,9 +164,11 @@ class LoadoutController extends BaseController {
         }
         return false;
     }
+
     public static function countSubmissions($loadout_id) {
         return DB::table('loadout_user') -> where('loadout_id', $loadout_id) -> count();
     }
+
     public function show(Game $game, $weaponName, Loadout $loadout) {
         $weapon = Weapon::where('game_id', $game -> id, 'AND') -> where('name', $weaponName) -> first();
         $loadout -> count = LoadoutController::countSubmissions($loadout -> id);
@@ -181,23 +186,7 @@ class LoadoutController extends BaseController {
         
         return View::make('loadout', compact('loadout', 'game', 'weapon'));
     }
-    public function show2(Game $game, $weaponName, Loadout $loadout) {
-        $weapon = Weapon::where('game_id', $game -> id, 'AND') -> where('name', $weaponName) -> first();
-        $loadout -> count = LoadoutController::countSubmissions($loadout -> id);
-        
-        if (Auth::check()) {
-            $user = Auth::user();
-            if (LoadoutController::userHasLoadout($user -> loadouts, $loadout -> id)) {
-                $loadout -> upvoted = 1;
-            } else {
-                $loadout -> upvoted = 0;
-            }
-        } else {
-            $loadout -> upvoted = 0;
-        }
-        
-        return View::make('loadout2', compact('loadout', 'game', 'weapon'));
-    }
+
     public function upvote(Game $game, $weaponName, Loadout $loadout) {
         if (Auth::check()) {
             $user = Auth::user();
@@ -221,6 +210,7 @@ class LoadoutController extends BaseController {
             return Response::json($response);
         }
     }
+
     public function upvoteGuest(Game $game, $weaponName, Loadout $loadout) {
         $this -> validateGuest();
         $user = Auth::user();
@@ -256,6 +246,7 @@ class LoadoutController extends BaseController {
             ));
         }
     }
+
     public function captchaCheck() {
         $captcha = new Captcha\Captcha();
         $captcha -> setPublicKey('6Lf9-_YSAAAAAJ9k2G_qXohJi74-pDe8V4NuUdzJ');
@@ -266,6 +257,7 @@ class LoadoutController extends BaseController {
         
         return $captcha -> check($recaptcha_challenge, $recaptcha_response);
     }
+
     public function validateGuest() {
         if (Auth::guest()) {
             // make account
@@ -303,6 +295,7 @@ class LoadoutController extends BaseController {
             }
         }
     }
+
     public function detach(Game $game, $weaponName, Loadout $loadout) {
         if (Auth::check()) {
             $user = Auth::user();
@@ -326,10 +319,12 @@ class LoadoutController extends BaseController {
             return Response::json($response);
         }
     }
+
     public function showDelete(Game $game, $weaponName, Loadout $loadout) {
         $weapon = Weapon::where('game_id', $game -> id, 'AND') -> where('name', $weaponName) -> first();
         return View::make('admin.loadout.delete', compact('game', 'weapon', 'loadout'));
     }
+
     public function delete(Game $game, $weaponName, Loadout $loadout) {
         try {
             $loadout -> delete();
@@ -347,14 +342,16 @@ class LoadoutController extends BaseController {
             ));
         }
     }
+
     public static function loadoutCount() {
         return DB::table('loadouts') -> count();
     }
+
     public static function voteCount() {
         return DB::table('loadout_user') -> count();
     }
+
     public function listVotes() {
-        
         $submissions = DB::select('SELECT w.game_id AS game, DATE( lu.created_at ) AS date, COUNT( lu.loadout_id ) AS votes
                                             FROM weapons w
                                             JOIN loadouts l ON l.weapon_id = w.id
@@ -391,18 +388,17 @@ class LoadoutController extends BaseController {
         $pageName = 'Votes';
         return View::make('admin/votes', compact('submissionsPerDay', 'games', 'pageName'));
     }
-    
+
     public function listLoadouts() {
-    
         $submissions = DB::select('SELECT w.game_id AS game, DATE( l.created_at ) AS date, COUNT( l.id ) AS loadout_count
                                             FROM weapons w
                                             JOIN loadouts l ON l.weapon_id = w.id
                                             GROUP BY w.game_id, DATE( l.created_at )
                                             ORDER BY DATE( l.created_at ) DESC');
-    
+        
         $submissionsPerDay = array ();
         $games = array ();
-    
+        
         foreach ( $submissions as $submission ) {
             $game = $submission -> game;
             $submissionsPerDay [$submission -> date] [$game] = intval($submission -> loadout_count);
@@ -411,7 +407,7 @@ class LoadoutController extends BaseController {
             }
         }
         $days = array_keys($submissionsPerDay);
-    
+        
         $gamesVotes = array ();
         foreach ( $days as $day ) {
             $total = 0;
