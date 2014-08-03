@@ -40,8 +40,8 @@
                         <li>
                             <a href="{{ route('adminDashboard') }}"><i class="fa fa-dashboard"></i> Dashboard</a>
                         </li>
-                        <li class="dropdown">
-                            <a href="#" class="dropdown-toggle" data-toggle="dropdown"><i class="fa fa-caret-square-o-down"></i> Users <b class="caret"></b></a>
+                        <li class="dropdown open">
+                            <a href="#" class="dropdown-toggle" data-toggle=""><i class="fa fa-caret-square-o-down"></i> Users <b class="caret"></b></a>
                             <ul class="dropdown-menu">
                                 <li>
                                     <a href="{{ route('createUser') }}">
@@ -65,8 +65,8 @@
                                 </li>
                             </ul>
                         </li>
-                        <li class="dropdown">
-                            <a href="#" class="dropdown-toggle" data-toggle="dropdown"><i class="fa fa-caret-square-o-down"></i> Games <b class="caret"></b></a>
+                        <li class="dropdown open">
+                            <a href="#" class="dropdown-toggle" data-toggle=""><i class="fa fa-caret-square-o-down"></i> Games <b class="caret"></b></a>
                             <ul class="dropdown-menu">
                                 <li>
                                     <a href="{{ action('GameController@create') }}">
@@ -76,6 +76,21 @@
                                 <li>
                                     <a href="{{ action('GameController@index') }}">
                                         Games List
+                                    </a>
+                                </li>
+                            </ul>
+                        </li>
+                        <li class="dropdown open">
+                            <a href="#" class="dropdown-toggle" data-toggle=""><i class="fa fa-caret-square-o-down"></i> Loadouts <b class="caret"></b></a>
+                            <ul class="dropdown-menu">
+                                <li>
+                                    <a href="{{ action('LoadoutController@listLoadouts') }}">
+                                        View Loadouts
+                                    </a>
+                                </li>
+                                <li>
+                                    <a href="{{ action('LoadoutController@listVotes') }}">
+                                        View Votes
                                     </a>
                                 </li>
                             </ul>

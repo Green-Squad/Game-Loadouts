@@ -177,6 +177,66 @@ Dashboard
                 </div> </a>
             </div>
         </div>
+        <div class="col-lg-3">
+            <div class="panel panel-default">
+                <div class="panel-heading">
+                    <div class="row">
+                        <div class="col-xs-6">
+                            <i class="fa fa-suitcase fa-5x"></i>
+                        </div>
+                        <div class="col-xs-6 text-right">
+                            <p class="announcement-heading">
+                                {{ LoadoutController::loadoutCount() }}
+                            </p>
+                            <p class="announcement-text">
+                                Loadouts
+                            </p>
+                        </div>
+                    </div>
+                </div>
+                <a href="{{ action('LoadoutController@listLoadouts') }}">
+                <div class="panel-footer announcement-bottom">
+                    <div class="row">
+                        <div class="col-xs-6">
+                            View Loadouts
+                        </div>
+                        <div class="col-xs-6 text-right">
+                            <i class="fa fa-arrow-circle-right"></i>
+                        </div>
+                    </div>
+                </div> </a>
+            </div>
+        </div>
+        <div class="col-lg-3">
+            <div class="panel panel-primary">
+                <div class="panel-heading">
+                    <div class="row">
+                        <div class="col-xs-6">
+                            <i class="fa fa-check-square-o fa-5x"></i>
+                        </div>
+                        <div class="col-xs-6 text-right">
+                            <p class="announcement-heading">
+                                {{ LoadoutController::voteCount() }}
+                            </p>
+                            <p class="announcement-text">
+                                Votes
+                            </p>
+                        </div>
+                    </div>
+                </div>
+                <a href="{{ action('LoadoutController@listVotes') }}">
+                <div class="panel-footer announcement-bottom">
+                    <div class="row">
+                        <div class="col-xs-6">
+                            View Votes
+                        </div>
+                        <div class="col-xs-6 text-right">
+                            <i class="fa fa-arrow-circle-right"></i>
+                        </div>
+                    </div>
+                </div> </a>
+            </div>
+        </div>
     </div><!-- /.row -->
 
     <div class="row">

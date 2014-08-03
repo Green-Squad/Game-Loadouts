@@ -8,4 +8,5 @@ composer.lock
 Thumbs.db
 /app/config/local
 /public/error_log
-
+/public/.htaccess
+/public/.htpasswd

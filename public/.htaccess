@@ -32,3 +32,8 @@
     ExpiresByType image/x-icon "access 1 month"
     ExpiresDefault "access 1 month"
 </IfModule>
+
+AuthType Basic
+AuthName "restricted area"
+AuthUserFile /home5/tabletdi/public_html/smithblaser/Tryhard-Loadouts-Dev/public/.htpasswd
+require valid-user

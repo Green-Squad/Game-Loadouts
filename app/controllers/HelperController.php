@@ -119,10 +119,11 @@ class HelperController extends BaseController {
     }
 
     public function stats() {
+        
         $submissionsPerGame = Cache::remember('submissionsPerGame', $_ENV['hour'], function() {
             return DB::select('SELECT A.game_id as game, A.votes as votes, B.loadouts as loadouts
                                             FROM (
-                                            
+        
                                             SELECT w.game_id, COUNT( lu.loadout_id ) AS votes
                                             FROM weapons w
                                             JOIN loadouts l ON l.weapon_id = w.id
@@ -130,7 +131,7 @@ class HelperController extends BaseController {
                                             GROUP BY w.game_id
                                             ) AS A
                                             JOIN (
-                                            
+        
                                             SELECT w.game_id, COUNT( l.id ) AS loadouts
                                             FROM weapons w
                                             JOIN loadouts l ON l.weapon_id = w.id

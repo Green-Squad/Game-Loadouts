@@ -1,20 +1,18 @@
 <?php
 class LoadoutController extends BaseController {
-
     public function store(Game $game, $weaponName) {
-        
         if (Auth::guest()) {
-            $this -> validateGuest();     
+            $this -> validateGuest();
         }
-
+        
         if (Auth::check()) {
             if (Auth::user() -> role == 'Guest') {
                 $response = $this -> captchaCheck();
-                if (!$response -> isValid()) {
+                if (! $response -> isValid()) {
                     // return with error
                     return Redirect::back() -> with(array (
                         'alert' => 'Error: Incorrect CAPTCHA. Please try again.',
-                        'alert-class' => 'alert-danger'
+                        'alert-class' => 'alert-danger' 
                     ));
                 }
             }
@@ -224,8 +222,7 @@ class LoadoutController extends BaseController {
         }
     }
     public function upvoteGuest(Game $game, $weaponName, Loadout $loadout) {
-
-        $this -> validateGuest();     
+        $this -> validateGuest();
         $user = Auth::user();
         
         if (LoadoutController::userHasLoadout($user -> loadouts, $loadout -> id)) {
@@ -259,7 +256,6 @@ class LoadoutController extends BaseController {
             ));
         }
     }
-    
     public function captchaCheck() {
         $captcha = new Captcha\Captcha();
         $captcha -> setPublicKey('6Lf9-_YSAAAAAJ9k2G_qXohJi74-pDe8V4NuUdzJ');
@@ -270,18 +266,16 @@ class LoadoutController extends BaseController {
         
         return $captcha -> check($recaptcha_challenge, $recaptcha_response);
     }
-    
-    public function validateGuest()
-    {
+    public function validateGuest() {
         if (Auth::guest()) {
             // make account
-        
+            
             $newUserId = str_random(128);
             // checks for duplicate user
             while ( User::find($newUserId) ) {
                 $newUserId = str_random(128);
             }
-        
+            
             $user = new User();
             $user -> email = $newUserId;
             $user -> username = $newUserId;
@@ -291,7 +285,7 @@ class LoadoutController extends BaseController {
             $user -> failed_attempts = 0;
             $user -> confirm_token = 1;
             $user -> save();
-        
+            
             // WTF LARAVEL WHY DO I NEED TO FIND IT AGAIN
             $user = User::findOrFail($newUserId);
             // log them in and remember
@@ -304,12 +298,11 @@ class LoadoutController extends BaseController {
                 // return error
                 return Redirect::back() -> with(array (
                     'alert' => 'Error: You tried to vote as a guest, but you are not using a guest account.',
-                    'alert-class' => 'alert-danger'
+                    'alert-class' => 'alert-danger' 
                 ));
             }
         }
     }
-    
     public function detach(Game $game, $weaponName, Loadout $loadout) {
         if (Auth::check()) {
             $user = Auth::user();
@@ -353,5 +346,88 @@ class LoadoutController extends BaseController {
                 'alert-class' => 'alert-danger' 
             ));
         }
+    }
+    public static function loadoutCount() {
+        return DB::table('loadouts') -> count();
+    }
+    public static function voteCount() {
+        return DB::table('loadout_user') -> count();
+    }
+    public function listVotes() {
+        
+        $submissions = DB::select('SELECT w.game_id AS game, DATE( lu.created_at ) AS date, COUNT( lu.loadout_id ) AS votes
+                                            FROM weapons w
+                                            JOIN loadouts l ON l.weapon_id = w.id
+                                            JOIN loadout_user lu ON l.id = lu.loadout_id
+                                            GROUP BY w.game_id, DATE( lu.created_at )
+                                            ORDER BY DATE( lu.created_at ) DESC');
+        
+        $submissionsPerDay = array ();
+        $games = array ();
+        
+        foreach ( $submissions as $submission ) {
+            $game = $submission -> game;
+            $submissionsPerDay [$submission -> date] [$game] = intval($submission -> votes);
+            if (! in_array($game, $games)) {
+                array_push($games, $game);
+            }
+        }
+        $days = array_keys($submissionsPerDay);
+        
+        $gamesVotes = array ();
+        foreach ( $days as $day ) {
+            $total = 0;
+            foreach ( $games as $game ) {
+                if (! isset($gamesVotes [$game])) {
+                    $gamesVotes [$game] = array ();
+                }
+                if (isset($submissionsPerDay [$day] [$game])) {
+                    array_push($gamesVotes [$game], $submissionsPerDay [$day] [$game]);
+                } else {
+                    array_push($gamesVotes [$game], 0);
+                }
+            }
+        }
+        $pageName = 'Votes';
+        return View::make('admin/votes', compact('submissionsPerDay', 'games', 'pageName'));
+    }
+    
+    public function listLoadouts() {
+    
+        $submissions = DB::select('SELECT w.game_id AS game, DATE( l.created_at ) AS date, COUNT( l.id ) AS loadout_count
+                                            FROM weapons w
+                                            JOIN loadouts l ON l.weapon_id = w.id
+                                            GROUP BY w.game_id, DATE( l.created_at )
+                                            ORDER BY DATE( l.created_at ) DESC');
+    
+        $submissionsPerDay = array ();
+        $games = array ();
+    
+        foreach ( $submissions as $submission ) {
+            $game = $submission -> game;
+            $submissionsPerDay [$submission -> date] [$game] = intval($submission -> loadout_count);
+            if (! in_array($game, $games)) {
+                array_push($games, $game);
+            }
+        }
+        $days = array_keys($submissionsPerDay);
+    
+        $gamesVotes = array ();
+        foreach ( $days as $day ) {
+            $total = 0;
+            foreach ( $games as $game ) {
+                if (! isset($gamesVotes [$game])) {
+                    $gamesVotes [$game] = array ();
+                }
+                if (isset($submissionsPerDay [$day] [$game])) {
+                    array_push($gamesVotes [$game], $submissionsPerDay [$day] [$game]);
+                } else {
+                    array_push($gamesVotes [$game], 0);
+                }
+            }
+        }
+        
+        $pageName = 'Loadouts';
+        return View::make('admin/votes', compact('submissionsPerDay', 'games', 'pageName'));
     }
 }

@@ -1,5 +1,7 @@
 <?php
 
+
+
 /*
  * |-------------------------------------------------------------------------- | Application Routes |-------------------------------------------------------------------------- | | Here is where you can register all of the routes for an application. | It's a breeze. Simply tell Laravel the URIs it should respond to | and give it the Closure to execute when that URI is requested. |
  */
@@ -185,6 +187,16 @@ Route::group(array (
                 'as' => 'modConverted',
                 'uses' => 'UserController@listConverted'
             ));
+            
+            Route::get('votes', array (
+                'as' => 'modVotes',
+                'uses' => 'LoadoutController@listVotes'
+            ));
+            
+            Route::get('loadouts', array (
+            'as' => 'modLoadouts',
+            'uses' => 'LoadoutController@listLoadouts'
+                    ));
             
             Route::resource('game', 'GameController');
             
