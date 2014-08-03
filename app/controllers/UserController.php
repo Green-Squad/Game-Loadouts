@@ -119,10 +119,10 @@ class UserController extends BaseController {
                 $user = User::findOrFail($email);
                 
                 $data = array (
-                    'token' => $user -> confirm_token 
+                    'token' => $user -> confirm_token,
+                    'username' => $user -> username 
                 );
                 Mail::send('emails.auth.confirm', $data, function ($message) use($user) {
-                    
                     $message -> to($user -> email, $user -> username) -> subject('Confirm your email address for Game Loadouts.');
                 });
             } catch ( \Illuminate\Database\QueryException $e ) {
