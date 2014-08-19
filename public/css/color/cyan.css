@@ -401,6 +401,10 @@ header .top-bar ul li:hover a i {
     border-color: #00617c;
 }
 
+.logo {
+    background: url('/img/logo-cyan.png');
+}
+
 
 
 

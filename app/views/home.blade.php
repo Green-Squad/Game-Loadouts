@@ -9,73 +9,36 @@ Game Loadouts contains Titanfall, Battlefield 4 (BF4), and Call of Duty Ghosts (
 @stop
 
 @section('sub-header')
-<section id="home" >
-    <!-- Sub Header -->
-    <div class="sub-header" >
-        <!-- Slider -->
-        <div class="bannercontainer">
-            <div class="banner">
-                <ul>
-                    @foreach($games as $game)
-                    <li
-                    class="slide1"
-                    data-transition="slidehorizontal"
-                    data-slotamount="1"
-                    >
-                        <img src="{{ asset($game -> image_url )}}" alt="{{ $game -> id }}" />
-                        <a href="{{ route('showGame', urlencode($game -> id)) }}">
-                            <div
-                            class="caption lfb ltb"
-                            data-x="525"
-                            data-y="120"
-                            data-start="500"
-                            data-easing="easeOutBack"
-                            >
-                                <h2>{{ $game -> id }}</h2>
-                            </div>
-                            <div
-                            class="caption lfb ltb"
-                            data-x="525"
-                            data-y="104"
-                            data-start="500"
-                            >
-                                <p>
-                                    View Loadouts
-                                </p>
-                            </div>
-                        </a>
-                    </li>
-                    @endforeach
-                </ul>
-                <div class="tp-bannertimer tp-bottom"></div>
+<div id="home">
+    <div id="intro" style="padding-top:50px;padding-bottom:50px;text-align:left;">
+        <div class="container">
+            <div class="col-md-8 col-md-offset-2">
+                <h2 style="margin-top:0; margin-bottom: 20px;">Enter a weapon to find loadouts</h2>
+                {{ Form::open(array('action' => 'WeaponController@parseSearch', 'id' => 'searchForm')) }}
+                <div class="input-group">
+                    <input type="text" class="form-control input-lg" name="query" id="autocomplete-ajax" autofocus autocomplete="off" placeholder="e.g. ACE 23 / Battlefield 4" />
+                    <span class="input-group-btn">
+                        <button class="input-lg btn btn-primary" type="submit" style="font-size: 18px;">
+                        Search
+                        </button>
+                    </span>
+                </div>
+                {{ Form::close() }}
             </div>
         </div>
-        <!-- End Slider -->
     </div>
-</section>
+</div>
 @stop
 
 @section('content')
+
 <div class="row">
-    <div class="col-md-4">
+    <div class="col-md-8">
         <h2>What is Game Loadouts?</h2>
         <span class="line"> <span class="sub-line"></span> </span>
         <p>Game Loadouts is a portal for finding the best ways to outfit your weapons in your favorite games.</p>
         <p>This website comes in handy when you need to complete challenges with various weapons and need to know the best attachment combination for that weapon.</p>
         <p>It is also great for fine-tuning your favorite gun to help improve your gameplay. This will save you rounds of trial and error to find the best loadout.</p>
-    </div>
-    <div class="col-md-4">
-        <h2>Site News</h2>
-        <span class="line"> <span class="sub-line"></span> </span>
-        @for($i = 0; $i < 1; $i++)
-		<div class="item">
-			<h4><a href="{{ $items[$i]->get_permalink() }}" class="green-a">{{ $items[$i]->get_title() }}</a></h4>
-			<p>{{ $items[$i]->get_description() }}</p>
-			<p><small>Posted on {{ $items[$i]->get_date('j F Y | g:i a') }}</small></p>
-		</div>
- 
-	   @endfor
-
     </div>
     <div class="col-md-4">
     	@if(Auth::guest() || Auth::user() -> role == 'Guest')
@@ -118,14 +81,72 @@ Game Loadouts contains Titanfall, Battlefield 4 (BF4), and Call of Duty Ghosts (
         <p>You can <a href="{{ route('join') }}">register</a> for free.</p>
         @else
         	<h2>Hello {{ Auth::user() -> username }}</h2>
-        <span class="line"> <span class="sub-line"></span> </span>
-        <p>Thank you for stopping by. We hope you enjoy your visit.</p>
+            <span class="line"> <span class="sub-line"></span> </span>
+            @if($recentLoadout)
+                <?php
+                    $weapon = Weapon::findOrFail($recentLoadout -> weapon_id);
+                ?>
+                <p>Your <a href="{{ route('showLoadout', array(urlencode($weapon -> game_id), urlencode($weapon -> name), $recentLoadout -> id)) }}">last loadout</a> was for {{ link_to_route('showLoadouts', $weapon -> name, array(urlencode($weapon -> game_id), urlencode($weapon -> name))) }} in {{ link_to_route('showGame', $weapon -> game_id, urlencode($weapon -> game_id)) }} on {{ date('m/d/Y', strtotime($recentLoadout -> pivot -> updated_at )) }}.</p>
+                    <a class="block loadoutSmall" href="{{ route('showLoadout', array(urlencode($weapon -> game_id), urlencode($weapon -> name), $recentLoadout -> id)) }}">
+                         <div class="row">
+                             <div class="col-md-12">
+                                 <img src="{{ asset($weapon -> thumb_url) }}" alt="{{ $weapon -> name }}" class="pull-right" style="max-height: 30px;" />
+                                 <h4 class="weaponSmall theme-color">{{ $weapon -> name }}</h4>
+                             </div>
+                         </div>
+                            @foreach(Loadout::findOrFail($recentLoadout -> id) -> attachments as $attachment)
+                            <div class="attachmentSmall">
+                                <img src="{{ asset($attachment -> thumb_url) }}" alt="{{ $attachment -> name }}" />
+                                {{ $attachment -> name }}
+                            </div>
+                            @endforeach
+                        <div class="clearfix"></div>
+                    </a>  
+                          
+            @else
+                <p>You have not submitted any loadouts yet. You can start by searching for a weapon in the search box.</p>
+            @endif
         @endif
     </div>
+</div>
+<div class="row">
+    <div class="col-md-8">
+        <h2>Site News</h2>
+        <span class="line"> <span class="sub-line"></span> </span>
+        @for($i = 0; $i < 1; $i++)
+		<div class="item">
+			<h4><a href="{{ $items[$i]->get_permalink() }}" class="green-a">{{ $items[$i]->get_title() }}</a></h4>
+			<p>{{ $items[$i]->get_description() }}</p>
+			<p><small>Posted on {{ $items[$i]->get_date('j F Y | g:i a') }}</small></p>
+		</div>
+	   @endfor
+       <p>View more news on the <a href="http://blog.gameloadouts.com">Game Loadouts Blog</a>.</p>
+    </div>
+    <div class='ajax-poll' tclass='poll'></div>
 </div>
 @stop
 
 @section('scripts')
 <script type="text/javascript" src="{{ asset('rs-plugin/js/jquery.themepunch.plugins.min.js') }}"></script>
 <script type="text/javascript" src="{{ asset('rs-plugin/js/jquery.themepunch.revolution.min.js') }}"></script>
+<script type="text/javascript" src="{{ asset('js/jquery.autocomplete.js') }}"></script>
+<script type="text/javascript" src="/poll/ajax-poll.php"></script>
+<script>
+
+$('#autocomplete-ajax').autocomplete({
+    serviceUrl: '/search_weapons',
+    onSearchStart: function () {
+    	$(this).attr('autocomplete', 'off');
+    }
+});
+
+
+$('#autocomplete-ajax').focus(function() {
+	$('#autocomplete-ajax').attr('autocomplete', 'off');
+});
+$(document).ready(function() {
+    $('#autocomplete-ajax').attr('autocomplete', 'off');
+});
+
+</script>
 @stop

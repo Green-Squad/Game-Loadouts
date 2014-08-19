@@ -27,6 +27,7 @@ App::error(function (Exception $exception) {
     }
 });
 
+
 Route::get('sitemap.xml', 'HelperController@sitemap');
 
 Route::get('/', array (
@@ -36,6 +37,22 @@ Route::get('/', array (
             return Game::where('live', 1) -> orderBy(DB::raw('RAND()')) -> take(4) -> get();
         });
         $items = FeedReader::read('http://blog.gameloadouts.com/feed/') -> get_items();
+        $recentLoadout = '';
+        if(Auth::check() && Auth::user() -> role != 'Guest' && Auth::user() -> loadouts) {
+            $recentLoadout = Auth::user() -> loadouts;
+            $first = true;
+            foreach(Auth::user() -> loadouts as $loadout) {
+                if ($first) {
+                    $recentLoadout = $loadout;
+                    $first = false;
+                    return View::make('home', compact('games', 'items', 'recentLoadout'));
+                    break;
+                }
+            }
+            $recentLoadout = NULL;
+            return View::make('home', compact('games', 'items', 'recentLoadout'));
+            
+        }
         return View::make('home', compact('games', 'items'));
     } 
 ));
@@ -50,6 +67,16 @@ Route::get('terms', array (
     function () {
         return View::make('termsofservice');
     } 
+));
+
+Route::get('search_weapons', array (
+'as' => 'searchWeapons',
+'uses' => 'WeaponController@searchWeapons'
+));
+
+Route::post('search', array (
+'as' => 'parseSearch',
+'uses' => 'WeaponController@parseSearch'
 ));
 
 Route::group(array (

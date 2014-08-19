@@ -401,6 +401,10 @@ header .top-bar ul li:hover a i {
     border-color: #006d21;
 }
 
+.logo {
+    background: url('/img/logo-green.png');
+}
+
 
 
 

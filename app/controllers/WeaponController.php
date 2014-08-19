@@ -295,4 +295,51 @@ class WeaponController extends BaseController {
         ksort($attachmentsBySlot);
         return $attachmentsBySlot;
     }
+
+    public function searchWeapons() {
+        $query = Input::get('query');
+        $queryParts = explode('/', $query);
+        
+        $weaponName = trim($queryParts [0]);
+        if (isset($queryParts [1])) {
+            $gameName = trim($queryParts [1]);
+        }
+        
+        $weapons = Weapon::select('name', 'game_id') -> where('name', 'LIKE', '%' . $weaponName . '%') -> get();
+        $suggestions = array (
+            'suggestions' => array () 
+        );
+        foreach ( $weapons as $weapon ) {
+            $suggestionString = $weapon -> name . ' / ' . $weapon -> game_id;
+            array_push($suggestions ['suggestions'], $suggestionString);
+        }
+        
+        return Response::json($suggestions);
+    }
+
+    public function parseSearch() {
+        $query = Input::get('query');
+        if (strpos($query, '/')) {
+            $queryParts = explode('/', $query);
+            
+            $weaponName = trim($queryParts [0]);
+            $gameName = trim($queryParts [1]);
+            
+            $weapon = Weapon::where('name', $weaponName) -> where('game_id', $gameName) -> first();
+            
+            if (count($weapon) > 0) {
+                return Redirect::route('showLoadouts', array (
+                    urlencode($gameName),
+                    urlencode($weaponName) 
+                ));
+            }
+        }
+        try {
+            $googleRequest = file_get_contents($_ENV ['search_url'] . urlencode($query));
+            $googleRequestDecoded = json_decode($googleRequest);
+            return View::make('search', compact('googleRequestDecoded'));
+        } catch ( Exception $e ) {
+            return Redirect::to('https://www.google.com/?#q=site:gameloadouts.com+' . urlencode($query));
+        }
+    }
 }

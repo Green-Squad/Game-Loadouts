@@ -60,7 +60,7 @@ class User extends Eloquent implements UserInterface, RemindableInterface {
   }
   
   public function loadouts() {
-        return $this -> belongsToMany('Loadout') -> withTimestamps();
+        return $this -> belongsToMany('Loadout') -> withTimestamps() -> orderBy('loadout_user.updated_at', 'desc');
     }
 
 }

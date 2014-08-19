@@ -53,9 +53,11 @@
                                         <span class="icon-bar"></span>
                                         <span class="icon-bar"></span>
                                     </button>
-                                    <div class="logo h1">
-                                        <a href="{{ route('home') }}"> Game Loadouts </a>
-                                    </div>
+                                    <a href="{{ route('home') }}" class="logo">
+                                        <h1>
+                                            Game Loadouts    
+                                        </h1>
+                                    </a>
                                 </div>
 
                                 <!-- Collect the nav links, forms, and other content for toggling -->
@@ -150,9 +152,6 @@
                         </p>
                         <p>
                             This website comes in handy when you need to complete challenges with various weapons and need to know the best attachment combination for that weapon.
-                        </p>
-                        <p>
-                            It is also great for fine-tuning your favorite gun to help improve your gameplay. This will save you rounds of trial and error to find the best loadout.
                         </p>
                     </div>
                     <div class="col-md-3">
