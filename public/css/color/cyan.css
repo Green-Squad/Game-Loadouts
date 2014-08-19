@@ -19,10 +19,6 @@ header .top-bar ul li:hover a {
 	border-right: 1px solid #00bff3;
 }
 
-header .main-menu .navbar .navbar-toggle {
-	background: #00bff3;
-}
-
 header .main-menu .nav li > a:hover,
 header .main-menu .nav li.active > a,
 header .main-menu .nav li.active > a:hover {  
@@ -48,10 +44,6 @@ header .main-menu .navbar .btn-navbar {
 header .top-bar ul li.active a i,
 header .top-bar ul li:hover a i {
 	color: #00799a;
-}
-
-header .main-menu .navbar .navbar-toggle .icon-bar {
-	background-color: #00799a;
 }
 
 header .main-menu .nav li > a:hover,
@@ -394,6 +386,10 @@ header .top-bar ul li:hover a i {
 .btn-primary:hover {
     background-color: #0096bf;
     border-color: #00617c;
+}
+
+.nav-element:hover {
+    background-color: #00bff3;
 }
 
 #guestAlert {

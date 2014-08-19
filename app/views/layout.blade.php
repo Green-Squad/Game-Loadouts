@@ -47,19 +47,21 @@
                         <div class="row">
                             <nav class="navbar" role="navigation">
                                 <div class="navbar-header">
-                                    <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-ex1-collapse">
-                                        <span class="sr-only">Toggle navigation</span>
-                                        <span class="icon-bar"></span>
-                                        <span class="icon-bar"></span>
-                                        <span class="icon-bar"></span>
-                                    </button>
+                                    <div class="navbar-toggle-box">
+                                        <button type="button" class="navbar-toggle vertical-center" data-toggle="collapse" data-target=".navbar-ex1-collapse">
+                                            <span class="sr-only">Toggle navigation</span>
+                                            <span class="icon-bar"></span>
+                                            <span class="icon-bar"></span>
+                                            <span class="icon-bar"></span>
+                                        </button>
+                                    </div>
                                     <a href="{{ route('home') }}" class="logo">
-                                        <h1>
+                                        <h1 style="margin: 0;">
                                             Game Loadouts    
                                         </h1>
                                     </a>
                                 </div>
-
+                                
                                 <!-- Collect the nav links, forms, and other content for toggling -->
                                 <div class="collapse navbar-collapse navbar-ex1-collapse">
                                     <ul class="nav navbar-nav navbar-right">
@@ -103,6 +105,26 @@
                                         @endif
                                     </ul>
                                 </div><!-- /.navbar-collapse -->
+                                
+               <form class="navbar-form" id="navbar-search" role="search">
+					<div class="input-group">
+						<input type="text" class="form-control" id="autocomplete-ajax" placeholder="Search">
+						<span class="input-group-btn">
+							<button type="reset" class="btn btn-default nav-element">
+								<span class="glyphicon glyphicon-remove">
+									<span class="sr-only">Close</span>
+								</span>
+							</button>
+							<button type="submit" class="btn btn-default nav-element">
+								<span class="glyphicon glyphicon-search">
+									<span class="sr-only">Search</span>
+								</span>
+							</button>
+						</span>
+					</div>
+				</form>
+                                
+                                
                             </nav>
                         </div>
                     </div>
@@ -264,7 +286,47 @@
 
         </script>
         @endif
+        
+        <script>
 
+        $(function () {
+            // Remove Search if user Resets Form or hits Escape!
+    		$('body, #navbar-search button[type="reset"]').on('click keyup', function(event) {
+    			console.log(event.currentTarget);
+    			if (event.which == 27 && $('#navbar-search').hasClass('active') ||
+    				$(event.currentTarget).attr('type') == 'reset') {
+    				closeSearch();
+    			}
+    		});
+
+    		function closeSearch() {
+                var $form = $('#navbar-search.active')
+        		$form.find('input').val('');
+    			$form.removeClass('active');
+    		}
+
+    		// Show Search if form is not active // event.preventDefault() is important, this prevents the form from submitting
+    		$(document).on('click', '#navbar-search:not(.active) button[type="submit"]', function(event) {
+    			event.preventDefault();
+    			var $form = $(this).closest('form'),
+    				$input = $form.find('input');
+    			$form.addClass('active');
+    			$input.focus();
+
+    		});
+    		// ONLY FOR DEMO // Please use $('form').submit(function(event)) to track from submission
+    		// if your form is ajax remember to call `closeSearch()` to close the search container
+    		$(document).on('click', '#navbar-search.active button[type="submit"]', function(event) {
+    			event.preventDefault();
+    			var $form = $(this).closest('form'),
+    				$input = $form.find('input');
+    			$('#showSearchTerm').text($input.val());
+                closeSearch()
+    		});
+        });
+        
+        </script>
+        
         @yield('scripts')
         <!-- End Javascript -->
 
