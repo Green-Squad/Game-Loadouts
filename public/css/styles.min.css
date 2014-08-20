@@ -2246,11 +2246,11 @@ header .main-menu .navbar .navbar-toggle .icon-bar {
 }
 
 .navbar-toggle-box {
-    border-right: 1px solid #ccc;
+    border-right: 1px solid #000;
     float: left;
     height: 50px;
-    padding: 0 10px;
-    margin: 0 10px 0 0;
+    padding: 0 8px;
+    margin: 0 8px 0 0;
     display: flex;
 }
 
@@ -2326,6 +2326,10 @@ header .main-menu .navbar .navbar-toggle .icon-bar {
     #navbar-search button, #navbar-search input {
         height: 50px;
     }
+    
+     #navbar-search input {
+        font-size: 14pt;
+     }
     
     #navbar-search {
         top: -1px;

@@ -105,10 +105,9 @@
                                         @endif
                                     </ul>
                                 </div><!-- /.navbar-collapse -->
-                                
-               <form class="navbar-form" id="navbar-search" role="search">
+                {{ Form::open(array('action' => 'WeaponController@parseSearch', 'id' => 'navbar-search', 'class' => 'navbar-form', 'role' => 'search')) }}
 					<div class="input-group">
-						<input type="text" class="form-control" id="autocomplete-ajax" placeholder="Search">
+						<input type="text" class="form-control" name="query" id="autocomplete-ajax-nav" placeholder="e.g. ACE 23 / Battlefield 4" autocomplete="off">
 						<span class="input-group-btn">
 							<button type="reset" class="btn btn-default nav-element">
 								<span class="glyphicon glyphicon-remove">
@@ -122,8 +121,7 @@
 							</button>
 						</span>
 					</div>
-				</form>
-                                
+                {{ Form::close() }}                                
                                 
                             </nav>
                         </div>
@@ -314,19 +312,25 @@
     			$input.focus();
 
     		});
-    		// ONLY FOR DEMO // Please use $('form').submit(function(event)) to track from submission
-    		// if your form is ajax remember to call `closeSearch()` to close the search container
-    		$(document).on('click', '#navbar-search.active button[type="submit"]', function(event) {
-    			event.preventDefault();
-    			var $form = $(this).closest('form'),
-    				$input = $form.find('input');
-    			$('#showSearchTerm').text($input.val());
-                closeSearch()
-    		});
         });
         
         </script>
-        
+        <script type="text/javascript" src="{{ asset('js/jquery.autocomplete.js') }}"></script>
+        <script>
+            $('#autocomplete-ajax-nav').autocomplete({
+                serviceUrl: '/search_weapons',
+                onSearchStart: function () {
+                	$(this).attr('autocomplete', 'off');
+                }
+            });
+
+            $('#autocomplete-ajax-nav').focus(function() {
+            	$('#autocomplete-ajax').attr('autocomplete', 'off');
+            });
+            $(document).ready(function() {
+                $('#autocomplete-ajax-nav').attr('autocomplete', 'off');
+            });
+        </script>
         @yield('scripts')
         <!-- End Javascript -->
 

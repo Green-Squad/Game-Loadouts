@@ -129,7 +129,6 @@ Game Loadouts contains Titanfall, Battlefield 4 (BF4), and Call of Duty Ghosts (
 @section('scripts')
 <script type="text/javascript" src="{{ asset('rs-plugin/js/jquery.themepunch.plugins.min.js') }}"></script>
 <script type="text/javascript" src="{{ asset('rs-plugin/js/jquery.themepunch.revolution.min.js') }}"></script>
-<script type="text/javascript" src="{{ asset('js/jquery.autocomplete.js') }}"></script>
 <script type="text/javascript" src="/poll/ajax-poll.php"></script>
 <script>
 
