@@ -34,9 +34,13 @@ Route::get('/', array (
     'as' => 'home',
     function () {
         $games = Cache::remember('games_slider', $_ENV ['week'], function () {
-            return Game::where('live', 1) -> orderBy(DB::raw('RAND()')) -> take(4) -> get();
+            return Game::where('live', 1) -> orderBy(DB::raw('RAND()')) -> take(3) -> get();
         });
         $items = FeedReader::read('http://blog.gameloadouts.com/feed/') -> get_items();
+        $topLoadoutsPerGame = $games;
+        foreach($topLoadoutsPerGame as $game) {
+        	$game -> topLoadouts = GameController::topLoadouts($game);
+        }
         $recentLoadout = '';
         if(Auth::check() && Auth::user() -> role != 'Guest' && Auth::user() -> loadouts) {
             $recentLoadout = Auth::user() -> loadouts;
@@ -45,15 +49,16 @@ Route::get('/', array (
                 if ($first) {
                     $recentLoadout = $loadout;
                     $first = false;
-                    return View::make('home', compact('games', 'items', 'recentLoadout'));
+                    //return View::make('home', compact('games', 'items', 'recentLoadout'));
                     break;
                 }
             }
-            $recentLoadout = NULL;
-            return View::make('home', compact('games', 'items', 'recentLoadout'));
-            
+            if (get_class($recentLoadout) != 'Loadout') {
+            	$recentLoadout = NULL;
+            }
+           // return View::make('home', compact('games', 'items', 'recentLoadout', 'topLoadoutsPerGame'));
         }
-        return View::make('home', compact('games', 'items'));
+        return View::make('home', compact('games', 'items', 'topLoadoutsPerGame', 'recentLoadout'));
     } 
 ));
 
@@ -327,3 +332,17 @@ Route::post('{game}/{weapon}/{loadout}/detach', array (
     'as' => 'detachLoadout',
     'uses' => 'LoadoutController@detach' 
 ));
+
+Route::get('setauthor', function() {
+	$loadouts = Loadout::all();
+	foreach($loadouts as $loadout) {
+		$loadout_users = DB::table('loadout_user')->select('user_id','created_at', 'loadout_id')->where('loadout_id',$loadout->id)->orderBy('created_at')->get();
+		foreach($loadout_users as $loadout_user) {
+			$author = User::find($loadout_user->user_id);
+			$loadout->user_id = $author->email;
+			$loadout->save();
+			break;
+		}
+	}
+});
+

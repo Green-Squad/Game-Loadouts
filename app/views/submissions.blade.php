@@ -17,6 +17,7 @@ Submissions
         @endif
         <h2>Submissions</h2>
         <span class="line"> <span class="sub-line"></span></span>
+		@if(count($loadouts) > 0)
         <table class="table table-striped tablesorter">
             <thead>
                 <tr>
@@ -60,6 +61,14 @@ Submissions
                 @endforeach
             </tbody>
         </table>
+		@else
+		<p>
+			You have not submitted any loadouts yet.
+		</p>
+		<p>
+			You can start by searching for a weapon in the search box.
+		</p>
+		@endif
     </div>
     @if(HelperController::adsEnabled())
     <div class="col-md-4">

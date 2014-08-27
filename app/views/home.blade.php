@@ -110,6 +110,62 @@ Game Loadouts contains Titanfall, Battlefield 4 (BF4), and Call of Duty Ghosts (
     </div>
 </div>
 <div class="row">
+	<div class="col-md-12">
+		 <h2>Popular Loadouts</h2>
+		 <span class="line"> <span class="sub-line"></span> </span>
+		<div class="row">
+		@foreach($topLoadoutsPerGame as $game)
+		    <div class="col-md-4">
+				<a class="loadoutSmall block" href="{{ route('showGame', urlencode($game -> id)) }}">
+						<h3 class="weaponSmall theme-color" style="margin: 0px 0 3px 0">{{ $game -> id }}
+							<small class="pull-right" style="margin: 6px 0 0 0">All Loadouts</small>
+						</h3>
+					<img src="{{ $game -> thumb_url}}" alt="{{ $game -> id }}" style="width:100%;" />
+		        </a>
+				<?php 
+		        $loadoutCount = 1;
+		        $accordianId = "accordian" . preg_replace("/[\s]/", '', $game -> id);
+		        ?>
+		        <div class="panel-group" id="{{ $accordianId }}">
+		        @foreach($game -> topLoadouts as $loadout)
+				    <?php
+				    $count = $loadout -> count;
+				    $loadout = Loadout::findOrFail($loadout -> id);
+				    
+				    ?>
+				   	<div class="panel">
+					    <div class="loadoutSmall" style="margin:0">
+					      	<h4 class="panel-title">
+					        	<a data-toggle="collapse" data-parent="#{{ $accordianId }}" href="#collapse{{ $loadout -> id }}">
+				    				<h4 class="weaponSmall theme-color">{{ Weapon::findOrFail($loadout -> weapon_id) -> name }} <small class="pull-right"> ({{ $count }} votes)</small></h4> 
+				   				</a>
+				   			</h4>
+				   		</div>
+				   		<div id="collapse{{ $loadout -> id }}" class="panel-collapse collapse @if($loadoutCount++ == 1)in@endif">
+				    		<a class="loadoutSmall block" href="{{ route('showLoadout', array(urlencode($game -> id), urlencode(Weapon::findOrFail($loadout -> weapon_id) -> name), urlencode($loadout ->id))) }}"> 
+					    	@foreach($loadout -> attachments as $attachment)
+						    <div class="attachmentSmall">
+						        <img src="{{ asset($attachment -> thumb_url) }}" alt="{{ $attachment -> name }}" />
+						        {{ $attachment -> name }}
+						    </div> @endforeach
+								<div class="row">
+									<div class="col-md-12">
+										<button class="btn btn-primary pull-right" style="margin: 5px 0 0 0;" href="{{ route('showLoadout', array(urlencode($game -> id), urlencode(Weapon::findOrFail($loadout -> weapon_id) -> name), urlencode($loadout ->id))) }}">
+                        					<span class="glyphicon glyphicon-screenshot"></span> View Loadout
+                    					</button>
+									</div>
+								</div>
+							</a>
+				    	</div>
+					</div>
+			    @endforeach
+		    	</div>
+		    </div>
+	    @endforeach
+		</div>
+	</div>
+</div>
+<div class="row">
     <div class="col-md-8">
         <h2>Site News</h2>
         <span class="line"> <span class="sub-line"></span> </span>
@@ -127,8 +183,8 @@ Game Loadouts contains Titanfall, Battlefield 4 (BF4), and Call of Duty Ghosts (
 @stop
 
 @section('scripts')
-<script type="text/javascript" src="{{ asset('rs-plugin/js/jquery.themepunch.plugins.min.js') }}"></script>
-<script type="text/javascript" src="{{ asset('rs-plugin/js/jquery.themepunch.revolution.min.js') }}"></script>
+<!-- <script type="text/javascript" src="{{ asset('rs-plugin/js/jquery.themepunch.plugins.min.js') }}"></script>
+<script type="text/javascript" src="{{ asset('rs-plugin/js/jquery.themepunch.revolution.min.js') }}"></script> -->
 <script type="text/javascript" src="/poll/ajax-poll.php"></script>
 <script>
 

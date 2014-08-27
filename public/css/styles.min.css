@@ -2246,7 +2246,6 @@ header .main-menu .navbar .navbar-toggle .icon-bar {
 }
 
 .navbar-toggle-box {
-    border-right: 1px solid #000;
     float: left;
     height: 50px;
     padding: 0 8px;

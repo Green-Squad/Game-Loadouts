@@ -161,15 +161,20 @@ class GameController extends BaseController {
     public function listWeapons(Game $game) {
         $weaponsByType = $this -> getWeaponsByType($game);
         $recentLoadouts = DB::select('SELECT * FROM weapons w JOIN loadouts l ON l.weapon_id = w.id WHERE game_id = \'' . $game -> id . '\' ORDER BY l.updated_at DESC LIMIT 5');
-        $topLoadouts = DB::select('SELECT lu.loadout_id, l.id , COUNT( lu.loadout_id ) as count
+        $topLoadouts = GameController::topLoadouts($game);
+        return View::make('game', compact('game', 'weaponsByType', 'recentLoadouts', 'topLoadouts'));
+    }
+    
+    public static function topLoadouts(Game $game) {
+    	$topLoadouts = DB::select('SELECT lu.loadout_id, l.id , COUNT( lu.loadout_id ) as count
                                         FROM weapons w
                                         JOIN loadouts l ON l.weapon_id = w.id
                                         JOIN loadout_user lu ON l.id = lu.loadout_id
                                         WHERE game_id =  \'' . $game -> id . '\'
                                         GROUP BY lu.loadout_id
-                                        ORDER BY COUNT( lu.loadout_id ) DESC 
+                                        ORDER BY COUNT( lu.loadout_id ) DESC
                                         LIMIT 5');
-        return View::make('game', compact('game', 'weaponsByType', 'recentLoadouts', 'topLoadouts'));
+    	return $topLoadouts;
     }
 
     public function getWeaponsByType(Game $game) {
