@@ -78,8 +78,8 @@ class LoadoutController extends BaseController {
                         $user -> loadouts() -> save($existingLoadout);
                         $user -> save();
                         return Redirect::route('showLoadout', array (
-                            $game -> id,
-                            $weapon -> name,
+                            urlencode($game -> id),
+                            urlencode($weapon -> name),
                             $existingLoadout -> id 
                         )) -> with(array (
                             'alert' => 'Your vote for an existing loadout has been recorded.',
@@ -88,9 +88,11 @@ class LoadoutController extends BaseController {
                     }
                 } else {
                     try {
-                        
+                        $user = Auth::user();
+						
                         $loadout = new Loadout();
                         $loadout -> weapon_id = $weapon -> id;
+						$loadout -> user_id = $user -> email;
                         $loadout -> save();
                         
                         foreach ( $attachments as $attachment ) {
@@ -98,7 +100,7 @@ class LoadoutController extends BaseController {
                             $loadout -> attachments() -> save($attachment);
                         }
                         
-                        $user = Auth::user();
+                        
                         $user -> loadouts() -> save($loadout);
                         $user -> save();
                     } catch ( \Illuminate\Database\QueryException $e ) {
@@ -109,8 +111,8 @@ class LoadoutController extends BaseController {
                     }
                 }
                 return Redirect::route('showLoadout', array (
-                    $game -> id,
-                    $weapon -> name,
+                    urlencode($game -> id),
+                    urlencode($weapon -> name),
                     $loadout -> id 
                 )) -> with(array (
                     'alert' => 'Loadout has been successfully created.',

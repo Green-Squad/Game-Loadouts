@@ -149,12 +149,11 @@ class GameController extends BaseController {
     }
     
     // lists the games for the public navigation
-    // It only returns 'live' games
     public static function listGames() {
-        // $games = Game::where('live', 1) -> get();
-        $games = Cache::remember('games_nav', $_ENV ['week'], function () {
-            return Game::where('live', 1) -> get();
-        });
+        $games = Game::all();
+        //$games = Cache::remember('games_nav', $_ENV ['week'], function () {
+            //return Game::where('live', 1) -> get();
+        //});
         return $games;
     }
 
@@ -162,7 +161,12 @@ class GameController extends BaseController {
         $weaponsByType = $this -> getWeaponsByType($game);
         $recentLoadouts = DB::select('SELECT * FROM weapons w JOIN loadouts l ON l.weapon_id = w.id WHERE game_id = \'' . $game -> id . '\' ORDER BY l.updated_at DESC LIMIT 5');
         $topLoadouts = GameController::topLoadouts($game);
-        return View::make('game', compact('game', 'weaponsByType', 'recentLoadouts', 'topLoadouts'));
+		if ($game -> live == 0) {
+			if (Auth::guest() || Auth::user() -> role != 'Admin') {
+				return Response::view('errors.missing', array (), 404);
+			}
+		}
+       	return View::make('game', compact('game', 'weaponsByType', 'recentLoadouts', 'topLoadouts'));
     }
     
     public static function topLoadouts(Game $game) {

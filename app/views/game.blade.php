@@ -9,7 +9,6 @@
 @stop
 
 @section('css')
-<link rel="stylesheet" type="text/css" href="{{ asset('css/games/' . urlencode($game -> id) . '.css') }}" />
 <style>
     .hide {
         visibility: hidden;
@@ -21,10 +20,14 @@
 </style>
 @stop
 
+@section('theme-color')
+<body class="red">
+@stop
+
 @section('sub-header')
 <section id="game" >
     <!-- Sub Header -->
-    <div class="sub-header" >
+    <div class="{{ strtolower(preg_replace('/\s/','-', $game -> id))}}-sub-header sub-header" >
         <div class="container">
             <div class="row" >
                 <ul class="sub-header-container" >

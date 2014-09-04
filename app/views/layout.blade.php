@@ -18,6 +18,8 @@
         <link href="{{ asset('css/styles.min.css') }}" rel="stylesheet" />
         @yield('css', '<link href="/css/color/green.css" rel="stylesheet" />')
         <link href="{{ asset('css/media-queries.css') }}" rel="stylesheet" />
+		
+		
 
         <!-- HTML5 shim, for IE6-8 support of HTML5 elements -->
         <!--[if lt IE 9]>
@@ -30,7 +32,7 @@
         <![endif]-->
         <!-- End CSS -->
     </head>
-    <body>
+    @yield('theme-color', '<body class="green">')
         @if ((Auth::guest() || Auth::user() -> role == 'Guest') && !isset($_COOKIE['guestAlertClose']))
         <div id="guestAlert" class="alert" style="margin:0">You no longer need to register to submit or vote on loadouts, but there are still {{ link_to_route('join','many benefits') }} to registering.
             <button type="button" class="close" id="guestAlertClose"><span class="glyphicon glyphicon-remove-sign"></span></button>
@@ -73,9 +75,15 @@
                                             <a href="{{ route('showGames') }}" class="dropdown-toggle"> Games <b class="caret"></b> </a>
                                             <ul>
                                                 @foreach(GameController::listGames() as $game)
-                                                <li>
-                                                    <a href="{{ route('showGame', urlencode($game -> id)) }}"> {{ $game -> id }} </a>
-                                                </li>
+													@if($game -> live == 1)
+														<li>
+															<a href="{{ route('showGame', urlencode($game -> id)) }}"> {{ $game -> id }} </a>
+														</li>
+													@elseif(Auth::check() && Auth::user() -> role == "Admin")
+														<li>
+															<a href="{{ route('showGame', urlencode($game -> id)) }}"> {{ $game -> id }} </a>
+														</li>
+													@endif
                                                 @endforeach
                                             </ul>
                                         </li>
@@ -332,7 +340,9 @@
             });
         </script>
         @yield('scripts')
+		<!--<script src="{{ asset('js/instantclick.min.js') }}" data-no-instant></script>
+		<script data-no-instant>InstantClick.init();</script>-->
         <!-- End Javascript -->
-
+	
     </body>
 </html>

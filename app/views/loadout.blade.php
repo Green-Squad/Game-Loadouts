@@ -57,6 +57,17 @@ The {{ $weapon -> name }} in {{ $game -> id }}@if($game -> short_name) ({{ $game
                             </li>
                         </ul>
                     </li>
+					<li>
+						<h4 class="title" style="padding:5px 5px 4px 5px;">
+							Originally submitted by <a href="" style="color:#fff">
+								@if(User::find($loadout -> user_id) -> role == 'Guest')
+									Guest
+								@else
+									{{ User::find($loadout -> user_id) -> username }}
+								@endif
+							</a>
+						</h4>
+					</li>
                 </ul>
             </div>
         </div>

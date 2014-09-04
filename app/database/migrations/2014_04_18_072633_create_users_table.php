@@ -83,10 +83,12 @@ class CreateUsersTable extends Migration {
         Schema::create('loadouts', function(Blueprint $table) {
             $table -> increments('id');
             $table -> integer('weapon_id') -> unsigned();
+			$table -> string('user_id', 128);
             $table -> timestamps();
-
+			
+            $table -> foreign('user_id') -> references('email') -> on('users') -> onUpdate('cascade') -> onDelete('cascade');
             $table -> foreign('weapon_id') -> references('id') -> on('weapons') -> onUpdate('cascade') -> onDelete('cascade');
-
+	
             $table -> engine = 'InnoDB';
         });
 

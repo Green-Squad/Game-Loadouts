@@ -76,6 +76,23 @@ class HelperController extends BaseController {
             imagegif($virtual_image, $thumb_url);
         }
     }
+	
+	public function compileCSS() {
+		
+		// GitHub: oyejorge/less.php
+		$options = array( 'compress'=>true );
+		$parser = new Less_Parser( $options );
+		$parser->parseFile(app_path() . '/less/red.less', '/css/' );
+		$css = $parser->getCss();
+		$cssFile = fopen(public_path() . '/css/color/red.css', "w") or die("Unable to open file!");
+		fwrite($cssFile, $css);
+		fclose($cssFile);
+		
+		// GitHub: leafo/lessphp
+		//$less = new lessc; // Compile a file '
+		//$less->compileFile(app_path() . '/less/red.less', public_path() . '/css/color/red.css');
+		return "It probably compiled...";
+	}
 
     public function sitemap() {
         // use this package for the easy sitemap creation in Laravel 4.*: https://github.com/RoumenDamianoff/laravel4-sitemap

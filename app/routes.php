@@ -161,6 +161,8 @@ Route::group(array (
             ));
             
             // Route::get('beta', 'BetaController@create');
+			
+			Route::get('compile-css', 'HelperController@compileCSS');
             
             Route::get('toggleAds', 'HelperController@toggleAds');
             
@@ -298,12 +300,12 @@ Route::group(array (
 
 Route::get('games', array (
     'as' => 'showGames',
-    'uses' => 'GameController@showGames' 
+    'uses' => 'GameController@showGames'
 ));
 
 Route::get('{game}', array (
     'as' => 'showGame',
-    'uses' => 'GameController@listWeapons' 
+    'uses' => 'GameController@listWeapons'
 ));
 
 Route::post('{game}/{weapon}/{loadout}/upvoteGuest', array (
@@ -332,17 +334,3 @@ Route::post('{game}/{weapon}/{loadout}/detach', array (
     'as' => 'detachLoadout',
     'uses' => 'LoadoutController@detach' 
 ));
-
-Route::get('setauthor', function() {
-	$loadouts = Loadout::all();
-	foreach($loadouts as $loadout) {
-		$loadout_users = DB::table('loadout_user')->select('user_id','created_at', 'loadout_id')->where('loadout_id',$loadout->id)->orderBy('created_at')->get();
-		foreach($loadout_users as $loadout_user) {
-			$author = User::find($loadout_user->user_id);
-			$loadout->user_id = $author->email;
-			$loadout->save();
-			break;
-		}
-	}
-});
-
