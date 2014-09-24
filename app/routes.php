@@ -13,7 +13,11 @@ HTML::macro('navLink', function ($route, $text) {
     } else {
         $active = '';
     }
-    return '<li ' . $active . '>' . link_to($route, $text) . '</li>';
+	if($text == 'Home') {
+		return '<li ' . $active . '><a href="' . route('home') . '" data-no-instant>' . $text .'</a></li>';	
+	} else {
+    	return '<li ' . $active . '>' . link_to($route, $text) . '</li>';
+	}
 });
 
 App::missing(function ($exception) {
@@ -32,34 +36,7 @@ Route::get('sitemap.xml', 'HelperController@sitemap');
 
 Route::get('/', array (
     'as' => 'home',
-    function () {
-        $games = Cache::remember('games_slider', $_ENV ['week'], function () {
-            return Game::where('live', 1) -> orderBy(DB::raw('RAND()')) -> take(3) -> get();
-        });
-        $items = FeedReader::read('http://blog.gameloadouts.com/feed/') -> get_items();
-        $topLoadoutsPerGame = $games;
-        foreach($topLoadoutsPerGame as $game) {
-        	$game -> topLoadouts = GameController::topLoadouts($game);
-        }
-        $recentLoadout = '';
-        if(Auth::check() && Auth::user() -> role != 'Guest' && Auth::user() -> loadouts) {
-            $recentLoadout = Auth::user() -> loadouts;
-            $first = true;
-            foreach(Auth::user() -> loadouts as $loadout) {
-                if ($first) {
-                    $recentLoadout = $loadout;
-                    $first = false;
-                    //return View::make('home', compact('games', 'items', 'recentLoadout'));
-                    break;
-                }
-            }
-            if (get_class($recentLoadout) != 'Loadout') {
-            	$recentLoadout = NULL;
-            }
-           // return View::make('home', compact('games', 'items', 'recentLoadout', 'topLoadoutsPerGame'));
-        }
-        return View::make('home', compact('games', 'items', 'topLoadoutsPerGame', 'recentLoadout'));
-    } 
+	'uses' => 'HelperController@showHome'
 ));
 
 Route::get('stats', array (

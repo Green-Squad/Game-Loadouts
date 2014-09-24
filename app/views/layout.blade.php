@@ -11,15 +11,17 @@
         <!-- Responsive Metatag -->
         <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1" />
         <meta name="google-site-verification" content="IcSSxczl-uweXXUf6CZMqlr_zHyqh19xpP2F2vkBZC8" />
+		
+		<!-- JS -->
+		<script type="text/javascript" src="http://www.google.com/recaptcha/api/js/recaptcha_ajax.js"></script>
         
         <!-- CSS -->
         <link href="{{ asset('css/bootstrap.min.css') }}" rel="stylesheet" />
-        <link rel="stylesheet" type="text/css" href="{{ asset('rs-plugin/css/settings.min.css') }}" media="screen" />
+        <!-- <link rel="stylesheet" type="text/css" href="{{ asset('rs-plugin/css/settings.min.css') }}" media="screen" /> -->
         <link href="{{ asset('css/styles.min.css') }}" rel="stylesheet" />
-        @yield('css', '<link href="/css/color/green.css" rel="stylesheet" />')
         <link href="{{ asset('css/media-queries.css') }}" rel="stylesheet" />
-		
-		
+		<link href="{{ asset('font-awesome/css/font-awesome.min.css') }}" rel="stylesheet" type="text/css">
+		@yield('css')
 
         <!-- HTML5 shim, for IE6-8 support of HTML5 elements -->
         <!--[if lt IE 9]>
@@ -57,7 +59,7 @@
                                             <span class="icon-bar"></span>
                                         </button>
                                     </div>
-                                    <a href="{{ route('home') }}" class="logo">
+                                    <a href="{{ route('home') }}" class="logo" data-no-instant>
                                         <h1 style="margin: 0;">
                                             Game Loadouts    
                                         </h1>
@@ -106,7 +108,7 @@
                                                     {{ HTML::linkRoute('account', 'Account') }}
                                                 </li>
                                                 <li>
-                                                    {{ HTML::linkRoute('logout', 'Logout') }}
+													<a href="{{ route('logout') }}" data-no-instant>Logout</a>
                                                 </li>
                                             </ul>
                                         </li>
@@ -212,9 +214,15 @@
                         <h3>Games</h3>
                         <p></p>
                         @foreach(GameController::listGames() as $game)
-                        <p>
-                            <a class="button-gym" href="{{ route('showGame', urlencode($game -> id)) }}">{{ $game -> id  }}</a>
-                        </p>
+							@if($game -> live == 1)
+							<p>
+								<a class="button-gym" href="{{ route('showGame', urlencode($game -> id)) }}">{{ $game -> id  }}</a>
+							</p>
+							@elseif(Auth::check() && Auth::user() -> role == "Admin")
+							<p>
+								<a class="button-gym" href="{{ route('showGame', urlencode($game -> id)) }}">{{ $game -> id  }}</a>
+							</p>
+							@endif
                         @endforeach
                     </div>
                 </div>
@@ -271,28 +279,6 @@
         <!-- Minified Site JS -->
         <script src="{{ asset('js/script.min.js') }}" type="text/javascript"></script>
 
-        <!-- Google Analytics -->
-        @if(Auth::guest() || Auth::user() -> role != 'Admin')
-        <script>
-            (function(i, s, o, g, r, a, m) {
-                i['GoogleAnalyticsObject'] = r;
-                i[r] = i[r] ||
-                function() {
-                    (i[r].q = i[r].q || []).push(arguments)
-                }, i[r].l = 1 * new Date();
-                a = s.createElement(o), m = s.getElementsByTagName(o)[0];
-                a.async = 1;
-                a.src = g;
-                m.parentNode.insertBefore(a, m)
-            })(window, document, 'script', '//www.google-analytics.com/analytics.js', 'ga');
-
-            ga('create', 'UA-50909901-1', 'gameloadouts.com');
-            ga('require', 'displayfeatures');
-            ga('send', 'pageview');
-
-        </script>
-        @endif
-        
         <script>
 
         $(function () {
@@ -340,8 +326,33 @@
             });
         </script>
         @yield('scripts')
-		<!--<script src="{{ asset('js/instantclick.min.js') }}" data-no-instant></script>
-		<script data-no-instant>InstantClick.init();</script>-->
+		<script src="{{ asset('js/instantclick.min.js') }}" data-no-instant></script>
+		<script data-no-instant>
+		<!-- Google Analytics -->
+        @if(Auth::guest() || Auth::user() -> role != 'Admin')
+            (function(i, s, o, g, r, a, m) {
+                i['GoogleAnalyticsObject'] = r;
+                i[r] = i[r] ||
+                function() {
+                    (i[r].q = i[r].q || []).push(arguments)
+                }, i[r].l = 1 * new Date();
+                a = s.createElement(o), m = s.getElementsByTagName(o)[0];
+                a.async = 1;
+                a.src = g;
+                m.parentNode.insertBefore(a, m)
+            })(window, document, 'script', '//www.google-analytics.com/analytics.js', 'ga');
+
+            ga('create', 'UA-50909901-1', 'gameloadouts.com');
+            ga('require', 'displayfeatures');
+
+        @endif
+			
+			//InstantClick.on('change', function() {
+			  //ga('send', 'pageview', location.pathname + location.search);
+			//});
+ 			
+			//InstantClick.init('mousedown');
+		</script>
         <!-- End Javascript -->
 	
     </body>

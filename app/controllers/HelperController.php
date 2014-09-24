@@ -1,5 +1,39 @@
 <?php
 class HelperController extends BaseController {
+	
+	function showHome() {
+        $items = FeedReader::read('http://blog.gameloadouts.com/feed/') -> get_items();
+		
+		$topLoadoutsPerGame = Cache::remember('top_loadouts_per_game_home', $_ENV ['hour'], function () {
+			$games = Cache::remember('games_home', $_ENV ['week'], function () {
+				return Game::where('live', 1) -> orderBy(DB::raw('RAND()')) -> take(3) -> get();
+			});		
+			foreach($games as $game) {
+				$game -> topLoadouts = GameController::topLoadouts($game);
+			}
+            return $games;
+        });
+        
+        $recentLoadout = '';
+        if(Auth::check() && Auth::user() -> role != 'Guest' && Auth::user() -> loadouts) {
+            $recentLoadout = Auth::user() -> loadouts;
+            $first = true;
+            foreach(Auth::user() -> loadouts as $loadout) {
+                if ($first) {
+                    $recentLoadout = $loadout;
+                    $first = false;
+                    //return View::make('home', compact('games', 'items', 'recentLoadout'));
+                    break;
+                }
+            }
+            if (get_class($recentLoadout) != 'Loadout') {
+            	$recentLoadout = NULL;
+            }
+           // return View::make('home', compact('games', 'items', 'recentLoadout', 'topLoadoutsPerGame'));
+        }
+		
+        return View::make('home', compact('games', 'items', 'topLoadoutsPerGame', 'recentLoadout'));
+	}
 
     public static function adsEnabled() {
         return $_ENV ['ads'];
@@ -82,9 +116,9 @@ class HelperController extends BaseController {
 		// GitHub: oyejorge/less.php
 		$options = array( 'compress'=>true );
 		$parser = new Less_Parser( $options );
-		$parser->parseFile(app_path() . '/less/red.less', '/css/' );
+		$parser->parseFile(app_path() . '/less/styles.less', '/css/' );
 		$css = $parser->getCss();
-		$cssFile = fopen(public_path() . '/css/color/red.css', "w") or die("Unable to open file!");
+		$cssFile = fopen(public_path() . '/css/styles.min.css', "w") or die("Unable to open file!");
 		fwrite($cssFile, $css);
 		fclose($cssFile);
 		

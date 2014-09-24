@@ -4,11 +4,6 @@
 Submissions
 @stop
 
-@section('css')
-<link href="/css/color/green.css" rel="stylesheet" />
-<link href="{{ asset('font-awesome/css/font-awesome.min.css') }}" rel="stylesheet" type="text/css">
-@stop
-
 @section('content')
 @if(HelperController::adsEnabled())
 <div class="col-md-8">

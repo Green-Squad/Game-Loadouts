@@ -9,7 +9,6 @@ Login with your Game Loadouts account here.
 @stop
 
 @section('content')
-
 <div class="col-md-12">
     <h2>Login</h2>
     <span class="line"> <span class="sub-line"></span> </span>
@@ -51,5 +50,4 @@ Login with your Game Loadouts account here.
         You can <a href="{{ route('join') }}">register</a> for free.
     </p>
 </div>
-
 @stop

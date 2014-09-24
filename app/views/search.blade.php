@@ -10,7 +10,7 @@ Game Loadouts search results page.
 
 @section('content')
 <div class="col-md-12">
-@if(HelperController::adsEnabled())
+	@if(HelperController::adsEnabled())
     <script async src="//pagead2.googlesyndication.com/pagead/js/adsbygoogle.js"></script>
     <!-- Game Loadouts Leaderboard -->
     <ins class="adsbygoogle"
@@ -21,7 +21,7 @@ Game Loadouts search results page.
     <script>
         ( adsbygoogle = window.adsbygoogle || []).push({});
     </script>
-@endif
+	@endif
         <h2>
             Search Results for '{{ $googleRequestDecoded -> queries -> request[0] -> searchTerms }}'
              @if($googleRequestDecoded -> queries -> request[0] -> totalResults > 0)

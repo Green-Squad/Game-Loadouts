@@ -31,13 +31,16 @@ Edit Game {{ $game -> id }}
                     <h2>Edit Game</h2>
                 </legend>
                 <div class="form-group">
-                    <div class="col-lg-12">
+                    <div class="col-lg-7">
                         {{ Form::text('id', $game -> id, array('class' => 'form-control input-lg', 'placeholder' => 'Game Name', 'required' => '')) }}
+                    </div>
+					<div class="col-lg-5">
+                        {{ Form::text('short_name', $game -> short_name, array('class' => 'form-control input-lg', 'placeholder' => 'Short Name')) }}
                     </div>
                 </div>
                 <div class="form-group">
-                    <div class="col-lg-6">
-                        {{ Form::text('short_name', $game -> short_name, array('class' => 'form-control input-lg', 'placeholder' => 'Short Name')) }}
+					<div class="col-lg-6">
+                        {{ Form::text('theme_color', $game -> theme_color, array('class' => 'form-control input-lg', 'placeholder' => 'Theme Color', 'required' => '')) }}
                     </div>
                     <div class="col-lg-6">
                         {{ Form::text('live', $game -> live, array('class' => 'form-control input-lg', 'placeholder' => 'Live', 'required' => '')) }}

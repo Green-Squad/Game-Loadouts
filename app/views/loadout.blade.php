@@ -8,14 +8,14 @@
 The {{ $weapon -> name }} in {{ $game -> id }}@if($game -> short_name) ({{ $game -> short_name }})@endif with {{ $prettyAttachments }}  has @if($loadout -> count == 1) 1 vote. @else{{ $loadout -> count }} votes.@endif
 @stop
 
-@section('css')
-<link rel="stylesheet" type="text/css" href="{{ asset('css/games/' . urlencode($game -> id) . '.css') }}" />
+@section('theme-color')
+<body class="{{ $game -> theme_color }}">
 @stop
 
 @section('sub-header')
 <section id="game">
     <!-- Sub Header -->
-    <div class="sub-header">
+    <div class="{{ strtolower(preg_replace('/\s/','-', $game -> id))}}-sub-header sub-header">
         <div class="container">
             <div class="row">
                 <ul class="sub-header-container">

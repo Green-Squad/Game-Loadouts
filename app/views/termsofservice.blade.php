@@ -9,7 +9,6 @@ Game Loadouts Terms of Service
 @stop
 
 @section('content')
-
 <div class="col-md-12">
 
     <h2> Web Site Terms and Conditions of Use </h2>

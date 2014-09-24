@@ -31,13 +31,16 @@ Create Game
                     <h2>Create Game</h2>
                 </legend>
                 <div class="form-group">
-                    <div class="col-lg-12">
+                    <div class="col-lg-7">
                         {{ Form::text('id', '', array('class' => 'form-control input-lg', 'placeholder' => 'Game Name', 'required' => '')) }}
+                    </div>
+					<div class="col-lg-5">
+                        {{ Form::text('short_name', '', array('class' => 'form-control input-lg', 'placeholder' => 'Short Name')) }}
                     </div>
                 </div>
                 <div class="form-group">
                     <div class="col-lg-6">
-                        {{ Form::text('short_name', '', array('class' => 'form-control input-lg', 'placeholder' => 'Short Name')) }}
+                        {{ Form::text('theme_color', '', array('class' => 'form-control input-lg', 'placeholder' => 'Theme Color', 'required' => '')) }}
                     </div>
                     <div class="col-lg-6">
                         {{ Form::text('live', '0', array('class' => 'form-control input-lg', 'placeholder' => 'Live', 'required' => '')) }}

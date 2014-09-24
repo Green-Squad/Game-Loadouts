@@ -8,20 +8,8 @@
 {{ $game -> id }}@if($game -> short_name) ({{ $game -> short_name }})@endif weapon list. Find the best loadout for any {{ $game -> id }}@if($game -> short_name) ({{ $game -> short_name }})@endif gun.
 @stop
 
-@section('css')
-<style>
-    .hide {
-        visibility: hidden;
-    }
-
-    .show {
-        visibility: visible;
-    }
-</style>
-@stop
-
 @section('theme-color')
-<body class="red">
+<body class="{{ $game -> theme_color }}">
 @stop
 
 @section('sub-header')

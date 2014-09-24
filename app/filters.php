@@ -56,6 +56,19 @@ Route::filter('standard', function () {
 });
 
 /*
+ * |-------------------------------------------------------------------------- | Non-live Games Filter |-------------------------------------------------------------------------- | 
+ */
+
+Route::filter('live', function ($route) {
+    // passed in Post from the route
+    $game = $route -> getParameter('game');
+    if ($game -> live == 0) {
+        if (Auth::guest() || Auth::user() -> role != 'Admin')
+            App::abort(404);
+    }
+});
+
+/*
  * |-------------------------------------------------------------------------- | Guest Filter |-------------------------------------------------------------------------- | | The "guest" filter is the counterpart of the authentication filters as | it simply checks that the current user is not logged in. A redirect | response will be issued if they are, which you may freely change. |
  */
 

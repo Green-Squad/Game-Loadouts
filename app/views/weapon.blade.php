@@ -8,27 +8,14 @@
 {{ $game -> id }}@if($game -> short_name) ({{ $game -> short_name }})@endif {{ $weapon -> name }} loadouts are located on this page. Find the best setup for the {{ $game -> id }}@if($game -> short_name) ({{ $game -> short_name }})@endif {{ $weapon -> name }} here.
 @stop
 
-@section('css')
-<link rel="stylesheet" type="text/css" href="{{ asset('css/games/' . urlencode($game -> id) . '.css') }}" />
-<script type="text/javascript" src="http://www.google.com/recaptcha/api/js/recaptcha_ajax.js"></script>
-<style>
-@media (max-width: 444px) {
-    #recaptcha_challenge_image {
-        margin: 0 !important;
-        width: 200px !important;
-    }
-    
-    .recaptchatable .recaptcha_r1_c1, .recaptchatable .recaptcha_r3_c1, .recaptchatable .recaptcha_r3_c2, .recaptchatable .recaptcha_r7_c1, .recaptchatable .recaptcha_r8_c1, .recaptchatable .recaptcha_r3_c3, .recaptchatable .recaptcha_r2_c1, .recaptchatable .recaptcha_r4_c1, .recaptchatable .recaptcha_r4_c2, .recaptchatable .recaptcha_r4_c4, .recaptchatable .recaptcha_r2_c2, .recaptchatable .recaptcha_image_cell {
-        background: none !important;
-    }
-}
-</style>
+@section('theme-color')
+<body class="{{ $game -> theme_color }}">
 @stop
 
 @section('sub-header')
 <section id="game">
     <!-- Sub Header -->
-    <div class="sub-header">
+    <div class="{{ strtolower(preg_replace('/\s/','-', $game -> id))}}-sub-header sub-header">
         <div class="container">
             <div class="row">
                 <ul class="sub-header-container">

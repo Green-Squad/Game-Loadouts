@@ -19,6 +19,7 @@ class GameController extends BaseController {
         $live = Input::get('live');
         $image = Input::file('image');
         $short_name = Input::get('short_name');
+		$theme_color = Input::get('theme_color');
         
         if (Input::hasFile('image')) {
             $destinationPath = public_path() . '/uploads/';
@@ -45,8 +46,9 @@ class GameController extends BaseController {
             $game -> image_url = "uploads/$fileName";
             $game -> thumb_url = "uploads/thumb/$fileName";
             $game -> short_name = $short_name;
+			$game -> theme_color = $theme_color;
             $game -> save();
-        } catch ( \Illuminate\Database\QueryException $e ) {
+		} catch ( \Illuminate\Database\QueryException $e ) {
             return Redirect::back() -> with(array (
                 'alert' => 'Error: Failed to create new game',
                 'alert-class' => 'alert-danger' 
@@ -80,6 +82,7 @@ class GameController extends BaseController {
         $live = Input::get('live');
         $image = Input::file('image');
         $short_name = Input::get('short_name');
+		$theme_color = Input::get('theme_color');
         
         try {
             $game -> id = $id;
@@ -100,6 +103,7 @@ class GameController extends BaseController {
             }
             
             $game -> short_name = $short_name;
+			$game -> theme_color = $theme_color;
             $game -> save();
         } catch ( \Illuminate\Database\QueryException $e ) {
             return Redirect::back() -> with(array (
@@ -150,10 +154,10 @@ class GameController extends BaseController {
     
     // lists the games for the public navigation
     public static function listGames() {
-        $games = Game::all();
-        //$games = Cache::remember('games_nav', $_ENV ['week'], function () {
-            //return Game::where('live', 1) -> get();
-        //});
+        //$games = Game::all();
+        $games = Cache::remember('games_nav', $_ENV ['week'], function () {
+            return Game::all();
+        });
         return $games;
     }
 

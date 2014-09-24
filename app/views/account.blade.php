@@ -1,9 +1,7 @@
 @extends('layout')
 
 @section('subtitle')
-
 Account
-
 @stop
 
 @section('content')
@@ -35,5 +33,4 @@ Account
     </fieldset>
     {{ Form::close() }}
 </div>
-
 @stop

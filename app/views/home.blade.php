@@ -31,7 +31,6 @@ Game Loadouts contains Titanfall, Battlefield 4 (BF4), and Call of Duty Ghosts (
 @stop
 
 @section('content')
-
 <div class="row">
     <div class="col-md-8">
         <h2>What is Game Loadouts?</h2>

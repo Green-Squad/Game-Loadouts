@@ -9,7 +9,6 @@ View the stats we have collected on all the game loadout submissions.
 @stop
 
 @section('content')
-
 <div class="col-md-12">
     <h2>Website Stats <small class="pull-right">Stats are cached hourly.</small></h2>
     <span class="line"> <span class="sub-line"></span> </span>
@@ -45,7 +44,6 @@ View the stats we have collected on all the game loadout submissions.
 @stop
 
 @section('scripts')
-
 <script src="{{ asset('js/Chart.min.js') }}"></script>
 <script>
     var lineChartData = {
@@ -67,5 +65,4 @@ View the stats we have collected on all the game loadout submissions.
         }
         var myLine = new Chart(document.getElementById("canvas").getContext("2d")).Line(lineChartData);
 </script>
-
 @stop

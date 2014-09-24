@@ -189,5 +189,7 @@ return array(
 	    'FeedReader'      => 'Awjudd\FeedReader\Facades\FeedReader'
 
 	),
+	
+	'cipher' => MCRYPT_RIJNDAEL_256
 
 );

@@ -6,3 +6,6 @@
 [02-May-2014 08:00:48 America/Denver] PHP Warning:  Invalid argument supplied for foreach() in - on line 46
 [22-May-2014 16:33:14 America/New_York] PHP Fatal error:  Class 'Roumen\Sitemap\SitemapServiceProvider' not found in /home5/tabletdi/public_html/Tryhard-Loadouts/vendor/laravel/framework/src/Illuminate/Foundation/ProviderRepository.php on line 158
 [29-Jul-2014 19:26:13 America/New_York] PHP Fatal error:  Class 'Awjudd\Layoutview\LayoutviewServiceProvider' not found in /home5/tabletdi/public_html/Tryhard-Loadouts/vendor/laravel/framework/src/Illuminate/Foundation/ProviderRepository.php on line 158
+[10-Sep-2014 18:04:37 America/Denver] PHP Warning:  readfile(https://getcomposer.org/installer): failed to open stream: Invalid argument in Command line code on line 1
+[10-Sep-2014 18:04:51 America/Denver] PHP Warning:  readfile(https://getcomposer.org/installer): failed to open stream: Invalid argument in Command line code on line 1
+[10-Sep-2014 18:09:13 America/Denver] PHP Warning:  readfile(https://getcomposer.org/installer): failed to open stream: Invalid argument in Command line code on line 1
