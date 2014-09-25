@@ -36,7 +36,7 @@
     </head>
     @yield('theme-color', '<body class="green">')
         @if ((Auth::guest() || Auth::user() -> role == 'Guest') && !isset($_COOKIE['guestAlertClose']))
-        <div id="guestAlert" class="alert" style="margin:0">You no longer need to register to submit or vote on loadouts, but there are still {{ link_to_route('join','many benefits') }} to registering.
+        <div id="guestAlert" class="alert" style="margin:0">You no longer need to register to submit or vote on loadouts, but there are still {{ link_to_route('register','many benefits') }} to registering.
             <button type="button" class="close" id="guestAlertClose"><span class="glyphicon glyphicon-remove-sign"></span></button>
         </div>
         @endif
@@ -249,7 +249,7 @@
                         </li>
                         @if(Auth::guest() || Auth::user() -> role == 'Guest')
                         <li>
-                            {{ HTML::linkRoute('join', 'Join') }}
+                            {{ HTML::linkRoute('register', 'Join') }}
                         </li>
                         <li>
                             {{ HTML::linkRoute('login', 'Login') }}

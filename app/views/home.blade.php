@@ -77,7 +77,7 @@ Game Loadouts contains Titanfall, Battlefield 4 (BF4), and Call of Duty Ghosts (
         </fieldset>
         {{ Form::close() }}
         <h3>Don't have an account?</h3>
-        <p>You can <a href="{{ route('join') }}">register</a> for free.</p>
+        <p>You can <a href="{{ route('register') }}">register</a> for free.</p>
         @else
         	<h2>Hello {{ Auth::user() -> username }}</h2>
             <span class="line"> <span class="sub-line"></span> </span>
@@ -168,13 +168,20 @@ Game Loadouts contains Titanfall, Battlefield 4 (BF4), and Call of Duty Ghosts (
     <div class="col-md-8">
         <h2>Site News</h2>
         <span class="line"> <span class="sub-line"></span> </span>
+        
+        
+        
         @for($i = 0; $i < 1; $i++)
 		<div class="item">
 			<h4><a href="{{ $items[$i]->get_permalink() }}" class="green-a">{{ $items[$i]->get_title() }}</a></h4>
-			<p>{{ $items[$i]->get_description() }}</p>
+			<p>{{ $items[$i] -> get_description() }}</p>
 			<p><small>Posted on {{ $items[$i]->get_date('j F Y | g:i a') }}</small></p>
 		</div>
-	   @endfor
+        @endfor
+        
+        
+        
+        
        <p>View more news on the <a href="http://blog.gameloadouts.com">Game Loadouts Blog</a>.</p>
     </div>
     <div class='ajax-poll' tclass='poll'></div>

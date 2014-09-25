@@ -47,7 +47,7 @@ Login with your Game Loadouts account here.
     {{ Form::close() }}
     <h3>Don't have an account?</h3>
     <p>
-        You can <a href="{{ route('join') }}">register</a> for free.
+        You can <a href="{{ route('register') }}">register</a> for free.
     </p>
 </div>
 @stop

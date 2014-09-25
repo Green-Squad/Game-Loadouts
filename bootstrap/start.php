@@ -26,7 +26,7 @@ $app = new Illuminate\Foundation\Application;
 
 $env = $app->detectEnvironment(array(
 
-	'local' => array('box718.bluehost.com')
+	'local' => array('GreenSquad1')
 
 ));
 

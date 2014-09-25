@@ -2,8 +2,9 @@
 class HelperController extends BaseController {
 	
 	function showHome() {
-        $items = FeedReader::read('http://blog.gameloadouts.com/feed/') -> get_items();
-		
+        $items = Cache::remember('feed_items', $_ENV ['day'], function () {
+            return FeedReader::read('http://blog.gameloadouts.com/feed/') -> get_items(0, 1);
+        });
 		$topLoadoutsPerGame = Cache::remember('top_loadouts_per_game_home', $_ENV ['hour'], function () {
 			$games = Cache::remember('games_home', $_ENV ['week'], function () {
 				return Game::where('live', 1) -> orderBy(DB::raw('RAND()')) -> take(3) -> get();
@@ -22,17 +23,16 @@ class HelperController extends BaseController {
                 if ($first) {
                     $recentLoadout = $loadout;
                     $first = false;
-                    //return View::make('home', compact('games', 'items', 'recentLoadout'));
                     break;
                 }
             }
             if (get_class($recentLoadout) != 'Loadout') {
             	$recentLoadout = NULL;
             }
-           // return View::make('home', compact('games', 'items', 'recentLoadout', 'topLoadoutsPerGame'));
         }
 		
         return View::make('home', compact('games', 'items', 'topLoadoutsPerGame', 'recentLoadout'));
+        //return View::make('home', compact('games', 'topLoadoutsPerGame', 'recentLoadout'));
 	}
 
     public static function adsEnabled() {

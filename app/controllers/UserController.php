@@ -81,6 +81,7 @@ class UserController extends BaseController {
     }
     
     // Attempt to register a new user
+    
     public function join() {
         $rules = array (
             'username' => 'Required|Between:4,128|AlphaNum|Unique:users',

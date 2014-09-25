@@ -226,7 +226,7 @@
                             <p><strong>Use an account</strong></p>
                             <p>
                                 <a href="{{route('login')}}" class="btn btn-primary">Login</a>
-                                <a href="{{route('join')}}" class="btn btn-primary">Join</a>
+                                <a href="{{route('register')}}" class="btn btn-primary">Join</a>
                             </p>
                             <p><strong>Benefits of an account</strong></p>
                             <ul style="padding-left: 20px">
@@ -297,7 +297,7 @@
             <p><strong>Use an account</strong></p>
             <p>
                 <a href="{{route('login')}}" class="btn btn-primary">Login</a>
-                <a href="{{route('join')}}" class="btn btn-primary">Join</a>
+                <a href="{{route('register')}}" class="btn btn-primary">Join</a>
             </p>
             <p><strong>Benefits of an account</strong></p>
             <ul style="padding-left: 20px">

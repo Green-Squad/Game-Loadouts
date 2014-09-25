@@ -7,7 +7,7 @@
 		"laravel/framework": "4.1.*",
 		"roumen/sitemap": "2.4.*",
 		"recaptcha/php5": "v1.1.0",
-		"awjudd/feed-reader": "1.1.0",
+		"awjudd/feed-reader": "1.1.*",
 		"oyejorge/less.php": "~1.5",
 		"rcrowe/turbo": "0.2.*"
 	},
