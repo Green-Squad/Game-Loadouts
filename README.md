@@ -1,4 +1,4 @@
-Basic-GS
+Tryhard-Loadouts
 ========
 
-Basic login system for our Laravel projects.
+
