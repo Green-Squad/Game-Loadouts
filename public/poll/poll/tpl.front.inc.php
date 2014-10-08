@@ -32,11 +32,7 @@
 			</div>
 		</div>
 
-		<!-- [BEGIN] Reset Button -->
-		<div style='text-align:center;padding:0 10px 10px 10px;'>
-			<input type="submit" class="ap-clear-block" value="    Clear IP & Cookie Blocks   " />
-		</div>
-		<!-- [END] Reset Button -->
+
 
 	</form>
 
