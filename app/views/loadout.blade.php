@@ -114,7 +114,7 @@ The {{ $weapon -> name }} in {{ $game -> id }}@if($game -> short_name) ({{ $game
                     <div class="col-md-6 vertical-center margin-50px">
                         @if (Auth::guest() || Auth::user() -> role == 'Guest')
                             @if ($loadout -> upvoted == 1)
-                            {{ Form::open(array('id' => "guestUnvote", 'url' => '/' . $game -> id . '/' . $weapon -> name . '/' . $loadout['id'] . '/upvote2')) }}
+                            {{ Form::open(array('id' => "guestUnvote", 'url' => '/' . urlencode($game -> id) . '/' . urlencode($weapon -> name) . '/' . $loadout['id'] . '/upvoteGuest')) }}
                             <button style="margin: 0 25% 0;" type="submit" class="big-button button-gym nowrap">Remove Vote</button>
                             {{ Form::close() }}
                             @else
@@ -263,7 +263,7 @@ The {{ $weapon -> name }} in {{ $game -> id }}@if($game -> short_name) ({{ $game
 
 	<div class="modal fade" id="guest" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
   <div class="modal-dialog modal-lg">
-  {{ Form::open(array('id' => "guestVote", 'url' => '/' . $game -> id . '/' . $weapon -> name . '/' . $loadout['id'] . '/upvote2')) }}
+  {{ Form::open(array('id' => "guestVote", 'url' => '/' . urlencode($game -> id) . '/' . urlencode($weapon -> name) . '/' . $loadout['id'] . '/upvoteGuest')) }}
     <div class="modal-content">
       <div class="modal-header">
         <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button>
