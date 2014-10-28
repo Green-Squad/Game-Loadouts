@@ -74,16 +74,18 @@
 @section('content')
 @if(HelperController::adsEnabled())
 <div class="col-md-12">
-	<script async src="//pagead2.googlesyndication.com/pagead/js/adsbygoogle.js"></script>
-	<!-- Game Loadouts Leaderboard -->
-	<ins class="adsbygoogle"
-	style="display:block"
-	data-ad-client="ca-pub-9067954073014278"
-	data-ad-slot="1230654771"
-	data-ad-format="auto"></ins>
-	<script>
-		( adsbygoogle = window.adsbygoogle || []).push({});
-	</script>
+	<div class="top-ad-box">
+		<script async src="//pagead2.googlesyndication.com/pagead/js/adsbygoogle.js"></script>
+		<!-- Game Loadouts Leaderboard -->
+		<ins class="adsbygoogle"
+		style="display:block"
+		data-ad-client="ca-pub-9067954073014278"
+		data-ad-slot="1230654771"
+		data-ad-format="auto"></ins>
+		<script>
+			( adsbygoogle = window.adsbygoogle || []).push({});
+		</script>
+	</div>
 </div>
 @endif
 <div class="row">
@@ -256,29 +258,29 @@
                 
                 {{ Form::close() }}
             @if(HelperController::adsEnabled())
-    		<h2>Advertisement</h2>
-			<span class="line"> <span class="sub-line"></span> </span>
-			<style>
-				.game-loadouts-responsive-sidebar {
-					width: 300px;
-					height: 250px;
-				}
-				@media (min-width: 800px) {
+			<div class="right-ad-box">
+				<style>
 					.game-loadouts-responsive-sidebar {
-					width: 336px;
-					height: 280px;
+						width: 300px;
+						height: 250px;
 					}
-				}
-			</style>
-			<script async src="//pagead2.googlesyndication.com/pagead/js/adsbygoogle.js"></script>
-			<!-- Game Loadouts Responsive Sidebar -->
-			<ins class="adsbygoogle game-loadouts-responsive-sidebar"
-			style="display:inline-block"
-			data-ad-client="ca-pub-9067954073014278"
-			data-ad-slot="2846988777"></ins>
-			<script>
-				( adsbygoogle = window.adsbygoogle || []).push({});
-			</script>
+					@media (min-width: 800px) {
+						.game-loadouts-responsive-sidebar {
+						width: 336px;
+						height: 280px;
+						}
+					}
+				</style>
+				<script async src="//pagead2.googlesyndication.com/pagead/js/adsbygoogle.js"></script>
+				<!-- Game Loadouts Responsive Sidebar -->
+				<ins class="adsbygoogle game-loadouts-responsive-sidebar"
+				style="display:inline-block"
+				data-ad-client="ca-pub-9067954073014278"
+				data-ad-slot="2846988777"></ins>
+				<script>
+					( adsbygoogle = window.adsbygoogle || []).push({});
+				</script>
+			</div>
 			@endif
     	</div>
 	</div>

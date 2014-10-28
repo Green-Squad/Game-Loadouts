@@ -31,6 +31,22 @@ Game Loadouts contains Titanfall, Battlefield 4 (BF4), and Call of Duty Ghosts (
 @stop
 
 @section('content')
+@if(HelperController::adsEnabled())
+<div class="col-md-12">
+	<div class="top-ad-box">
+		<script async src="//pagead2.googlesyndication.com/pagead/js/adsbygoogle.js"></script>
+		<!-- Game Loadouts Leaderboard -->
+		<ins class="adsbygoogle"
+		style="display:block"
+		data-ad-client="ca-pub-9067954073014278"
+		data-ad-slot="1230654771"
+		data-ad-format="auto"></ins>
+		<script>
+			( adsbygoogle = window.adsbygoogle || []).push({});
+		</script>
+	</div>
+</div>
+@endif
 <div class="row">
     <div class="col-md-8">
         <h2>What is Game Loadouts?</h2>
@@ -184,7 +200,27 @@ Game Loadouts contains Titanfall, Battlefield 4 (BF4), and Call of Duty Ghosts (
         
        <p>View more news on the <a href="http://blog.gameloadouts.com">Game Loadouts Blog</a>.</p>
     </div>
-    <div class='ajax-poll' tclass='poll'></div>
+    @if(HelperController::adsEnabled())
+	<div class="col-md-4">
+		<div class="right-ad-box">
+			<style>
+				.game-loadouts-responsive-sidebar {
+					width: 300px;
+					height: 250px;
+				}
+			</style>
+			<script async src="//pagead2.googlesyndication.com/pagead/js/adsbygoogle.js"></script>
+			<!-- Game Loadouts Responsive Sidebar -->
+			<ins class="adsbygoogle game-loadouts-responsive-sidebar"
+			style="display:inline-block"
+			data-ad-client="ca-pub-9067954073014278"
+			data-ad-slot="2846988777"></ins>
+			<script>
+				( adsbygoogle = window.adsbygoogle || []).push({});
+			</script>
+		</div>
+	</div>
+    @endif
 </div>
 @stop
 

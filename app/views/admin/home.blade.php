@@ -240,15 +240,15 @@ Dashboard
             </div>
         </div>
 		<div class="col-lg-3">
-            <div class="panel panel-primary">
+            <div class="panel panel-info">
                 <div class="panel-heading">
                     <div class="row">
                         <div class="col-xs-6">
-                            <i class="fa fa-check-square-o fa-5x"></i>
+                            <i class="fa fa-arrow-circle-right fa-5x"></i>
                         </div>
                         <div class="col-xs-6 text-right">
                             <p class="announcement-heading">
-                                Compile CSS
+                                Less
                             </p>
                             <p class="announcement-text">
                                 Compile CSS
