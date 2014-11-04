@@ -178,7 +178,7 @@
                     <div class="col-md-3" >
                         <h3>About Game Loadouts</h3>
                         <p>
-                            Game Loadouts is a portal for finding the best ways to outfit your weapons in your favorite games.
+                            Game Loadouts is a portal for finding the best ways to outfit your weapons in your favorite video games.
                         </p>
                         <p>
                             This website comes in handy when you need to complete challenges with various weapons and need to know the best attachment combination for that weapon.
@@ -215,12 +215,12 @@
                         <p></p>
                         @foreach(GameController::listGames() as $game)
 							@if($game -> live == 1)
-							<p>
-								<a class="button-gym" href="{{ route('showGame', urlencode($game -> id)) }}">{{ $game -> id  }}</a>
+							<p class="no-margin">
+								<a class="button-gym footer-games" href="{{ route('showGame', urlencode($game -> id)) }}">{{ $game -> id  }}</a>
 							</p>
 							@elseif(Auth::check() && Auth::user() -> role == "Admin")
-							<p>
-								<a class="button-gym" href="{{ route('showGame', urlencode($game -> id)) }}">{{ $game -> id  }}</a>
+							<p class="no-margin">
+								<a class="button-gym footer-games" href="{{ route('showGame', urlencode($game -> id)) }}">{{ $game -> id  }}</a>
 							</p>
 							@endif
                         @endforeach

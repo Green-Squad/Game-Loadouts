@@ -159,9 +159,9 @@
 	header .main-menu .navbar .dropdown ul li a{
 	  margin: 0;
 	  padding: 0 15px;
-	  width: 165px;
+	  width: 100%;
 	  line-height: 44px;
-	  height: 44px;
+	  height: 100%;
 	  display: inline-block;
 	}
 	header .main-menu .navbar .dropdown ul li a:hover{
