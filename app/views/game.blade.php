@@ -1,7 +1,7 @@
 @extends('layout')
 
 @section('subtitle')
-{{ $game -> id }}
+{{ $game -> id }} weapons
 @stop
 
 @section('description')
@@ -92,22 +92,19 @@
 <div class="col-md-4">
     @if(HelperController::adsEnabled())
     <div class="right-ad-box">
-		<style>
-			.game-loadouts-responsive-sidebar {
-				width: 300px;
-				height: 250px;
-			}
-		</style>
+
 		<script async src="//pagead2.googlesyndication.com/pagead/js/adsbygoogle.js"></script>
 		<!-- Game Loadouts Responsive Sidebar -->
-		<ins class="adsbygoogle game-loadouts-responsive-sidebar"
-		style="display:inline-block"
-		data-ad-client="ca-pub-9067954073014278"
-		data-ad-slot="2846988777"></ins>
+			<ins class="adsbygoogle game-loadouts-responsive-sidebar"
+				 style="display:block"
+			 data-ad-client="ca-pub-9067954073014278"
+			 data-ad-slot="2846988777"
+			 data-ad-format="auto"></ins>
 		<script>
-			( adsbygoogle = window.adsbygoogle || []).push({});
+		(adsbygoogle = window.adsbygoogle || []).push({});
 		</script>
-		</div>
+		
+	</div>
     @endif
     <h2>Top Loadouts</h2>
     <span class="line"> <span class="sub-line"></span> </span>

@@ -19,15 +19,26 @@ Find the best weapon loadouts for {{ HelperController::listToString($games, 'id'
 		@for($i = 0; $i < 2; $i++)
 							<?php $counter = 0 + $i; ?>	
 							<div class="col-md-6">
-		@foreach($games as $game)
-		@if($counter++ % 2 == 0)
-		<article class="post">
-			<a href="{{ route('showGame', urlencode($game -> id)) }}"> <img src="{{ asset($game -> thumb_url) }}" alt="{{ $game -> id }}" />
-				<header>
-					<h3>{{ $game -> id }}</h3>
-				</header></a>
-		</article>
-		@endif
+		@foreach(GameController::listGames() as $game)
+			@if($game -> live == 1)
+				@if($counter++ % 2 == 0)
+				<article class="post">
+					<a href="{{ route('showGame', urlencode($game -> id)) }}"> <img src="{{ asset($game -> thumb_url) }}" alt="{{ $game -> id }}" />
+						<header>
+							<h3>{{ $game -> id }}</h3>
+						</header></a>
+				</article>
+				@endif
+			@elseif(Auth::check() && Auth::user() -> role == "Admin")
+				@if($counter++ % 2 == 0)
+				<article class="post">
+					<a href="{{ route('showGame', urlencode($game -> id)) }}"> <img src="{{ asset($game -> thumb_url) }}" alt="{{ $game -> id }}" />
+						<header>
+							<h3>{{ $game -> id }}</h3>
+						</header></a>
+				</article>
+				@endif
+			@endif
 		@endforeach
 	</div>
 	@endfor

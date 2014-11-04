@@ -25,16 +25,23 @@ class LoadoutController extends BaseController {
             if (count($attachments) >= $weapon -> min_attachments && count($attachments) <= $weapon -> max_attachments) {
                 // for each attachment
                 // if it isnt in possible attachments
+				// also check if it has duplicate attachments
                 // return error message
                 $possibleAttachments = $weapon -> attachments;
                 $possibleAttachments = $this -> getAttachmentsArray($possibleAttachments);
+				$attachmentsCount = array_count_values($attachments);
                 foreach ( $attachments as $attachment ) {
                     if (! in_array($attachment, $possibleAttachments)) {
                         return Redirect::back() -> with(array (
                             'alert' => 'This is not a valid loadout. Good attempt at hacking us though.',
                             'alert-class' => 'alert-danger' 
                         ));
-                    }
+                    } else if ($attachmentsCount[$attachment] > 1) {
+						return Redirect::back() -> with(array (
+                            'alert' => 'You cannot select the same attachment more than once in a loadout.',
+                            'alert-class' => 'alert-danger' 
+                        ));
+					}
                 }
                 
                 // for each attachment in slot
