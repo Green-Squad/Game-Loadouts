@@ -132,7 +132,12 @@ Game Loadouts contains Titanfall, Battlefield 4 (BF4), and Call of Duty Ghosts (
 		@foreach($topLoadoutsPerGame as $game)
 		    <div class="col-md-4">
 				<a class="loadoutSmall block" href="{{ route('showGame', urlencode($game -> id)) }}">
-						<h3 class="weaponSmall theme-color" style="margin: 0px 0 3px 0">{{ $game -> id }}
+						<h3 class="weaponSmall theme-color" style="margin: 0px 0 3px 0">
+							@if(strlen($game -> id) < 17)
+							  {{ $game -> id }}
+							@else
+							  {{ $game -> short_name }}
+							@endif
 							<small class="pull-right" style="margin: 6px 0 0 0">All Loadouts</small>
 						</h3>
 					<img src="{{ $game -> thumb_url}}" alt="{{ $game -> id }}" style="width:100%;" />
