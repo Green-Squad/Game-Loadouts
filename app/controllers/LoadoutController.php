@@ -9,7 +9,7 @@ class LoadoutController extends BaseController {
         if (Auth::check()) {
             if (Auth::user() -> role == 'Guest') {
                 $response = $this -> captchaCheck();
-                if (! $response -> isValid()) {
+                if (!$response) {
                     // return with error
                     return Redirect::back() -> with(array (
                         'alert' => 'Error: Incorrect CAPTCHA. Please try again.',
@@ -18,7 +18,7 @@ class LoadoutController extends BaseController {
                 }
             }
             $weapon = Weapon::where('game_id', $game -> id, 'AND') -> where('name', $weaponName) -> first();
-            $attachments = Input::except('_token', 'recaptcha_challenge_field', 'recaptcha_response_field');
+            $attachments = Input::except('_token', 'g-recaptcha-response');
             
             $weapon_loadouts = Loadout::where('weapon_id', $weapon -> id) -> get();
             
@@ -236,7 +236,7 @@ class LoadoutController extends BaseController {
         
         $response = $this -> captchaCheck();
         
-        if ($response -> isValid()) {
+        if ($response) {
             
             if (! LoadoutController::userHasLoadout($user -> loadouts, $loadout -> id)) {
                 $user -> loadouts() -> save($loadout);
@@ -257,14 +257,12 @@ class LoadoutController extends BaseController {
     }
 
     public function captchaCheck() {
-        $captcha = new Captcha\Captcha();
-        $captcha -> setPublicKey('6Lf9-_YSAAAAAJ9k2G_qXohJi74-pDe8V4NuUdzJ');
-        $captcha -> setPrivateKey($_ENV ['RECAPTCHA_PRIVATE_KEY']);
-        
-        $recaptcha_challenge = Input::get('recaptcha_challenge_field');
-        $recaptcha_response = Input::get('recaptcha_response_field');
-        
-        return $captcha -> check($recaptcha_challenge, $recaptcha_response);
+        $url = 'https://www.google.com/recaptcha/api/siteverify';
+        $response = Input::get('g-recaptcha-response');
+        $secret = $_ENV ['RECAPTCHA_PRIVATE_KEY'];
+        $json_response = file_get_contents("{$url}?secret={$secret}&response={$response}", false);
+        $decoded = json_decode($json_response);
+        return $decoded -> success;
     }
 
     public function validateGuest() {

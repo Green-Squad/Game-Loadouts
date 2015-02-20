@@ -292,7 +292,7 @@ The {{ $weapon -> name }} in {{ $game -> id }}@if($game -> short_name) ({{ $game
         <div class="col-lg-8">
             <p><strong>Continue as guest</strong></p>
             <p>You can submit your vote without registering by entering the CAPTCHA below.</p>
-            <div id="recaptcha"></div>
+            <div id="recaptcha" class="g-recaptcha" data-sitekey="6LdAYgITAAAAAIiGNHQnJvj0JYEW9xG7loWs7fls"></div>
        </div>
         
         <div style="clear:both;"></div>
@@ -308,19 +308,7 @@ The {{ $weapon -> name }} in {{ $game -> id }}@if($game -> short_name) ({{ $game
 @stop
 
 @section('scripts')
-<script type="text/javascript" src="http://www.google.com/recaptcha/api/js/recaptcha_ajax.js"></script>
-<style>
-@media (max-width: 444px) {
-    #recaptcha_challenge_image {
-        margin: 0 !important;
-        width: 200px !important;
-    }
-    
-    .recaptchatable .recaptcha_r1_c1, .recaptchatable .recaptcha_r3_c1, .recaptchatable .recaptcha_r3_c2, .recaptchatable .recaptcha_r7_c1, .recaptchatable .recaptcha_r8_c1, .recaptchatable .recaptcha_r3_c3, .recaptchatable .recaptcha_r2_c1, .recaptchatable .recaptcha_r4_c1, .recaptchatable .recaptcha_r4_c2, .recaptchatable .recaptcha_r4_c4, .recaptchatable .recaptcha_r2_c2, .recaptchatable .recaptcha_image_cell {
-        background: none !important;
-    }
-}
-</style>
+<script src='https://www.google.com/recaptcha/api.js'></script>
 <script type="text/javascript">
     $('.clickable').click(function() {
         var game_id = '<?php echo $game -> id; ?>';
@@ -339,11 +327,5 @@ The {{ $weapon -> name }} in {{ $game -> id }}@if($game -> short_name) ({{ $game
             }, 'json');
         }
     });
-    Recaptcha.create("6Lf9-_YSAAAAAJ9k2G_qXohJi74-pDe8V4NuUdzJ",
-            "recaptcha",
-            {
-        	 theme: "white",
-            }
-          );
 </script>
 @stop
