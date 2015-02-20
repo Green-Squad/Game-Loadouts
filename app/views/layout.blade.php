@@ -11,9 +11,6 @@
         <!-- Responsive Metatag -->
         <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1" />
         <meta name="google-site-verification" content="IcSSxczl-uweXXUf6CZMqlr_zHyqh19xpP2F2vkBZC8" />
-		
-		<!-- JS -->
-		<script type="text/javascript" src="http://www.google.com/recaptcha/api/js/recaptcha_ajax.js"></script>
         
         <!-- CSS -->
         <link href="{{ asset('css/bootstrap.min.css') }}" rel="stylesheet" />

@@ -204,7 +204,7 @@
                 <div class="form-group">
                     <div class="col-md-12">
                         @if (Auth::guest() || Auth::user() -> role == 'Guest')
-                            <button class="btn button-gym" data-toggle="modal" data-target="#guestLoadout" onclick="guestSubmitLoadout()">Submit Loadout</button>
+                            <button class="btn button-gym" data-toggle="modal" data-target="#guestLoadout">Submit Loadout</button>
                         @else
                         <button type="submit" class="btn button-gym">
                             Submit Loadout
@@ -242,7 +242,7 @@
                         <div class="col-lg-8">
                             <p><strong>Continue as guest</strong></p>
                             <p>You can submit your vote without registering by entering the CAPTCHA below.</p>
-                            <div id="recaptchaSubmit"></div>
+                            <div id="recaptchaSubmit" class="g-recaptcha"></div>
                        </div>
                         
                         <div style="clear:both;"></div>
@@ -313,7 +313,7 @@
         <div class="col-lg-8">
             <p><strong>Continue as guest</strong></p>
             <p>You can submit your vote without registering by entering the CAPTCHA below.</p>
-            <div id="recaptchaVote"></div>
+            <div id="recaptchaVote" class="g-recaptcha"></div>
        </div>
         
         <div style="clear:both;"></div>
@@ -330,6 +330,7 @@
 @stop
 
 @section('scripts')
+<script src="https://www.google.com/recaptcha/api.js?onload=initRecaptcha&render=explicit" async defer></script>
 <script type="text/javascript">
 var modal_type;
     $('.comment').each(function() {
@@ -357,25 +358,26 @@ var modal_type;
 
      
 
-     function guestLoadoutId(id) {
-    	    var game_id = '<?php echo $game -> id; ?>';
-    	    var weapon_name = '<?php echo $weapon -> name; ?>';
-    		$('#guestVote').attr("action", '/' + game_id + '/' + weapon_name + '/' + id + '/upvoteGuest');
-    		Recaptcha.create("6Lf9-_YSAAAAAJ9k2G_qXohJi74-pDe8V4NuUdzJ",
-      	        "recaptchaVote",
-      	        {
-      	    	 theme: "white",
-      	        }
-      	      );
-    	}
+    function guestLoadoutId(id) {
+        var game_id = '<?php echo $game -> id; ?>';
+        var weapon_name = '<?php echo $weapon -> name; ?>';
+    	$('#guestVote').attr("action", '/' + game_id + '/' + weapon_name + '/' + id + '/upvoteGuest');
+    	
+    }
 
-  	function guestSubmitLoadout() {
-  		Recaptcha.create("6Lf9-_YSAAAAAJ9k2G_qXohJi74-pDe8V4NuUdzJ",
-            "recaptchaSubmit",
-            {
-        	 theme: "white",
-            }
-  	   );
-  	}
+    var recaptcha1;
+    var recaptcha2;
+    var initRecaptcha = function() {
+        
+        recaptcha1 = grecaptcha.render('recaptchaVote', {
+          'sitekey' : '6LdAYgITAAAAAIiGNHQnJvj0JYEW9xG7loWs7fls',
+          'theme' : 'light'
+        });
+        
+        recaptcha2 = grecaptcha.render('recaptchaSubmit', {
+          'sitekey' : '6LdAYgITAAAAAIiGNHQnJvj0JYEW9xG7loWs7fls',
+          'theme' : 'light'
+        });
+    };
 </script>
 @stop
