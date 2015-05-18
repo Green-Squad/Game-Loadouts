@@ -2214,21 +2214,10 @@ iframe[src="about:blank"] {
 
 .logo {
 	width: 260px;
-	height: 56px;
+	height: 75px;
 	display: block;
-	background-position: top left;
-	-webkit-transition: none !important;
-	-moz-transition: none !important;
-	-o-transition: none !important;
-	-ms-transition: none !important;
-	transition: none !important;
-	background-size: 100% 200% !important;
-	margin: 21px 0 0 0;
-	float: left;
-}
-
-.logo:hover {
-	background-position: bottom left;
+	margin: 10px 0 0 0;
+  transition: none !important;
 }
 
 .navbar-toggle {
@@ -2311,9 +2300,11 @@ header .main-menu .navbar .navbar-toggle .icon-bar {
 
 @media ( max-width : 767px) {
 	.logo {
-		width: 195px;
-		height: 42px;
-		margin: 3px 0 0 0;
+	  background-size: contain !important;
+    background-repeat: no-repeat !important;
+		width: 150px;
+		height: 40px;
+		margin: 3px 0 0 58px;
 	}
 
 	#navbar-search button, #navbar-search input {
