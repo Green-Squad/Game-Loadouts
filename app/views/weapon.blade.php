@@ -106,7 +106,9 @@
                     <div class="col-md-10">
                         @foreach(Loadout::findOrFail($loadout['id']) -> attachments as $attachment)
                         <div class="attachment">
-                            <img src="{{ asset($attachment -> thumb_url) }}" alt="{{ $attachment -> name }}" />
+                            @if ($attachment -> thumb_url)
+                            <img class="mr-5" src="{{ asset($attachment -> thumb_url) }}" alt="{{ $attachment -> name }}" />
+                            @endif
                             {{ $attachment -> name }}
                         </div>
                         @endforeach
@@ -191,8 +193,10 @@
                         " id="{{ $key }}">
                             <div class="btn-group-vertical" data-toggle="buttons">
                                 @foreach($slot as $attachment)
-                                <label class="btn btn-default" style="text-align: left;">
+                                <label class="btn btn-default loadoutButton">
+                                    @if ($attachment -> thumb_url)
                                     <img src="{{ asset($attachment -> thumb_url) }}" alt="{{ $attachment -> name }}" style="margin-right: 10px">
+                                    @endif
                                     <input type="radio" value="{{ $attachment -> id }}" name="{{ $key }}">
                                     {{ $attachment -> name }} </label>
                                 @endforeach

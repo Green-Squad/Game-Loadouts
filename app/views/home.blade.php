@@ -111,7 +111,9 @@ Game Loadouts contains Titanfall, Battlefield 4 (BF4), and Call of Duty Ghosts (
                          </div>
                             @foreach(Loadout::findOrFail($recentLoadout -> id) -> attachments as $attachment)
                             <div class="attachmentSmall">
-                                <img src="{{ asset($attachment -> thumb_url) }}" alt="{{ $attachment -> name }}" />
+                                @if ($attachment -> thumb_url)
+                                <img class="mr-5" src="{{ asset($attachment -> thumb_url) }}" alt="{{ $attachment -> name }}" />
+                                @endif
                                 {{ $attachment -> name }}
                             </div>
                             @endforeach
@@ -165,7 +167,9 @@ Game Loadouts contains Titanfall, Battlefield 4 (BF4), and Call of Duty Ghosts (
 				    		<a class="loadoutSmall block" href="{{ route('showLoadout', array(urlencode($game -> id), urlencode(Weapon::findOrFail($loadout -> weapon_id) -> name), urlencode($loadout ->id))) }}"> 
 					    	@foreach($loadout -> attachments as $attachment)
 						    <div class="attachmentSmall">
-						        <img src="{{ asset($attachment -> thumb_url) }}" alt="{{ $attachment -> name }}" />
+                                @if ($attachment -> thumb_url)
+                                <img class="mr-5" src="{{ asset($attachment -> thumb_url) }}" alt="{{ $attachment -> name }}" />
+                                @endif
 						        {{ $attachment -> name }}
 						    </div> @endforeach
 								<div class="row">

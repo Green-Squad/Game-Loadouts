@@ -5,9 +5,11 @@ class HelperController extends BaseController {
         $items = Cache::remember('feed_items', $_ENV ['day'], function () {
             return FeedReader::read('http://blog.gameloadouts.com/feed/') -> get_items(0, 1);
         });
+
 		$topLoadoutsPerGame = Cache::remember('top_loadouts_per_game_home', $_ENV ['hour'], function () {
-			$games = Cache::remember('games_home', $_ENV ['week'], function () {
-				return Game::where('live', 1) -> orderBy(DB::raw('RAND()')) -> take(3) -> get();
+			$games = Cache::remember('games_home', $_ENV ['hour'], function () {
+                // return Game::where('live', 1) -> orderBy(DB::raw('RAND()')) -> take(3) -> get();
+                return Game::where('live', 1) -> orderBy('created_at', 'DESC') -> take(3) -> get();
 			});		
 			foreach($games as $game) {
 				$game -> topLoadouts = GameController::topLoadouts($game);
@@ -32,7 +34,6 @@ class HelperController extends BaseController {
         }
 		
         return View::make('home', compact('games', 'items', 'topLoadoutsPerGame', 'recentLoadout'));
-        //return View::make('home', compact('games', 'topLoadoutsPerGame', 'recentLoadout'));
 	}
 
     public static function adsEnabled() {

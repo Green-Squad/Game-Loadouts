@@ -115,7 +115,9 @@
     ?>
     <a class="loadoutSmall block" href="{{ route('showLoadout', array(urlencode($game -> id), urlencode(Weapon::findOrFail($loadout -> weapon_id) -> name), urlencode($loadout ->id))) }}"> <h4 class="weaponSmall theme-color">{{ Weapon::findOrFail($loadout -> weapon_id) -> name }} <small class="pull-right"> ({{ $count }} votes)</small></h4> @foreach($loadout -> attachments as $attachment)
     <div class="attachmentSmall">
-        <img src="{{ asset($attachment -> thumb_url) }}" alt="{{ $attachment -> name }}" />
+        @if ($attachment -> thumb_url)
+        <img class="mr-5" src="{{ asset($attachment -> thumb_url) }}" alt="{{ $attachment -> name }}" />
+        @endif
         {{ $attachment -> name }}
     </div> @endforeach </a>
     @endforeach
@@ -125,7 +127,9 @@
     <?php $loadout = Loadout::findOrFail($loadout -> id); ?>
     <a class="loadoutSmall block" href="{{ route('showLoadout', array(urlencode($game -> id), urlencode(Weapon::findOrFail($loadout -> weapon_id) -> name), urlencode($loadout ->id))) }}"> <h4 class="weaponSmall theme-color">{{ Weapon::findOrFail($loadout -> weapon_id) -> name }}</h4> @foreach($loadout -> attachments as $attachment)
     <div class="attachmentSmall">
-        <img src="{{ asset($attachment -> thumb_url) }}" alt="{{ $attachment -> name }}" />
+        @if ($attachment -> thumb_url)
+        <img class="mr-5" src="{{ asset($attachment -> thumb_url) }}" alt="{{ $attachment -> name }}" />
+        @endif
         {{ $attachment -> name }}
     </div> @endforeach </a>
     @endforeach

@@ -33,11 +33,11 @@ class AttachmentController extends BaseController {
             
             copy($destinationPath . $fileName, $thumbPath . $fileName);
             HelperController::createThumbnail($thumbPath . $fileName, $fileExtension, 64);
-        } else {
-            return Redirect::back() -> with(array (
-                'alert' => 'Error: Failed to upload image',
-                'alert-class' => 'alert-danger' 
-            ));
+        // } else {
+        //     return Redirect::back() -> with(array (
+        //         'alert' => 'Error: Failed to upload image',
+        //         'alert-class' => 'alert-danger' 
+        //     ));
         }
         
         try {
@@ -45,8 +45,12 @@ class AttachmentController extends BaseController {
             $attachment -> name = $name;
             $attachment -> slot = $slot;
             $attachment -> game_id = $game_id;
-            $attachment -> image_url = "uploads/$fileName";
-            $attachment -> thumb_url = "uploads/thumb/$fileName";
+
+            if (Input::hasFile('image')) {
+                $attachment -> image_url = "uploads/$fileName";
+                $attachment -> thumb_url = "uploads/thumb/$fileName";
+            }
+            
             $attachment -> save();
         } catch ( \Illuminate\Database\QueryException $e ) {
             return Redirect::back() -> with(array (
@@ -105,6 +109,25 @@ class AttachmentController extends BaseController {
                 $attachment -> image_url = "uploads/$fileName";
                 $attachment -> thumb_url = "uploads/thumb/$fileName";
             }
+            
+            $attachment -> save();
+        } catch ( \Illuminate\Database\QueryException $e ) {
+            return Redirect::back() -> with(array (
+                'alert' => 'Error: Failed to update attachment',
+                'alert-class' => 'alert-danger' 
+            ));
+        }
+        return Redirect::route('admin.game.show', $game -> id) -> with(array (
+            'alert' => 'Attachment has been successfully updated.',
+            'alert-class' => 'alert-success' 
+        ));
+    }
+
+    public function removeImage(Game $game, $attachmentID) {       
+        try {
+            $attachment = Attachment::findOrFail($attachmentID);
+            $attachment -> image_url = "";
+            $attachment -> thumb_url = "";
             
             $attachment -> save();
         } catch ( \Illuminate\Database\QueryException $e ) {

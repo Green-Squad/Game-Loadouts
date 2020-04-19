@@ -129,9 +129,13 @@ Game Administration
                         {{ $attachment -> slot }}
                     </td>
                     <td>
+                        @if ($attachment -> image_url)
                         <a href="{{ asset($attachment -> image_url) }}">
                             <img src="{{ asset($attachment -> thumb_url) }}" alt="Image URL" class="thumbnail" />
                         </a>
+                        @else
+                        No Image
+                        @endif
                     </td>
                     <td>
                         {{ $attachment -> created_at }}

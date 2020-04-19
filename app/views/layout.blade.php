@@ -190,7 +190,7 @@
                             Use the link below and then select "Submit New Idea" on the top left.
                         </p>
                         <p>
-                            <a class="button-gym" href="http://greensquad.ideascale.com/a/ideafactory.do?id=29675&amp;mode=top&amp;discussionFilter=byids&amp;discussionID=7136"> Submit Feedback </a>
+                            <a class="button-gym" href="https://greensquad.ideascale.com/a/index"> Submit Feedback </a>
                         </p>
                     </div>
                     <div class="col-md-3">
@@ -200,17 +200,14 @@
                         </p>
                         <ul class="social" >
                             <li>
-                                <a href="http://www.facebook.com/GameLoadouts"><i class="entypo-facebook" ></i></a>
-                            </li>
-                            <li>
-                                <a href="https://www.twitter.com/GameLoadouts"><i class="entypo-twitter" ></i></a>
+                                <a href="https://www.twitter.com/GameLoadouts"><i class="entypo-twitter"></i></a>
                             </li>
                         </ul>
                     </div>
                     <div class="col-md-3">
-                        <h3>Games</h3>
+                        <h3>Recent Games</h3>
                         <p></p>
-                        @foreach(GameController::listGames() as $game)
+                        @foreach(GameController::recentGames(4) as $game)
 							@if($game -> live == 1)
 							<p class="no-margin">
 								<a class="button-gym footer-games" href="{{ route('showGame', urlencode($game -> id)) }}">{{ $game -> id  }}</a>

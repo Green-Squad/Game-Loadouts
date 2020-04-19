@@ -88,7 +88,9 @@ The {{ $weapon -> name }} in {{ $game -> id }}@if($game -> short_name) ({{ $game
                         <div class="col-md-12">
                             @foreach(Loadout::findOrFail($loadout['id']) -> attachments as $attachment)
                             <div class="attachment">
-                                <img src="{{ asset($attachment -> thumb_url) }}" alt="{{ $attachment -> name }}" />
+                                @if ($attachment -> thumb_url)
+                                <img class="mr-5" src="{{ asset($attachment -> thumb_url) }}" alt="{{ $attachment -> name }}" />
+                                @endif
                                 {{ $attachment -> name }}
                             </div>
                             @endforeach

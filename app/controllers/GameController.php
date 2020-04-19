@@ -148,7 +148,7 @@ class GameController extends BaseController {
     }
 
     public static function recentGames($num) {
-        $recentGames = Game::all() -> reverse() -> take($num);
+        $recentGames = Game::orderBy('created_at', 'DESC') -> take($num) -> get();
         return $recentGames;
     }
     

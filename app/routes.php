@@ -234,6 +234,8 @@ Route::group(array (
                     'uses' => 'AttachmentController@edit' 
                 ));
                 Route::post('attachment/{attachment}/edit', 'AttachmentController@update');
+
+                Route::get('attachment/{attachment}/removeImage', 'AttachmentController@removeImage');
                 
                 Route::get('attachment/{attachment}/delete', array (
                     'as' => 'attachmentDelete',

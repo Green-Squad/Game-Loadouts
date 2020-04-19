@@ -57,7 +57,15 @@ Edit Attachment {{ $attachment -> name }}
                     </div>
                 </div>
                 <div class="form-group">
-                    <div class="col-lg-12">
+                    @if ($attachment -> thumb_url)
+                    <div class="col-lg-2">
+                        <img src="{{ asset($attachment -> thumb_url) }}" alt="{{ $attachment -> name }}" />
+                        <a href="{{ action('AttachmentController@removeImage', array('id' => $game -> id, 'attachmentID' => $attachment -> id)) }}" class="btn btn-danger">
+                            <span class="glyphicon glyphicon-trash"></span>
+                        </a>
+                    </div>
+                    @endif
+                    <div class="col-lg-10">
                         {{ Form::label('image', 'Upload Image: ', array('class' => 'control-label'))}}
                         {{ Form::file('image', '', array('class' => 'form-control input-lg')) }}
                     </div>
