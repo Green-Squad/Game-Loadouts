@@ -40,7 +40,10 @@ Edit Game {{ $game -> id }}
                 </div>
                 <div class="form-group">
 					<div class="col-lg-6">
-                        {{ Form::text('theme_color', $game -> theme_color, array('class' => 'form-control input-lg', 'placeholder' => 'Theme Color', 'required' => '')) }}
+                        {{ Form::select('theme_color', 
+                            array('cyan' => 'Cyan', 'green' => 'Green', 'orange' => 'Orange', 'red' => 'Red', 'yellow' => 'Yellow'), 
+                            $game -> theme_color, 
+                            array('class' => 'form-control input-lg', 'placeholder' => 'Theme Color', 'required' => '')) }}
                     </div>
                     <div class="col-lg-6">
                         {{ Form::text('live', $game -> live, array('class' => 'form-control input-lg', 'placeholder' => 'Live', 'required' => '')) }}
