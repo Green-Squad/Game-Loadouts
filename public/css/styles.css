@@ -3343,18 +3343,6 @@ header .main-menu .navbar .navbar-toggle .icon-bar {
     margin: 0 37px 0 0 !important
   }
 }
-.battlefield-4-sub-header {
-  background-image: url("/img/header/battlefield4.jpg")
-}
-.titanfall-sub-header {
-  background-image: url("/img/header/titanfall.jpg")
-}
-.call-of-duty-ghosts-sub-header {
-  background-image: url("/img/header/callofdutyghosts.jpg")
-}
-.call-of-duty-advanced-warfare-sub-header {
-  background-image: url("/img/header/callofdutyadvancedwarfare.jpg")
-}
 .hide {
   visibility: hidden
 }

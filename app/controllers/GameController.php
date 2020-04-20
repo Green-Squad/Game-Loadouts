@@ -18,20 +18,31 @@ class GameController extends BaseController {
         $id = Input::get('id');
         $live = Input::get('live');
         $image = Input::file('image');
+        $header_image = Input::file('header_image');
         $short_name = Input::get('short_name');
-		$theme_color = Input::get('theme_color');
+        $theme_color = Input::get('theme_color');
+        
+        $destinationPath = public_path() . '/uploads/';
+        $thumbPath = public_path() . '/uploads/thumb/';
+        $headerPath = public_path() . '/uploads/header/';
         
         if (Input::hasFile('image')) {
-            $destinationPath = public_path() . '/uploads/';
-            $thumbPath = public_path() . '/uploads/thumb/';
-            
             $fileExtension = $image -> getClientOriginalExtension();
             $fileName = urlencode($id) . '.' . $fileExtension;
-            
             $image -> move($destinationPath, $fileName);
-            
             copy($destinationPath . $fileName, $thumbPath . $fileName);
             HelperController::createThumbnail($thumbPath . $fileName, $fileExtension, $this -> thumb_dimension);
+        } else {
+            return Redirect::back() -> with(array (
+                'alert' => 'Error: Failed to upload image',
+                'alert-class' => 'alert-danger' 
+            ));
+        }
+
+        if (Input::hasFile('header_image')) {
+            $fileExtension = $header_image -> getClientOriginalExtension();
+            $fileName = urlencode($id) . '.' . $fileExtension;
+            $header_image -> move($headerPath, $fileName);
         } else {
             return Redirect::back() -> with(array (
                 'alert' => 'Error: Failed to upload image',
@@ -45,6 +56,7 @@ class GameController extends BaseController {
             $game -> live = $live;
             $game -> image_url = "uploads/$fileName";
             $game -> thumb_url = "uploads/thumb/$fileName";
+            $game -> header_url = "uploads/header/$fileName";
             $game -> short_name = $short_name;
 			$game -> theme_color = $theme_color;
             $game -> save();
@@ -81,16 +93,19 @@ class GameController extends BaseController {
         $id = Input::get('id');
         $live = Input::get('live');
         $image = Input::file('image');
+        $header_image = Input::file('header_image');
         $short_name = Input::get('short_name');
 		$theme_color = Input::get('theme_color');
         
         try {
             $game -> id = $id;
             $game -> live = $live;
+
+            $destinationPath = public_path() . '/uploads/';
+            $thumbPath = public_path() . '/uploads/thumb/';
+            $headerPath = public_path() . '/uploads/header/';
             
             if (Input::hasFile('image')) {
-                $destinationPath = public_path() . '/uploads/';
-                $thumbPath = public_path() . '/uploads/thumb/';
                 $fileExtension = $image -> getClientOriginalExtension();
                 $fileName = urlencode($id) . '.' . $fileExtension;
                 $image -> move($destinationPath, $fileName);
@@ -100,6 +115,19 @@ class GameController extends BaseController {
                 
                 $game -> thumb_url = "uploads/thumb/$fileName";
                 $game -> image_url = "uploads/$fileName";
+            }
+
+            if (Input::hasFile('header_image')) {
+                $fileExtension = $header_image -> getClientOriginalExtension();
+                $fileName = urlencode($id) . '.' . $fileExtension;
+                $header_image -> move($headerPath, $fileName);
+
+                $game -> header_url = "uploads/header/$fileName";
+            } else {
+                return Redirect::back() -> with(array (
+                    'alert' => 'Error: Failed to upload image',
+                    'alert-class' => 'alert-danger' 
+                ));
             }
             
             $game -> short_name = $short_name;

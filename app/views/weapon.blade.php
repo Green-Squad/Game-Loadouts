@@ -15,7 +15,7 @@
 @section('sub-header')
 <section id="game">
     <!-- Sub Header -->
-    <div class="{{ strtolower(preg_replace('/\s/','-', $game -> id))}}-sub-header sub-header">
+    <div class="sub-header" style="background-image: url('/{{ $game -> header_url }}')">
         <div class="container">
             <div class="row">
                 <ul class="sub-header-container">

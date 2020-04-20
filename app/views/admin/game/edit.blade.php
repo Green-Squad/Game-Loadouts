@@ -51,8 +51,16 @@ Edit Game {{ $game -> id }}
                 </div>
                 <div class="form-group">
                     <div class="col-lg-12">
-                        {{ Form::label('image', 'Upload Image: ', array('class' => 'control-label'))}}
+                        {{ Form::label('image', 'Upload Small Image (525 x 179 minimum): ', array('class' => 'control-label'))}}
                         {{ Form::file('image', '', array('class' => 'form-control input-lg')) }}
+                        Current: {{ $game -> thumb_url }}
+                    </div>
+                </div>
+                <div class="form-group">
+                    <div class="col-lg-12">
+                        {{ Form::label('header_image', 'Upload Header Image (1500 x 215 minimum): ', array('class' => 'control-label'))}}
+                        {{ Form::file('header_image', '', array('class' => 'form-control input-lg')) }}
+                        Current: {{ $game -> header_url }}
                     </div>
                 </div>
                 <div class="form-group">
