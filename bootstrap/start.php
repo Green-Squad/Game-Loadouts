@@ -26,7 +26,7 @@ $app = new Illuminate\Foundation\Application;
 
 $env = $app->detectEnvironment(array(
 
-    'local' => array('GreenSquad2'),
+    'local' => array('GreenSquad2', 'Inspiron-3137'),
     'jordan-dev' => array('Jordan-Desktop')
 
 ));
