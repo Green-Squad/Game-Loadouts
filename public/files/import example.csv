@@ -1,0 +1,13 @@
+Weapon Name,,Weapon 1 Group 1,Weapon 2 Group 1,Weapon 1 Group 2,Weapon 2 Group 2
+Group Name,,Group 1,Group 1,Group 2,Group 2
+Min Attachments,,1,1,3,5
+Max Attachments,,2,1,5,5
+,,,,,
+Slot 1 Attachment 1,Slot 1,X,,,X
+Slot 1 Attachment 2,Slot 1,X,,,X
+Slot 1 Attachment 3,Slot 1,,X,,X
+Slot 1 Attachment 4,Slot 1,,,,X
+Slot 2 Attachment 1,Slot 2,X,,,X
+Slot 2 Attachment 2,Slot 2,X,,,X
+Slot 2 Attachment 3,Slot 2,X,,,X
+Slot 2 Attachment 4,Slot 2,,X,,X

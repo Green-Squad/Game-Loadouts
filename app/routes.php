@@ -222,6 +222,10 @@ Route::group(array (
             Route::group(array (
                 'prefix' => '{game}' 
             ), function () {
+                // Import
+                Route::get('import', 'ImportController@import');
+                Route::post('import', 'ImportController@processImport');
+
                 // ATTACHMENT
                 Route::get('attachment/create', array (
                     'as' => 'attachmentCreate',
