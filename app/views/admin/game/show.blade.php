@@ -29,6 +29,13 @@ Game Administration
     </div>
 </div><!-- /.row -->
 
+<div>
+<div class="row">
+    <div class="col-lg-12">
+        <h3> Import <a href="{{ action('ImportController@import', array('game_id' => $game -> id)) }}" class="btn btn-sm btn-success"><span class="glyphicon glyphicon-plus"></span></a></h3>
+    </div>
+</div>
+
 <div class="row">
     <div class="col-lg-12">
         <h3> Weapons <a href="{{ action('WeaponController@create', array('game_id' => $game -> id)) }}" class="btn btn-sm btn-success"><span class="glyphicon glyphicon-plus"></span></a></h3>
@@ -66,9 +73,13 @@ Game Administration
                         {{ count(Loadout::where('weapon_id', $weapon -> id) -> get()) }}
                     </td>
                     <td>
+                        @if ($weapon -> thumb_url)
                         <a href="{{ asset($weapon -> image_url) }}">
                             <img src="{{ asset($weapon -> thumb_url) }}" alt="thumb URL" class="thumbnail" />
                         </a>
+                        @else
+                        No Image
+                        @endif
                     </td>
                     <td>
                         {{ $weapon -> min_attachments }}
