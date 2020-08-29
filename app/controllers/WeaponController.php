@@ -292,10 +292,12 @@ class WeaponController extends BaseController {
                 );
             }
         }
-		// Make Call of Duty Advanced Warfare work with out system
+
+		// Make Call of Duty Advanced Warfare work with our system
 		if ($weapon -> game_id == "Call of Duty Advanced Warfare" && isset($attachmentsBySlot['Other1'])) {
 			$attachmentsBySlot['Other2'] = $attachmentsBySlot['Other1'];
-		}
+        }
+        
 		ksort($attachmentsBySlot);
         return $attachmentsBySlot;
     }
