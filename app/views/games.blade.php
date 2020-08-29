@@ -19,7 +19,7 @@ Find the best weapon loadouts for {{ HelperController::listToString($games, 'id'
 		@for($i = 0; $i < 2; $i++)
 							<?php $counter = 0 + $i; ?>	
 							<div class="col-md-6">
-		@foreach(GameController::listGames() as $game)
+		@foreach(GameController::recentGames() as $game)
 			@if($game -> live == 1)
 				@if($counter++ % 2 == 0)
 				<article class="post">

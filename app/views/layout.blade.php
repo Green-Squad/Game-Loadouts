@@ -73,7 +73,7 @@
                                         <li class="dropdown">
                                             <a href="{{ route('showGames') }}" class="dropdown-toggle"> Games <b class="caret"></b> </a>
                                             <ul>
-                                                @foreach(GameController::listGames() as $game)
+                                                @foreach(GameController::recentGames(5) as $game)
 													@if($game -> live == 1)
 														<li>
 															<a href="{{ route('showGame', urlencode($game -> id)) }}"> {{ $game -> id }} </a>

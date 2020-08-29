@@ -175,8 +175,14 @@ class GameController extends BaseController {
         return $gameCount;
     }
 
-    public static function recentGames($num) {
-        $recentGames = Game::orderBy('created_at', 'DESC') -> take($num) -> get();
+    public static function recentGames($num = null) {
+        if ($num == null) {
+            $recentGames = Game::orderBy('created_at', 'DESC') -> get();
+        }
+        else {
+            $recentGames = Game::orderBy('created_at', 'DESC') -> take($num) -> get();
+        }
+
         return $recentGames;
     }
     
