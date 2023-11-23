@@ -67,6 +67,11 @@ App::down(function()
 	return Response::make("Be right back!", 503);
 });
 
+
+App::before(function ($request) {
+    $_SERVER['HTTPS'] = 'on';
+});
+
 /*
 |--------------------------------------------------------------------------
 | Require The Filters File
