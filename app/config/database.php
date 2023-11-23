@@ -54,10 +54,10 @@ return array(
 
 		'mysql' => array(
 			'driver'    => 'mysql',
-			'host'      => 'localhost',
-			'database'  => 'database',
-			'username'  => 'root',
-			'password'  => '',
+			'host'      => getenv('DB_HOST') ?: 'localhost',
+    		'database'  => getenv('DB_DATABASE') ?: 'database',
+    		'username'  => getenv('DB_USERNAME') ?: 'root',
+    		'password'  => getenv('DB_PASSWORD') ?: '',
 			'charset'   => 'utf8',
 			'collation' => 'utf8_unicode_ci',
 			'prefix'    => '',

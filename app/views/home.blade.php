@@ -189,48 +189,6 @@ Game Loadouts contains Titanfall, Battlefield 4 (BF4), and Call of Duty Ghosts (
 		</div>
 	</div>
 </div>
-<div class="row">
-    <div class="col-md-8">
-        <h2>Site News</h2>
-        <span class="line"> <span class="sub-line"></span> </span>
-        
-        
-        
-        @for($i = 0; $i < 1; $i++)
-		<div class="item">
-			<h4><a href="{{ $items[$i]->get_permalink() }}" class="green-a">{{ $items[$i]->get_title() }}</a></h4>
-			<p>{{ $items[$i] -> get_description() }}</p>
-			<p><small>Posted on {{ $items[$i]->get_date('j F Y | g:i a') }}</small></p>
-		</div>
-        @endfor
-        
-        
-        
-        
-       <p>View more news on the <a href="http://blog.gameloadouts.com">Game Loadouts Blog</a>.</p>
-    </div>
-    @if(HelperController::adsEnabled())
-	<div class="col-md-4">
-		<div class="right-ad-box">
-			<style>
-				.game-loadouts-responsive-sidebar {
-					width: 300px;
-					height: 250px;
-				}
-			</style>
-			<script async src="//pagead2.googlesyndication.com/pagead/js/adsbygoogle.js"></script>
-			<!-- Game Loadouts Responsive Sidebar -->
-			<ins class="adsbygoogle game-loadouts-responsive-sidebar"
-			style="display:inline-block"
-			data-ad-client="ca-pub-9067954073014278"
-			data-ad-slot="2846988777"></ins>
-			<script>
-				( adsbygoogle = window.adsbygoogle || []).push({});
-			</script>
-		</div>
-	</div>
-    @endif
-</div>
 @stop
 
 @section('scripts')

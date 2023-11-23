@@ -78,7 +78,7 @@ return array(
 	|
 	*/
 
-	'key' => '',
+	'key' => getenv('KEY') ?: '',
 
 	/*
 	|--------------------------------------------------------------------------
@@ -120,7 +120,6 @@ return array(
 		'Illuminate\View\ViewServiceProvider',
 		'Illuminate\Workbench\WorkbenchServiceProvider',
 		'Roumen\Sitemap\SitemapServiceProvider',
-	    'Awjudd\FeedReader\FeedReaderServiceProvider'
 	),
 
 	/*
@@ -186,7 +185,6 @@ return array(
 		'URL'             => 'Illuminate\Support\Facades\URL',
 		'Validator'       => 'Illuminate\Support\Facades\Validator',
 		'View'            => 'Illuminate\Support\Facades\View',
-	    'FeedReader'      => 'Awjudd\FeedReader\Facades\FeedReader'
 
 	),
 	
