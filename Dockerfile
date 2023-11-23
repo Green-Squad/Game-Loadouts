@@ -4,6 +4,7 @@ FROM php:5.6-apache
 # Set the working directory inside the container
 WORKDIR /var/www/html
 
+# set hostname
 ENV HOSTNAME docker
 
 # Update repository URLs to archive and update packages
