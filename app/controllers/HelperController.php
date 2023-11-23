@@ -2,10 +2,6 @@
 class HelperController extends BaseController {
 	
 	function showHome() {
-        $items = Cache::remember('feed_items', $_ENV ['day'], function () {
-            return FeedReader::read('http://blog.gameloadouts.com/feed/') -> get_items(0, 1);
-        });
-
 		$topLoadoutsPerGame = Cache::remember('top_loadouts_per_game_home', $_ENV ['hour'], function () {
 			$games = Cache::remember('games_home', $_ENV ['hour'], function () {
                 // return Game::where('live', 1) -> orderBy(DB::raw('RAND()')) -> take(3) -> get();
