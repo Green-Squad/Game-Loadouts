@@ -1,13 +1,10 @@
 <?php
 
-use Illuminate\Support\Facades\URL;
-URL::forceSchema('https');
-
 /*
  * |-------------------------------------------------------------------------- | Application & Route Filters |-------------------------------------------------------------------------- | | Below you will find the "before" and "after" events for the application | which may be used to do any work before or after a request into your | application. Here you may also register your custom route filters. |
  */
 App::before(function ($request) {
-    //
+    $request->server->set('HTTPS', true);
 });
 
 App::after(function ($request, $response) {
