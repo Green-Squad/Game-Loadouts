@@ -20,16 +20,16 @@ HTML::macro('navLink', function ($route, $text) {
 	}
 });
 
-// App::missing(function ($exception) {
-//     if (Auth::guest() || Auth::user() -> role != 'Admin') {
-//         return Response::view('errors.missing', array (), 404);
-//     }
-// });
-// App::error(function (Exception $exception) {
-//     if (Auth::guest() || Auth::user() -> role != 'Admin') {
-//         return Response::view('errors.missing', array (), 404);
-//     }
-// });
+App::missing(function ($exception) {
+    if (Auth::guest() || Auth::user() -> role != 'Admin') {
+        return Response::view('errors.missing', array (), 404);
+    }
+});
+App::error(function (Exception $exception) {
+    if (Auth::guest() || Auth::user() -> role != 'Admin') {
+        return Response::view('errors.missing', array (), 404);
+    }
+});
 
 
 Route::get('sitemap.xml', 'HelperController@sitemap');

@@ -20,3 +20,7 @@ DB_USERNAME
 DB_PASSWORD
 MAIL_USERNAME
 MAIL_PASSWORD
+
+# Issues
+
+If we re-import the db, we might need to run `ALTER TABLE `users` MODIFY `remember_token` varchar(100) COLLATE utf8mb3_unicode_ci NOT NULL DEFAULT '';`
