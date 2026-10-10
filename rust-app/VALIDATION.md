@@ -9,6 +9,8 @@
 - Chromium 156 headless browser checks passed: desktop home/games/game/weapon/loadout/stats, asset responses and JS errors, actual typed autocomplete selection display, accordion expansion, weapon filtering, disabled votes, mobile home/navigation and no horizontal overflow. Screenshots inspected for home/weapon/game/mobile; fixture uses tracked real gun media after the first visual pass revealed that a header-image stand-in was too wide for weapon thumbnails.
 - Three read-only production page fetches (home, COD Modern Warfare/M19, loadout 1082) checked the actual public markup, title/description, URL/attachment ordering patterns and Disqus identity. All 24 sampled image paths are in Git. No production traffic benchmark or DB access occurred. Full production result/ranking parity awaits the same authorized DB snapshot.
 - CSS HTTP response verified as `text/css`, `public, max-age=3600`, with Last-Modified and no immutable flag. Health check returns 200. Ten startup/SIGTERM cycles exited cleanly.
+- [GitHub Actions run 38074054904](https://github.com/Kyle-Dornblaser/Game-Loadouts/actions/runs/38074054904) passed for source commit `07475ef2a145d685628b9c5ed32581023a7dbb9f`: formatting, lint, all unit/integration tests against **MySQL 8.4**, production Docker build, and browser smoke tests against the image. The container ran as non-root with `--read-only --cap-drop ALL`, served CSS with correct MIME/cache headers, and exited with status 0 after SIGTERM. An initial CI run exposed stricter MySQL date grouping; the corrected derived-table aggregation passes both MySQL and MariaDB.
+- CI Docker image size (`docker image inspect .Size`): **123,115,618 bytes (117.41 MiB)**, uncompressed local image size, including shipped static assets; not compressed registry transfer size. CI artifacts include the exact size, rendered HTML, headers, JSON logs and browser screenshots. A compact record is in [measurements/ci.json](measurements/ci.json).
 
 ## Local warm measurements
 
@@ -43,7 +45,7 @@ Raw reports and source/environment digest are in [measurements](measurements/). 
 
 - Actual production MySQL schema, indexes/collation, timezone and complete data/image inventory. Fixture inference is documented in README.
 - Full same-dataset PHP 5.6/Laravel response parity and latency, including tied rankings with the legacy unspecified tie-break.
-- Docker image build, runtime image size and MySQL 8.4 validation on this workstation: no Docker daemon is available. The Dockerfile is release/multi-stage/non-root; CI includes an actual build and read-only-container smoke test, with image-size output. CI status is separate from these local results.
+- Local workstation Docker execution: no Docker daemon is available here. Docker build/runtime and MySQL 8.4 validation were completed separately in CI as recorded above; CI did not run a controlled container latency/memory benchmark.
 - Live Google Custom Search credentials/response; provider logic is tested with a local HTTP fixture. Actual Disqus thread content/network response is unverified; identifiers and embedding configuration are preserved.
 - Cloud Run startup/cold starts, memory, billable instance time, costs, cloud-region DB time, or a running batched Laravel performance baseline. No cloud credentials were available; nothing was deployed.
 
