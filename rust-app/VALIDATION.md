@@ -18,24 +18,24 @@ Three final runs, each **200 measured requests + 20 warmups per route and concur
 
 | Route | Concurrency | p50 ms range | p95 ms range | Queries | Mean DB ms range |
 |---|---:|---:|---:|---:|---:|
-| `/` | 1 | 2.34–3.87 | 4.46–8.38 | 4 | 1.64–2.93 |
-| `/` | 8 | 5.57–10.44 | 10.23–24.18 | 4 | 3.05–5.48 |
-| `/games` | 1 | 0.42–0.67 | 0.93–2.37 | 1 | 0.18–0.22 |
-| `/games` | 8 | 2.34–3.63 | 6.99–10.53 | 1 | 0.26–0.43 |
-| `/COD-MW` | 1 | 2.95–4.04 | 5.29–8.23 | 6 | 2.06–2.64 |
-| `/COD-MW` | 8 | 5.39–10.03 | 9.53–18.11 | 6 | 3.13–5.35 |
-| `/COD-MW/M4A1` | 1 | 2.68–3.43 | 4.91–7.17 | 6 | 1.79–2.23 |
-| `/COD-MW/M4A1` | 8 | 5.07–7.67 | 7.97–13.10 | 6 | 2.56–3.90 |
-| `/COD-MW/M4A1/1` | 1 | 1.94–3.56 | 3.16–9.07 | 5 | 1.18–2.05 |
-| `/COD-MW/M4A1/1` | 8 | 3.95–6.85 | 7.04–16.41 | 5 | 1.89–2.90 |
-| `/stats` | 1 | 1.70–1.98 | 3.24–4.39 | 3 | 1.13–1.32 |
-| `/stats` | 8 | 4.08–5.58 | 8.61–22.81 | 3 | 1.77–2.21 |
-| `/search_weapons?query=M4` | 1 | 0.40–0.81 | 0.85–2.79 | 1 | 0.15–0.20 |
-| `/search_weapons?query=M4` | 8 | 2.27–3.64 | 6.74–12.82 | 1 | 0.25–0.28 |
+| `/` | 1 | 2.35–2.89 | 4.07–5.36 | 4 | 1.68–2.18 |
+| `/` | 8 | 4.87–6.01 | 9.03–11.75 | 4 | 2.74–3.26 |
+| `/games` | 1 | 0.36–0.46 | 0.72–1.73 | 1 | 0.15–0.23 |
+| `/games` | 8 | 1.52–2.10 | 5.85–6.46 | 1 | 0.27–0.38 |
+| `/COD-MW` | 1 | 2.83–3.20 | 4.54–8.23 | 6 | 1.98–2.38 |
+| `/COD-MW` | 8 | 4.89–5.59 | 8.23–9.25 | 6 | 2.73–2.99 |
+| `/COD-MW/M4A1` | 1 | 2.48–2.51 | 3.96–4.27 | 6 | 1.61–1.73 |
+| `/COD-MW/M4A1` | 8 | 4.73–5.29 | 7.97–10.93 | 6 | 2.48–2.74 |
+| `/COD-MW/M4A1/1` | 1 | 1.89–1.98 | 3.07–3.56 | 5 | 1.18–1.28 |
+| `/COD-MW/M4A1/1` | 8 | 3.50–3.80 | 6.00–7.33 | 5 | 1.75–1.87 |
+| `/stats` | 1 | 1.64–1.76 | 2.96–3.60 | 3 | 1.09–1.20 |
+| `/stats` | 8 | 3.40–3.51 | 6.22–7.96 | 3 | 1.43–1.75 |
+| `/search_weapons?query=M4` | 1 | 0.40–0.45 | 0.91–1.11 | 1 | 0.18–0.19 |
+| `/search_weapons?query=M4` | 8 | 2.04–2.45 | 7.12–8.48 | 1 | 0.26–0.30 |
 
-Process RSS after the final workloads: **9.38 MiB**; observed process high-water mark **9.38 MiB**. This is not total container/cgroup memory. Stripped release binary: **6,252,976 bytes**; this is not Docker image size.
+Process RSS after the final workloads: **9.44 MiB**; observed process high-water mark **9.44 MiB**. This is not total container/cgroup memory. Stripped release binary: **6,268,120 bytes**; this is not Docker image size.
 
-Local startup, 10 warm-host launches with a ready local DB: health-readiness median **6.38 ms**, range **6.13–9.40 ms**, 5 ms polling interval. Internal `ready` log median **1.05 ms**. These exclude image pull, Cloud Run provisioning, remote DB connection delays and real Cloud Run cold starts.
+Local startup, 10 warm-host launches with a ready local DB: health-readiness median **6.61 ms**, range **6.14–12.22 ms**, 5 ms polling interval. Internal `ready` log median **1.20 ms**. These exclude image pull, Cloud Run provisioning, remote DB connection delays and real Cloud Run cold starts.
 
 Raw reports and source/environment digest are in [measurements](measurements/). `db_mean_ms` is measured execution/fetch time, not pool wait; request latency includes pool wait, HTTP and HTML rendering. Query count covers application SQL, excludes prepare/connection/session maintenance. An earlier exploratory pass showed more variable weapon-tail latency; final repeated runs are reported here. No percentage PHP speedup is claimed.
 

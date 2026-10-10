@@ -339,7 +339,7 @@ async fn build_page(
             p.description =
                 "View the stats we have collected on all the game loadout submissions.".into();
             p.stats=db.rows("SELECT A.game_id game, CAST(A.votes AS SIGNED) votes, CAST(B.loadouts AS SIGNED) loadouts FROM (SELECT w.game_id, COUNT(lu.loadout_id) votes FROM weapons w JOIN loadouts l ON l.weapon_id=w.id JOIN loadout_user lu ON lu.loadout_id=l.id GROUP BY w.game_id) A JOIN (SELECT w.game_id, COUNT(l.id) loadouts FROM weapons w JOIN loadouts l ON l.weapon_id=w.id GROUP BY w.game_id) B ON A.game_id=B.game_id ORDER BY A.game_id",&[]).await?;
-            let days: Vec<Day>=db.rows("SELECT w.game_id game, CAST(DATE(lu.created_at) AS CHAR) date, CAST(COUNT(*) AS SIGNED) votes FROM weapons w JOIN loadouts l ON l.weapon_id=w.id JOIN loadout_user lu ON lu.loadout_id=l.id WHERE DATE(lu.created_at)>=DATE_SUB(CURDATE(),INTERVAL 30 DAY) GROUP BY w.game_id,DATE(lu.created_at) ORDER BY DATE(lu.created_at),w.game_id",&[]).await?;
+            let days: Vec<Day>=db.rows("SELECT d.game,CAST(d.vote_date AS CHAR) date,CAST(d.votes AS SIGNED) votes FROM (SELECT w.game_id game,DATE(lu.created_at) vote_date,COUNT(*) votes FROM weapons w JOIN loadouts l ON l.weapon_id=w.id JOIN loadout_user lu ON lu.loadout_id=l.id WHERE DATE(lu.created_at)>=DATE_SUB(CURDATE(),INTERVAL 30 DAY) GROUP BY w.game_id,DATE(lu.created_at)) d ORDER BY d.vote_date,d.game",&[]).await?;
             let dates: std::collections::BTreeSet<_> =
                 days.iter().map(|d| d.date.clone()).collect();
             let mut names = vec![];

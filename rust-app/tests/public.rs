@@ -168,6 +168,10 @@ async fn public_correctness_and_query_budgets() {
     let (s, q, html) = request(&app, "/Call+of+Duty+Modern+Warfare", "GET", "").await;
     assert_eq!((s, q), (200, 6));
     assert!(html.contains("Recent Loadouts"));
+    sqlx::query("UPDATE loadout_user SET created_at=CURRENT_DATE WHERE loadout_id=1")
+        .execute(&pool)
+        .await
+        .unwrap();
     let (s, q, html) = request(&app, "/stats", "GET", "").await;
     assert_eq!((s, q), (200, 3));
     assert!(
@@ -175,6 +179,25 @@ async fn public_correctness_and_query_budgets() {
             .contains("<td>Call of Duty Modern Warfare</td><td>11</td><td>7</td>")
     );
     assert!(!html.contains("<td>No Votes</td>"));
+    let chart = html
+        .split("id=\"chart-data\">")
+        .nth(1)
+        .unwrap()
+        .split("</script>")
+        .next()
+        .unwrap();
+    let chart: serde_json::Value = serde_json::from_str(chart).unwrap();
+    assert!(!chart["labels"].as_array().unwrap().is_empty());
+    assert!(chart["datasets"].as_array().unwrap().iter().any(|d| {
+        d["label"] == "Call of Duty Modern Warfare"
+            && d["data"]
+                .as_array()
+                .unwrap()
+                .iter()
+                .map(|n| n.as_i64().unwrap())
+                .sum::<i64>()
+                >= 3
+    }));
     let (s, q, xml) = request(&app, "/sitemap.xml", "GET", "").await;
     assert_eq!((s, q), (200, 3));
     assert!(xml.contains("A%2BB+%2F+Pok%C3%A9mon%27s+%7E"));

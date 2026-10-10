@@ -166,6 +166,27 @@ See [VALIDATION.md](VALIDATION.md) for the measurements actually taken and unmea
 1. Use an isolated DB snapshot with identical schema/data for both services. Do not load-test the live site. Match CPU/memory, region, DB proximity, DB indexes/timezone, pool/connection limits, Cloud Run billing mode/concurrency/autoscaling, and request bodies/route mix. Record commit/image digest, database row counts and all resource settings.
 2. Hit origin/direct service URLs, bypassing CDN/browser caches. Disable third-party scripts for end-to-end browser work on both services, and keep HTML-only and full asset navigation measurements separate. Metrics headers are enabled for comparison; no application cache exists in Rust. Legacy PHP caches must be cleared/disabled for an uncached baseline, then optionally measured as a separately labeled cached scenario.
 3. Run `benchmark.py --requests 200 --concurrency 1 8` three or more times in alternating service order. It warms each route/workload with 20 requests, uses persistent connections, cache-busting query parameters and no-cache headers, validates HTTP status, and reports p50/p95, query counts, DB execution/fetch time and response bytes. It refuses gameloadouts.com. Modest remote traffic requires `--allow-isolated-target` on a dedicated service. For IAM-only Cloud Run, use a local `gcloud run services proxy game-loadouts-rust-experiment --project PROJECT --region REGION --port 8088`; proxy/network overhead is part of client latency, so use the same path for PHP.
+For the isolated legacy PHP service, set the Laravel cache driver to `array` before resolving the cache service (so each PHP request starts with an empty request-local store). For query/time headers, register this fixture-only instrumentation early in `app/start/global.php`; do not log SQL/bindings. Do not install this on the live service:
+
+```php
+if (getenv('BENCHMARK_METRICS') === '1') {
+    Config::set('cache.driver', 'array');
+    $queryCount = 0;
+    $dbMs = 0;
+    DB::listen(function ($sql, $bindings, $time) use (&$queryCount, &$dbMs) {
+        $queryCount++;
+        $dbMs += $time;
+    });
+    App::after(function ($request, $response) use (&$queryCount, &$dbMs) {
+        $response->headers->set('X-DB-Queries', (string) $queryCount);
+        $response->headers->set('Server-Timing', sprintf('db;dur=%.3f', $dbMs));
+        $response->headers->set('Cache-Control', 'no-store');
+    });
+}
+```
+
+Confirm that the listener includes queries during view rendering by checking a weapon page's N+1 count before relying on its headers. If the installed Laravel version renders the view after its after-filter, move the header emission after response rendering. Run the **same** benchmark client against both isolated services; without PHP instrumentation the DB columns remain unmeasured, not zero.
+
 4. Collect process RSS/high-water mark with `--pid PID` (Linux /proc), and cgroup/container peak memory separately. Image size comes from `docker image inspect --format '{{.Size}}'` (uncompressed local size); registry compressed transfer size is a separate measure. Binary size is not image size.
 5. Measure local warm-host process startup with `measure_startup.py`; it performs ten launches/readiness probes and verifies clean SIGTERM exits. Real Cloud Run cold starts require separate scale-to-zero trials: keep min=0, verify no active instance, invoke one request with no intervening probes, and correlate client latency, the `ready` log, revision startup metrics and request logs. A deploy/new revision startup is not the same trial as steady-state cold activation. Do not report the local startup result as a Cloud Run cold start.
 6. For billable time, run identical scheduled bursts into otherwise idle dedicated services and record UTC start/end. After Cloud Monitoring's collection delay, use:

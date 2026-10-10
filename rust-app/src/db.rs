@@ -59,7 +59,24 @@ impl<'a> Db<'a> {
                 }
                 Ok(rows)
             }
-            Ok(Err(_)) => Err(DbError::Query),
+            Ok(Err(error)) => {
+                // Diagnostic codes/column names only; never log SQL, bind values,
+                // connect options or the database server's raw error message.
+                match &error {
+                    sqlx::Error::Database(e) => tracing::error!(
+                        sqlstate = e.code().as_deref().unwrap_or("unknown"),
+                        mysql_code = e
+                            .try_downcast_ref::<sqlx::mysql::MySqlDatabaseError>()
+                            .map(|e| e.number()),
+                        "SQL query rejected"
+                    ),
+                    sqlx::Error::ColumnDecode { index, .. } => {
+                        tracing::error!(column = index, "SQL column decoding failed")
+                    }
+                    _ => tracing::error!("SQL execution/fetch failed"),
+                }
+                Err(DbError::Query)
+            }
             Err(_) => {
                 conn.close_on_drop();
                 Err(DbError::Timeout)
