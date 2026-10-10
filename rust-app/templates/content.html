@@ -1,0 +1,308 @@
+{% if kind == "home" %}
+<div class="row">
+<div class="col-md-8">
+<h2>What is Game Loadouts?</h2>
+<span class="line">
+<span class="sub-line">
+</span>
+</span>
+<p>Game Loadouts is a portal for finding the best ways to outfit your weapons in your favorite video games.</p>
+<p>This website comes in handy when you need to complete challenges with various weapons and need to know the best attachment combination for that weapon.</p>
+<p>It is also great for fine-tuning your favorite gun to help improve your gameplay. This will save you rounds of trial and error to find the best loadout.</p>
+</div>
+<div class="col-md-4">
+<h2>Read-only preview</h2>
+<span class="line">
+<span class="sub-line">
+</span>
+</span>
+<p>Browse all existing loadouts and votes. Accounts, voting and submissions are unavailable in this version.</p>
+</div>
+</div>
+<div class="row">
+<div class="col-md-12">
+<h2>Popular Loadouts</h2>
+<span class="line">
+<span class="sub-line">
+</span>
+</span>
+<div class="row">
+{% for pop in popular %}
+<div class="col-md-4">
+<a class="loadoutSmall block" href="{{ pop.game.url() }}">
+<h3 class="weaponSmall theme-color" style="margin:0 0 3px">{{ pop.game.label() }}<small class="pull-right" style="margin:6px 0 0">All Loadouts</small>
+</h3>
+<img src="{{ self.asset(pop.game.thumb_url) }}" alt="{{ pop.game.id }}" style="width:100%">
+</a>
+<div class="panel-group" id="accordion-{{ loop.index }}">
+{% let accordion = loop.index %}{% for l in pop.loadouts %}
+<div class="panel">
+<div class="loadoutSmall" style="margin:0">
+<h4 class="panel-title">
+<a data-toggle="collapse" data-parent="#accordion-{{ accordion }}" href="#collapse{{ l.id }}">
+<span class="weaponSmall theme-color">{{ l.weapon_name }}<small class="pull-right">({{ l.votes }} votes)</small>
+</span>
+</a>
+</h4>
+</div>
+<div id="collapse{{ l.id }}" class="panel-collapse collapse{% if loop.first %} in{% endif %}">
+<a class="loadoutSmall block" href="{{ l.url() }}">
+{% include "small_attachments.html" %}
+<div class="row">
+<div class="col-md-12">
+<span class="btn btn-primary pull-right" style="margin:5px 0 0">
+<span class="glyphicon glyphicon-screenshot">
+</span> View Loadout</span>
+</div>
+</div>
+</a>
+</div>
+</div>
+{% endfor %}
+</div>
+</div>
+{% endfor %}
+</div>
+</div>
+</div>
+{% else if kind == "games" %}
+<div class="col-md-12">
+<h2>Games</h2>
+<span class="line">
+<span class="sub-line">
+</span>
+</span>
+{% for column in columns %}
+<div class="col-md-6">
+{% for g in column %}
+<article class="post">
+<a href="{{ g.url() }}">
+<img src="{{ self.asset(g.thumb_url) }}" alt="{{ g.id }}">
+<header>
+<h3>{{ g.id }}</h3>
+</header>
+</a>
+</article>
+{% endfor %}
+</div>
+{% endfor %}
+</div>
+{% else if kind == "game" %}
+<div class="col-md-8">
+<h2>Weapons</h2>
+<span class="line">
+<span class="sub-line">
+</span>
+</span>
+<div class="form-group">
+<input type="text" class="form-control input-lg" id="weaponSearch" placeholder="Search Weapons">
+</div>
+<table class="table table-striped table-hover" id="weapon-table">
+{% for group in weapons %}
+<tr>
+<td class="type" style="background-color:#fff;border:none">
+<h3>{{ group.kind }}</h3>
+<span class="line">
+<span class="sub-line">
+</span>
+</span>
+</td>
+</tr>
+{% for w in group.weapons %}
+<tr>
+<td class="searchable no-padding">
+<a class="block padding-8px flex" href="{{ w.url() }}">
+<div class="col-md-3 vertical-center">
+<img src="{{ self.asset(w.thumb_url) }}" alt="{{ w.name }}">
+</div>
+<div class="col-md-9 vertical-center">
+<span class="h3">{{ w.name }}</span>
+</div>
+<div class="clearfix">
+</div>
+</a>
+</td>
+</tr>
+{% endfor %}{% endfor %}
+</table>
+</div>
+<div class="col-md-4">
+<h2>Top Loadouts</h2>
+<span class="line">
+<span class="sub-line">
+</span>
+</span>
+{% for l in loadouts %}
+<a class="loadoutSmall block" href="{{ l.url() }}">
+<h4 class="weaponSmall theme-color">{{ l.weapon_name }}<small class="pull-right">({{ l.votes }} votes)</small>
+</h4>
+{% include "small_attachments.html" %}
+</a>
+{% endfor %}
+<h2>Recent Loadouts</h2>
+<span class="line">
+<span class="sub-line">
+</span>
+</span>
+{% for l in recent %}
+<a class="loadoutSmall block" href="{{ l.url() }}">
+<h4 class="weaponSmall theme-color">{{ l.weapon_name }}</h4>
+{% include "small_attachments.html" %}
+</a>
+{% endfor %}
+</div>
+{% else if kind == "weapon" %}
+<div class="row">
+<div class="col-md-6">
+<h2>Top voted loadouts</h2>
+<span class="line">
+<span class="sub-line">
+</span>
+</span>
+{% if loadouts.is_empty() %}
+<p>There are no loadouts for the {{ weapon.name }} yet.</p>
+{% endif %}{% for l in loadouts %}
+<div class="loadout" data-loadout-id="{{ l.id }}" data-votes="{{ l.votes }}">
+<a class="block" href="{{ l.url() }}">
+<div class="col-md-2 rank theme-color">{{ loop.index }}</div>
+<div class="col-md-10">
+{% for a in l.attachments %}
+<div class="attachment">
+{% if !a.thumb_url.is_empty() %}
+<img class="mr-5" src="{{ self.asset(a.thumb_url) }}" alt="{{ a.name }}">
+{% endif %}{{ a.name }}</div>
+{% endfor %}
+</div>
+<div class="clearfix">
+</div>
+</a>
+<div class="col-md-12 loadoutButtons">
+<button type="button" disabled class="btn btn-default" title="Voting is unavailable in this read-only experiment">
+<span class="glyphicon glyphicon-star-empty">
+</span> vote ({{ l.votes }})</button>
+<a class="btn btn-default comment" href="{{ l.url() }}#disqus_thread" data-disqus-identifier="loadout-{{ l.id }}">
+<span class="glyphicon glyphicon-comment">
+</span> Comments</a>
+<a class="btn btn-default" href="{{ l.url() }}">
+<span class="glyphicon glyphicon-screenshot">
+</span> View Loadout</a>
+</div>
+</div>
+{% endfor %}
+</div>
+<div class="col-md-6">
+<h2>Available attachments</h2>
+<span class="line">
+<span class="sub-line">
+</span>
+</span>
+<p>Submissions are unavailable in this read-only experiment.</p>
+<h3>
+{% if weapon.min_attachments == weapon.max_attachments %}Select {{ weapon.min_attachments }} attachment{% if weapon.min_attachments != 1 %}s{% endif %}.{% else if weapon.max_attachments - weapon.min_attachments == 1 %}Select {{ weapon.min_attachments }} or {{ weapon.max_attachments }} attachments.{% else %}Select between {{ weapon.min_attachments }} and {{ weapon.max_attachments }} attachments.{% endif %}
+</h3>
+<ul class="nav nav-tabs nav-tabs-sec">
+{% for group in attachments %}
+<li{% if loop.first %} class="active"{% endif %}>
+<a href="#slot-{{ loop.index }}" data-toggle="tab">{{ group.slot }}</a>
+</li>
+{% endfor %}
+</ul>
+<div class="tab-content nav-tabs-sec">
+{% for group in attachments %}
+<div class="tab-pane{% if loop.first %} active{% endif %}" id="slot-{{ loop.index }}">
+<div class="btn-group-vertical">
+{% for a in group.attachments %}
+<div class="btn btn-default loadoutButton">
+{% if !a.thumb_url.is_empty() %}
+<img src="{{ self.asset(a.thumb_url) }}" alt="{{ a.name }}" style="margin-right:10px">
+{% endif %}{{ a.name }}</div>
+{% endfor %}
+</div>
+</div>
+{% endfor %}
+</div>
+</div>
+</div>
+{% else if kind == "loadout" %}
+<div class="col-md-12">
+<h3>Do you like this loadout? Discuss below!</h3>
+<div class="well">
+<div id="disqus_thread" data-disqus-identifier="loadout-{{ loadout.id }}" data-disqus-url="{{ public_url }}{{ loadout.url() }}">
+</div>
+{% if !disqus %}
+<p>Comments are disabled for this comparison service.</p>
+{% endif %}
+</div>
+</div>
+{% else if kind == "stats" %}
+<div class="col-md-12">
+<h2>Website Stats</h2>
+<span class="line">
+<span class="sub-line">
+</span>
+</span>
+</div>
+<div class="col-md-4">
+<h2>Loadout Stats</h2>
+<table class="table">
+<tr>
+<th>Game</th>
+<th>Loadout Votes</th>
+<th>Unique Loadouts</th>
+</tr>
+{% for s in stats %}
+<tr>
+<td>{{ s.game }}</td>
+<td>{{ s.votes }}</td>
+<td>{{ s.loadouts }}</td>
+</tr>
+{% endfor %}
+</table>
+</div>
+<div class="col-md-8">
+<h2>Votes Per Day</h2>
+<h3 id="chart-legend">
+</h3>
+<canvas id="canvas" height="547" width="730">
+</canvas>
+</div>
+<script type="application/json" id="chart-data">{{ chart_json|safe }}</script>
+{% else if kind == "search" %}
+<div class="col-md-12">
+<h2>Search Results for '{{ query }}'{% if !results.is_empty() %}
+<small class="pull-right">{{ results.len() }} results</small>
+{% endif %}
+</h2>
+<span class="line">
+<span class="sub-line">
+</span>
+</span>
+<div class="col-md-8">
+{% for item in results %}
+<div style="margin-bottom:20px">
+<h4 class="no-margin">
+<a href="{{ item.url }}">{{ item.name }}</a>
+</h4>
+<p class="no-margin search-url">{{ item.url }}</p>
+<p class="no-margin">{{ item.snippet }}</p>
+</div>
+{% endfor %}{% if results.is_empty() %}
+<h3>There are no search results.</h3>
+{% endif %}
+</div>
+</div>
+{% else if kind == "terms" %}{% include "terms.html" %}
+{% else %}
+<div class="row errorpage">
+<div class="col-md-12">
+<strong>{{ status }}</strong>
+<br>
+<b>{{ message }}</b>
+<i>
+{% if status == 404 %}Sorry the page could not be found.{% endif %}
+</i>
+<p>Try using the button below to go to home page of the site.</p>
+<a href="/" class="button-gym big-button">Home</a>
+</div>
+</div>
+{% endif %}

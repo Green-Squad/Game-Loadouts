@@ -8,3 +8,10 @@ Thumbs.db
 /app/config/*dev
 /public/error_log
 /public/.htpasswd
+
+/rust-app/target/
+/rust-app/benchmark-results/
+/rust-app/.env
+/.env
+
+/rust-app/tools/__pycache__/

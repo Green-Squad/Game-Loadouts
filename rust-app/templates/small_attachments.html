@@ -1,0 +1,8 @@
+{% for a in l.attachments %}
+<div class="attachmentSmall">
+{% if !a.thumb_url.is_empty() %}
+<img class="mr-5" src="{{ self.asset(a.thumb_url) }}" alt="{{ a.name }}">
+{% endif %}{{ a.name }}</div>
+{% endfor %}
+<div class="clearfix">
+</div>

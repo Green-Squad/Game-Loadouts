@@ -1,0 +1,247 @@
+{
+  "base": "http://127.0.0.1:8080",
+  "warmups_per_workload": 20,
+  "cache": "no application caching; CDN must be bypassed",
+  "rss_before_kib": null,
+  "measurements": [
+    {
+      "route": "/",
+      "concurrency": 1,
+      "requests": 200,
+      "p50_ms": 3.874433,
+      "p95_ms": 8.375808,
+      "mean_ms": 4.52767101,
+      "requests_per_second": 219.26937370372696,
+      "db_mean_ms": 2.9281,
+      "db_p95_ms": 6.028,
+      "query_counts": [
+        4
+      ],
+      "response_bytes": [
+        21448
+      ]
+    },
+    {
+      "route": "/",
+      "concurrency": 8,
+      "requests": 200,
+      "p50_ms": 7.471214,
+      "p95_ms": 18.366894,
+      "mean_ms": 9.045509125,
+      "requests_per_second": 797.5510874849592,
+      "db_mean_ms": 3.90989,
+      "db_p95_ms": 9.556,
+      "query_counts": [
+        4
+      ],
+      "response_bytes": [
+        21448
+      ]
+    },
+    {
+      "route": "/games",
+      "concurrency": 1,
+      "requests": 200,
+      "p50_ms": 0.539374,
+      "p95_ms": 2.370649,
+      "mean_ms": 0.841690565,
+      "requests_per_second": 1150.466002877469,
+      "db_mean_ms": 0.18769,
+      "db_p95_ms": 0.331,
+      "query_counts": [
+        1
+      ],
+      "response_bytes": [
+        5879
+      ]
+    },
+    {
+      "route": "/games",
+      "concurrency": 8,
+      "requests": 200,
+      "p50_ms": 3.63379,
+      "p95_ms": 10.52682,
+      "mean_ms": 4.518855125,
+      "requests_per_second": 1431.916785062566,
+      "db_mean_ms": 0.43295,
+      "db_p95_ms": 1.551,
+      "query_counts": [
+        1
+      ],
+      "response_bytes": [
+        5879
+      ]
+    },
+    {
+      "route": "/Call+of+Duty+Modern+Warfare",
+      "concurrency": 1,
+      "requests": 200,
+      "p50_ms": 3.993153,
+      "p95_ms": 7.147434,
+      "mean_ms": 4.427245775,
+      "requests_per_second": 224.23443401533805,
+      "db_mean_ms": 2.643215,
+      "db_p95_ms": 5.167,
+      "query_counts": [
+        6
+      ],
+      "response_bytes": [
+        11399
+      ]
+    },
+    {
+      "route": "/Call+of+Duty+Modern+Warfare",
+      "concurrency": 8,
+      "requests": 200,
+      "p50_ms": 7.710539,
+      "p95_ms": 18.107636,
+      "mean_ms": 9.23112839,
+      "requests_per_second": 803.5906681103882,
+      "db_mean_ms": 4.87246,
+      "db_p95_ms": 11.535,
+      "query_counts": [
+        6
+      ],
+      "response_bytes": [
+        11399
+      ]
+    },
+    {
+      "route": "/Call+of+Duty+Modern+Warfare/M4A1",
+      "concurrency": 1,
+      "requests": 200,
+      "p50_ms": 3.39223,
+      "p95_ms": 7.166503,
+      "mean_ms": 3.843991265,
+      "requests_per_second": 258.4895409752339,
+      "db_mean_ms": 2.167265,
+      "db_p95_ms": 4.129,
+      "query_counts": [
+        6
+      ],
+      "response_bytes": [
+        14600
+      ]
+    },
+    {
+      "route": "/Call+of+Duty+Modern+Warfare/M4A1",
+      "concurrency": 8,
+      "requests": 200,
+      "p50_ms": 7.668388,
+      "p95_ms": 13.10308,
+      "mean_ms": 7.978512965,
+      "requests_per_second": 912.6934636902644,
+      "db_mean_ms": 3.900125,
+      "db_p95_ms": 6.927,
+      "query_counts": [
+        6
+      ],
+      "response_bytes": [
+        14600
+      ]
+    },
+    {
+      "route": "/Call+of+Duty+Modern+Warfare/M4A1/1",
+      "concurrency": 1,
+      "requests": 200,
+      "p50_ms": 2.18247,
+      "p95_ms": 4.380041,
+      "mean_ms": 2.58698672,
+      "requests_per_second": 384.1046797727351,
+      "db_mean_ms": 1.543,
+      "db_p95_ms": 2.382,
+      "query_counts": [
+        5
+      ],
+      "response_bytes": [
+        6739
+      ]
+    },
+    {
+      "route": "/Call+of+Duty+Modern+Warfare/M4A1/1",
+      "concurrency": 8,
+      "requests": 200,
+      "p50_ms": 3.950503,
+      "p95_ms": 7.039076,
+      "mean_ms": 4.261337615,
+      "requests_per_second": 1724.0505395123707,
+      "db_mean_ms": 1.89202,
+      "db_p95_ms": 2.936,
+      "query_counts": [
+        5
+      ],
+      "response_bytes": [
+        6739
+      ]
+    },
+    {
+      "route": "/stats",
+      "concurrency": 1,
+      "requests": 200,
+      "p50_ms": 1.697968,
+      "p95_ms": 3.240705,
+      "mean_ms": 1.92147322,
+      "requests_per_second": 515.6768974003663,
+      "db_mean_ms": 1.12531,
+      "db_p95_ms": 1.806,
+      "query_counts": [
+        3
+      ],
+      "response_bytes": [
+        6239
+      ]
+    },
+    {
+      "route": "/stats",
+      "concurrency": 8,
+      "requests": 200,
+      "p50_ms": 4.083804,
+      "p95_ms": 8.607846,
+      "mean_ms": 4.54164527,
+      "requests_per_second": 1556.1134913890317,
+      "db_mean_ms": 1.77343,
+      "db_p95_ms": 3.118,
+      "query_counts": [
+        3
+      ],
+      "response_bytes": [
+        6239
+      ]
+    },
+    {
+      "route": "/search_weapons?query=M4",
+      "concurrency": 1,
+      "requests": 200,
+      "p50_ms": 0.395422,
+      "p95_ms": 0.846894,
+      "mean_ms": 0.44959236,
+      "requests_per_second": 2151.3571164017985,
+      "db_mean_ms": 0.152815,
+      "db_p95_ms": 0.27,
+      "query_counts": [
+        1
+      ],
+      "response_bytes": [
+        54
+      ]
+    },
+    {
+      "route": "/search_weapons?query=M4",
+      "concurrency": 8,
+      "requests": 200,
+      "p50_ms": 2.272424,
+      "p95_ms": 6.736303,
+      "mean_ms": 2.77115868,
+      "requests_per_second": 2291.6255009673096,
+      "db_mean_ms": 0.25408000000000003,
+      "db_p95_ms": 0.587,
+      "query_counts": [
+        1
+      ],
+      "response_bytes": [
+        54
+      ]
+    }
+  ],
+  "rss_after_kib": null
+}

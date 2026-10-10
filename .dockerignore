@@ -1,0 +1,7 @@
+.git
+**/target
+**/benchmark-results
+**/.env
+.env
+rust-app/.env.*
+**/error_log

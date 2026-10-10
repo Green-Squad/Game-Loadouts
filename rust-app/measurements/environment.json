@@ -1,0 +1,20 @@
+{
+  "date_utc": "2026-10-10",
+  "rustc": "rustc 1.99.0 (b940084d7 2026-09-28)",
+  "kernel": "6.18.44",
+  "source_sha256": "3151fac5f1a5bfbaf2e4561a124637ad95726ecc515d88e9f961e4a3b81a38e3",
+  "fixture": {
+    "games": 7,
+    "weapons": 8,
+    "loadouts": 24,
+    "attachments": 4,
+    "votes": 39
+  },
+  "pool_max": 10,
+  "application_cache": false,
+  "rss_after_kib": 9600,
+  "high_water_kib": 9600,
+  "binary_bytes": 6252976,
+  "cpu_max": "800000 100000",
+  "memory_max": "8589934592"
+}

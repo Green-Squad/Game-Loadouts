@@ -1,0 +1,31 @@
+services:
+  fixture-db:
+    image: mysql:8.4
+    environment:
+      MYSQL_ALLOW_EMPTY_PASSWORD: "yes"
+      MYSQL_DATABASE: loadouts_fixture
+    ports:
+      - "127.0.0.1:3307:3306"
+    tmpfs:
+      - /var/lib/mysql
+    volumes:
+      - ./fixtures/schema.sql:/docker-entrypoint-initdb.d/01-schema.sql:ro
+      - ./fixtures/data.sql:/docker-entrypoint-initdb.d/02-data.sql:ro
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
+      interval: 2s
+      timeout: 2s
+      retries: 30
+  rust:
+    build:
+      context: ..
+    environment:
+      DB_HOST: fixture-db
+      DB_DATABASE: loadouts_fixture
+      DB_USERNAME: loadouts_reader
+      METRICS_HEADERS: "1"
+    ports:
+      - "127.0.0.1:8080:8080"
+    depends_on:
+      fixture-db:
+        condition: service_healthy

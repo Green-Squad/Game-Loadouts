@@ -24,3 +24,7 @@ MAIL_PASSWORD
 # Issues
 
 If we re-import the db, we might need to run `ALTER TABLE `users` MODIFY `remember_token` varchar(100) COLLATE utf8mb3_unicode_ci NOT NULL DEFAULT '';`
+
+# Rust public browsing experiment
+
+On the `rust` branch, the root Dockerfile builds a read-only Axum/SQLx/Askama application; the original container definition is retained as `Dockerfile.php`. See [rust-app/README.md](rust-app/README.md) for setup, schema assumptions, media handling, separate Cloud Run deployment and reproducible comparisons, and [rust-app/VALIDATION.md](rust-app/VALIDATION.md) for measured local results and unverified items.

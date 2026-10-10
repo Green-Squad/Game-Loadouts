@@ -1,0 +1,287 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<title>{{ title }}</title>
+<meta name="description" content="{{ description }}">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+<meta name="google-site-verification" content="IcSSxczl-uweXXUf6CZMqlr_zHyqh19xpP2F2vkBZC8">
+<link href="/css/bootstrap.min.css" rel="stylesheet">
+<link href="/css/styles.min.css" rel="stylesheet">
+<link href="/css/media-queries.css" rel="stylesheet">
+<link href="/font-awesome/css/font-awesome.min.css" rel="stylesheet">
+</head>
+<body class="{{ theme }}">
+<header>
+<div class="main-menu">
+<div class="main-menu-line">
+<div class="container">
+<div class="row">
+<nav class="navbar" role="navigation">
+<div class="navbar-header">
+<div class="navbar-toggle-box">
+<button type="button" class="navbar-toggle vertical-center" data-toggle="collapse" data-target=".navbar-ex1-collapse">
+<span class="sr-only">Toggle navigation</span>
+<span class="icon-bar">
+</span>
+<span class="icon-bar">
+</span>
+<span class="icon-bar">
+</span>
+</button>
+</div>
+<a href="/" class="logo">
+<h1 style="margin:0">Game Loadouts</h1>
+</a>
+</div>
+<div class="collapse navbar-collapse navbar-ex1-collapse">
+<ul class="nav navbar-nav navbar-right">
+<li{% if kind == "home" %} class="active"{% endif %}>
+<a href="/">Home</a>
+</li>
+<li class="dropdown">
+<a href="/games" class="dropdown-toggle">Games <b class="caret">
+</b>
+</a>
+<ul>
+{% for g in nav %}
+<li>
+<a href="{{ g.url() }}">{{ g.id }}</a>
+</li>
+{% endfor %}
+</ul>
+</li>
+</ul>
+</div>
+<form action="/search" method="get" id="navbar-search" class="navbar-form" role="search">
+<div class="input-group">
+<input type="text" class="form-control" name="query" id="autocomplete-ajax-nav" placeholder="e.g. ACE 23 / Battlefield 4" autocomplete="off">
+<span class="input-group-btn">
+<button type="reset" class="btn btn-default nav-element">
+<span class="glyphicon glyphicon-remove">
+<span class="sr-only">Close</span>
+</span>
+</button>
+<button type="submit" class="btn btn-default nav-element">
+<span class="glyphicon glyphicon-search">
+<span class="sr-only">Search</span>
+</span>
+</button>
+</span>
+</div>
+</form>
+</nav>
+</div>
+</div>
+</div>
+</div>
+</header>
+{% if kind == "home" %}
+<div id="home">
+<div id="intro" style="padding-top:50px;padding-bottom:50px;text-align:left">
+<div class="container">
+<div class="col-md-8 col-md-offset-2">
+<h2 style="margin-top:0;margin-bottom:20px">Enter a weapon to find loadouts</h2>
+<form action="/search" method="get" id="searchForm">
+<div class="input-group">
+<input type="text" class="form-control input-lg" name="query" id="autocomplete-ajax" autofocus autocomplete="off" placeholder="e.g. ACE 23 / Battlefield 4">
+<span class="input-group-btn">
+<button class="input-lg btn btn-primary" type="submit" style="font-size:18px">Search</button>
+</span>
+</div>
+</form>
+</div>
+</div>
+</div>
+</div>
+{% endif %}
+{% if kind == "game" || kind == "weapon" || kind == "loadout" %}
+<section id="game">
+<div class="sub-header" style="background-image: url('{{ self.asset(game.header_url) }}')">
+<div class="container">
+<div class="row">
+<ul class="sub-header-container">
+<li>
+<h1 class="title">
+{% if kind == "game" %}{{ game.id }}{% else %}
+<span class="game-title">{{ game.id }} \</span> {{ weapon.name }}{% endif %}
+</h1>
+</li>
+<li>
+<ul class="custom-breadcrumb">
+<li>
+<h5>
+<a href="/">Home</a>
+</h5>
+</li>
+<li>
+<i class="separator entypo-play">
+</i>
+</li>
+<li>
+<h5>
+<a href="{{ game.url() }}">{{ game.id }}</a>
+</h5>
+</li>
+{% if kind != "game" %}
+<li>
+<i class="separator entypo-play">
+</i>
+</li>
+<li>
+<h5>
+<a href="{{ weapon.url() }}">{{ weapon.name }}</a>
+</h5>
+</li>
+{% endif %}{% if kind == "loadout" %}
+<li>
+<i class="separator entypo-play">
+</i>
+</li>
+<li>
+<h5>Loadout</h5>
+</li>
+{% endif %}
+</ul>
+</li>
+{% if kind == "loadout" %}
+<li>
+<h4 class="title" style="padding:5px">Originally submitted by {{ loadout.author }}</h4>
+</li>
+{% endif %}
+</ul>
+</div>
+</div>
+</div>
+</section>
+{% endif %}
+{% if kind == "weapon" || kind == "loadout" %}
+<div id="home">
+<div id="intro"{% if kind == "loadout" %} style="padding:15px 0"{% endif %}>
+<div class="container">
+<div class="row flex">
+<div class="col-md-6 vertical-center">
+<img src="{{ self.asset(weapon.image_url) }}" alt="{{ weapon.name }}" class="weapon-img">
+</div>
+<div class="col-md-6 vertical-center">
+{% if kind == "weapon" %}
+<div class="heading-box">What is the best loadout for <em class="theme-color">{{ weapon.name }}</em> in {{ game.id }}?</div>
+{% else %}
+<div class="loadout">
+<div class="col-md-12">
+{% for a in loadout.attachments %}
+<div class="attachment">
+{% if !a.thumb_url.is_empty() %}
+<img class="mr-5" src="{{ self.asset(a.thumb_url) }}" alt="{{ a.name }}">
+{% endif %}{{ a.name }}</div>
+{% endfor %}
+</div>
+</div>
+{% endif %}
+</div>
+</div>
+</div>
+</div>
+</div>
+{% endif %}
+{% if kind == "loadout" %}
+<div id="trainers">
+<div id="suscribe">
+<div class="container">
+<div class="row">
+<div class="col-md-12">
+<h2>{{ loadout.votes }} {% if loadout.votes == 1 %}Vote{% else %}Votes{% endif %}
+<button type="button" disabled class="btn btn-default pull-right" title="Voting is unavailable in this read-only experiment">Voting unavailable</button>
+</h2>
+</div>
+</div>
+</div>
+</div>
+</div>
+{% endif %}
+<article class="article-container">
+<div class="container">
+{% include "content.html" %}
+</div>
+</article>
+<footer>
+<div class="container">
+<div class="row misc">
+<div class="col-md-3">
+<h3>About Game Loadouts</h3>
+<p>Game Loadouts is a portal for finding the best ways to outfit your weapons in your favorite video games.</p>
+<p>This website comes in handy when you need to complete challenges with various weapons and need to know the best attachment combination for that weapon.</p>
+</div>
+<div class="col-md-3">
+<h3>Feedback</h3>
+<p>Submit bug reports or suggest new features for the site!</p>
+<p>Use the link below and then select "Submit New Idea" on the top left.</p>
+<p>
+<a class="button-gym" href="https://greensquad.ideascale.com/a/index">Submit Feedback</a>
+</p>
+</div>
+<div class="col-md-3">
+<h3>Get Social</h3>
+<p>Follow us on these social networks to keep up-to-date with the site!</p>
+<ul class="social">
+<li>
+<a href="https://www.twitter.com/GameLoadouts">
+<i class="entypo-twitter">
+</i>
+</a>
+</li>
+</ul>
+</div>
+<div class="col-md-3">
+<h3>Recent Games</h3>
+{% for g in footer %}
+<p class="no-margin">
+<a class="button-gym footer-games" href="{{ g.url() }}">{{ g.id }}</a>
+</p>
+{% endfor %}
+</div>
+</div>
+</div>
+<div class="copyright">
+<div class="container">
+<p class="pull-left">Copyright &copy; <a href="/">Game Loadouts</a> <span id="copyright-year">
+</span>
+</p>
+<ul class="main-links pull-right">
+<li>
+<a href="/">Home</a>
+</li>
+<li>
+<a href="/games">Games</a>
+</li>
+<li>
+<a href="/stats">Stats</a>
+</li>
+<li>
+<a href="/terms">Terms of Service</a>
+</li>
+</ul>
+</div>
+</div>
+</footer>
+<a href="#" class="scrollup">
+<i class="entypo-up-open">
+</i>
+</a>
+<script src="/js/jquery-1.9.1.min.js">
+</script>
+<script src="/js/bootstrap.min.js">
+</script>
+<script src="/js/jquery.autocomplete.js">
+</script>
+{% if kind == "stats" %}
+<script src="/js/Chart.min.js">
+</script>
+{% endif %}
+<script src="/js/rust-public.js">
+</script>
+{% if disqus %}{% if kind == "loadout" %}
+<script>var thread=document.getElementById('disqus_thread');var disqus_shortname='tryharddev';var disqus_identifier=thread.dataset.disqusIdentifier;var disqus_config=function(){this.page.identifier=disqus_identifier;this.page.url=thread.dataset.disqusUrl;};(function(){var s=document.createElement('script');s.async=true;s.src='https://tryharddev.disqus.com/embed.js';document.body.appendChild(s);})();</script>
+{% endif %}{% endif %}
+</body>
+</html>

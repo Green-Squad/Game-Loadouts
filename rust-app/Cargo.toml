@@ -1,0 +1,28 @@
+[package]
+name = "game-loadouts"
+version = "0.1.0"
+edition = "2024"
+rust-version = "1.88"
+
+[dependencies]
+askama = "0.14"
+axum = "0.8"
+tokio = { version = "1", features = ["macros", "rt-multi-thread", "signal", "time"] }
+sqlx = { version = "0.8", default-features = false, features = ["runtime-tokio", "tls-rustls-ring", "mysql", "derive"] }
+serde = { version = "1", features = ["derive"] }
+serde_json = "1"
+reqwest = { version = "0.12", default-features = false, features = ["rustls-tls", "json"] }
+percent-encoding = "2"
+tower-http = { version = "0.6", features = ["fs", "set-header"] }
+tracing = "0.1"
+tracing-subscriber = { version = "0.3", features = ["env-filter", "json"] }
+
+tower = { version = "0.5", features = ["util"] }
+
+[dev-dependencies]
+http-body-util = "0.1"
+
+[profile.release]
+lto = "thin"
+codegen-units = 1
+strip = true
