@@ -205,7 +205,22 @@ impl From<sqlx::Error> for Error {
         if matches!(&e,sqlx::Error::Database(d) if d.is_unique_violation()) {
             Self::invalid("That username or email is already in use.")
         } else {
-            tracing::error!("Account database operation failed");
+            match &e {
+                sqlx::Error::Database(d) => tracing::error!(
+                    sqlstate = d.code().as_deref().unwrap_or("unknown"),
+                    mysql_code = d
+                        .try_downcast_ref::<sqlx::mysql::MySqlDatabaseError>()
+                        .map(|e| e.number()),
+                    "Account SQL operation rejected"
+                ),
+                sqlx::Error::ColumnDecode { index, .. } => {
+                    tracing::error!(column = index, "Account column decode failed")
+                }
+                sqlx::Error::ColumnNotFound(column) => {
+                    tracing::error!(column, "Account column missing")
+                }
+                _ => tracing::error!("Account database operation failed"),
+            }
             Self::internal()
         }
     }
@@ -281,6 +296,7 @@ async fn issue(
     a: &Accounts,
     email: Option<&str>,
     remember: bool,
+    verified_password: Option<&str>,
 ) -> Result<(String, Session), Error> {
     if rand::random::<u8>() < 26 {
         sqlx::query("DELETE FROM rust_sessions WHERE expires_at<=UTC_TIMESTAMP() LIMIT 128")
@@ -294,7 +310,7 @@ async fn issue(
     let csrf = random_token();
     let hash = digest(&token);
     let ttl = if remember { 30 * 24 * 3600 } else { 2 * 3600 };
-    sqlx::query("INSERT INTO rust_sessions(token_hash,user_email,csrf,expires_at,created_at,credential_hash) VALUES(?,?,?,TIMESTAMPADD(SECOND,?,UTC_TIMESTAMP()),UTC_TIMESTAMP(),(SELECT SHA2(password,256) FROM users WHERE email=?))").bind(&hash).bind(email).bind(&csrf).bind(ttl).bind(email).execute(&a.pool).await?;
+    sqlx::query("INSERT INTO rust_sessions(token_hash,user_email,csrf,expires_at,created_at,credential_hash) VALUES(?,?,?,TIMESTAMPADD(SECOND,?,UTC_TIMESTAMP()),UTC_TIMESTAMP(),COALESCE(?,(SELECT SHA2(password,256) FROM users WHERE email=?)))").bind(&hash).bind(email).bind(&csrf).bind(ttl).bind(verified_password.map(digest)).bind(email).execute(&a.pool).await?;
     Ok((
         token,
         Session {
@@ -328,7 +344,7 @@ pub async fn session_layer(
                 || (path.trim_matches('/').split('/').count() == 2 && !path.starts_with("/user/"))
                 || path.trim_matches('/').split('/').count() == 3;
             if session.hash.is_empty() && is_get && needs_form {
-                let (token, new) = issue(a, None, false).await?;
+                let (token, new) = issue(a, None, false, None).await?;
                 session = new;
                 set_cookie = Some(cookie(a, &token, 7200));
             }
@@ -416,8 +432,9 @@ async fn rotate(
     old: &Session,
     email: &str,
     remember: bool,
+    verified_password: Option<&str>,
 ) -> Result<Response, Error> {
-    let (token, _) = issue(a, Some(email), remember).await?;
+    let (token, _) = issue(a, Some(email), remember, verified_password).await?;
     if !old.hash.is_empty() {
         sqlx::query("DELETE FROM rust_sessions WHERE token_hash=?")
             .bind(&old.hash)
@@ -487,7 +504,7 @@ pub async fn post_account(
                 if changed!=1 {return Err(Error::invalid("Your password changed during this request. Sign in again."));}
                 sqlx::query("DELETE FROM rust_sessions WHERE user_email=?").bind(&session.email).execute(&mut *tx).await?;
                 sqlx::query("DELETE FROM rust_account_tokens WHERE user_email=?").bind(&session.email).execute(&mut *tx).await?;
-                tx.commit().await?;rotate(a,&session,&session.email,false).await
+                tx.commit().await?;rotate(a,&session,&session.email,false,None).await
             },
             "/password/reset"=>reset(a,&session,&form).await,
             _=>Ok(StatusCode::NOT_FOUND.into_response()),
@@ -544,7 +561,7 @@ async fn login(
             "Too many attempts. Please try again after 15 minutes.",
         ));
     }
-    if !verify_password(password.into(), user.password).await? {
+    if !verify_password(password.into(), user.password.clone()).await? {
         let attempts = user.failed_attempts + 1;
         sqlx::query("UPDATE users SET failed_attempts=?,disabled_until=IF(? >= 5,TIMESTAMPADD(MINUTE,15,UTC_TIMESTAMP()),disabled_until),updated_at=UTC_TIMESTAMP() WHERE email=?").bind(if attempts>=5 {0} else {attempts}).bind(attempts).bind(&user.email).execute(&mut *tx).await?;
         tx.commit().await?;
@@ -562,7 +579,14 @@ async fn login(
         .execute(&mut *tx)
         .await?;
     tx.commit().await?;
-    rotate(a, session, &user.email, f.contains_key("remember")).await
+    rotate(
+        a,
+        session,
+        &user.email,
+        f.contains_key("remember"),
+        Some(&user.password),
+    )
+    .await
 }
 async fn join(
     state: &AppState,
@@ -721,7 +745,7 @@ async fn reset(
     if confirmed == 0 {
         return Ok(Redirect::to("/login").into_response());
     }
-    rotate(a, session, email, false).await
+    rotate(a, session, email, false, None).await
 }
 pub async fn confirm(
     State(state): State<Arc<AppState>>,
@@ -737,7 +761,7 @@ pub async fn confirm(
         let email:Option<String>=sqlx::query_scalar("SELECT user_email FROM rust_account_tokens WHERE purpose='confirm' AND token_hash=? AND expires_at>UTC_TIMESTAMP() FOR UPDATE").bind(digest(&token)).fetch_optional(&mut *tx).await?;
         let email=match email {Some(email)=>email,None=>sqlx::query_scalar("SELECT email FROM users WHERE confirm_token=? AND role<>'Guest' AND confirm_token<>'1' FOR UPDATE").bind(&token).fetch_optional(&mut *tx).await?.ok_or_else(||Error::invalid("The confirmation link is invalid or expired."))?};
         sqlx::query("UPDATE users SET confirm_token='1',updated_at=UTC_TIMESTAMP() WHERE email=?").bind(&email).execute(&mut *tx).await?;
-        sqlx::query("DELETE FROM rust_account_tokens WHERE user_email=? AND purpose='confirm'").bind(&email).execute(&mut *tx).await?;tx.commit().await?;rotate(a,&session,&email,false).await
+        sqlx::query("DELETE FROM rust_account_tokens WHERE user_email=? AND purpose='confirm'").bind(&email).execute(&mut *tx).await?;tx.commit().await?;rotate(a,&session,&email,false,None).await
     }.await;
     match result {
         Ok(r) => r,

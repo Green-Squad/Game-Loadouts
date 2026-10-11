@@ -250,7 +250,13 @@ fn mail_token(mail: &str, route: &str) -> String {
 #[tokio::test]
 #[ignore = "requires an explicitly isolated loopback MySQL fixture"]
 async fn public_write_flows_and_security() {
+    let _ = tracing_subscriber::fmt()
+        .with_test_writer()
+        .with_max_level(tracing::Level::ERROR)
+        .try_init();
     let (app, pool, owner, messages, tasks) = fixture().await;
+    game_loadouts::schema::validate(&pool, true).await.unwrap();
+    game_loadouts::schema::migrate(&pool).await.unwrap();
     let mut member = Browser::default();
     let login = member.get(&app, "/login").await;
     assert_eq!(login.status, 200);
@@ -566,6 +572,25 @@ async fn public_write_flows_and_security() {
         ("password", "reset-password"),
         ("password_confirmation", "reset-password"),
     ];
+    let wrong_email = [
+        ("email", "tester@example.invalid"),
+        ("token", reset_token.as_str()),
+        ("password", "reset-password"),
+        ("password_confirmation", "reset-password"),
+    ];
+    assert_eq!(
+        resetter
+            .post(&app, "/password/reset", &wrong_email)
+            .await
+            .status,
+        422
+    );
+    sqlx::query("UPDATE rust_account_tokens SET expires_at=TIMESTAMPADD(SECOND,-1,UTC_TIMESTAMP()) WHERE user_email='new@example.invalid' AND purpose='reset'").execute(&pool).await.unwrap();
+    assert_eq!(
+        resetter.post(&app, "/password/reset", &fields).await.status,
+        422
+    );
+    sqlx::query("UPDATE rust_account_tokens SET expires_at=TIMESTAMPADD(HOUR,1,UTC_TIMESTAMP()) WHERE user_email='new@example.invalid' AND purpose='reset'").execute(&pool).await.unwrap();
     assert_eq!(
         resetter.post(&app, "/password/reset", &fields).await.status,
         303

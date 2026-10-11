@@ -58,6 +58,28 @@ async fn run() -> Result<(), Box<dyn std::error::Error>> {
         options = options.ssl_ca(ca);
     }
     let connect_timeout = Duration::from_millis(number("DB_CONNECT_TIMEOUT_MS", 5000)?);
+    let command = env::args().nth(1);
+    if let Some(command) = command {
+        if !matches!(
+            command.as_str(),
+            "--check-public-schema" | "--migrate-public-accounts"
+        ) {
+            return Err("Unknown command".into());
+        }
+        let operator_pool = MySqlPoolOptions::new()
+            .max_connections(2)
+            .acquire_timeout(connect_timeout)
+            .connect_lazy_with(options.clone().disable_statement_logging());
+        tokio::time::timeout(connect_timeout, operator_pool.acquire()).await??;
+        if command == "--migrate-public-accounts" {
+            game_loadouts::schema::migrate(&operator_pool).await?;
+        } else {
+            game_loadouts::schema::validate(&operator_pool, true).await?;
+            tracing::info!("Public account schema verified");
+        }
+        operator_pool.close().await;
+        return Ok(());
+    }
     let max = number("DB_POOL_MAX", 10)?;
     if !(1..=100).contains(&max) {
         return Err("DB_POOL_MAX must be 1..100".into());
@@ -86,6 +108,7 @@ async fn run() -> Result<(), Box<dyn std::error::Error>> {
             sqlx::query("SELECT token_hash FROM rust_account_tokens LIMIT 0").execute(&write_pool),
         )
         .await??;
+        game_loadouts::schema::validate(&write_pool, true).await?;
         Some(Arc::new(Accounts::from_env(write_pool)?))
     } else {
         None
