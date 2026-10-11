@@ -1,0 +1,36 @@
+[
+  {
+    "slug": "bo7",
+    "game_id": "Call of Duty Black Ops 7",
+    "weapons": 64,
+    "attachments": 1198,
+    "pairs": 2172,
+    "statuses": {
+      "named-artwork": 1262
+    }
+  },
+  {
+    "slug": "cod-mobile",
+    "game_id": "Call of Duty Mobile",
+    "weapons": 147,
+    "attachments": 382,
+    "pairs": 892,
+    "statuses": {
+      "sourced-artwork": 291,
+      "labeled-weapon-placeholder": 18,
+      "generic-slot-icon": 220
+    }
+  },
+  {
+    "slug": "bf6",
+    "game_id": "Battlefield 6",
+    "weapons": 63,
+    "attachments": 382,
+    "pairs": 5077,
+    "statuses": {
+      "sourced-artwork": 62,
+      "labeled-weapon-placeholder": 1,
+      "generic-slot-icon": 382
+    }
+  }
+]
