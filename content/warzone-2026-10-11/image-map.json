@@ -2,15 +2,15 @@
   "as_of": "2026-10-11",
   "game_id": "Call of Duty Warzone",
   "game": {
-    "image_file": "uploads/Call+of+Duty+Warzone.png",
-    "thumb_file": "uploads/thumb/Call+of+Duty+Warzone.png",
-    "header_file": "uploads/header/Call+of+Duty+Warzone.png",
-    "image_sha256": "a8fbb174c00515c9d378f87cdb97420e721a31d05a322cac127bf75f10259b30",
-    "image_url": "uploads/Call+of+Duty+Warzone.png",
-    "thumb_sha256": "a8fbb174c00515c9d378f87cdb97420e721a31d05a322cac127bf75f10259b30",
-    "thumb_url": "uploads/thumb/Call+of+Duty+Warzone.png",
-    "header_sha256": "011d97f799fe3b3630a3f738f1fe512401ed006d5c2fb4d59b553a25d2955b45",
-    "header_url": "uploads/header/Call+of+Duty+Warzone.png"
+    "image_file": "uploads/Call+of+Duty+Warzone-artwork-20261011.png",
+    "thumb_file": "uploads/thumb/Call+of+Duty+Warzone-artwork-20261011.png",
+    "header_file": "uploads/header/Call+of+Duty+Warzone-artwork-20261011.png",
+    "image_sha256": "8bfe1edd6056f98cf350922589229ce6f6a2b4621eac9a2e34e2c739fed14cd4",
+    "image_url": "uploads/Call+of+Duty+Warzone-artwork-20261011.png",
+    "thumb_sha256": "5dc76fbc8dc2eaaeaf6e29a2ae6a3be578b38ab70e54cd64270cbfa005cec1e1",
+    "thumb_url": "uploads/thumb/Call+of+Duty+Warzone-artwork-20261011.png",
+    "header_sha256": "723fc7d521ca56b8fea41d7227ee44d512fb811c43211a9091a50f04525d6836",
+    "header_url": "uploads/header/Call+of+Duty+Warzone-artwork-20261011.png"
   },
   "assets": [
     {

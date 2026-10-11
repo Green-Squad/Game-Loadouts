@@ -45,6 +45,11 @@ Missing attachment artwork uses generic slot icons. Nineteen weapons use clearly
 labeled artwork placeholders (mostly COD Mobile melee, plus BF6 Interdictor).
 Runtime assets are PNG; SVG graphic masters are kept here, outside the web root.
 
+Game cards and headers now use cropped official EA/Activision artwork. Source
+URLs, hashes and standard card/header dimensions are recorded in
+`../game-artwork-2026-10-11/artwork.json`. The earlier SVG card/header masters are
+historical and are no longer used by the published game records.
+
 ## Import and publish
 
 1. Deploy the PNG assets from this exact commit. Create the three game records
