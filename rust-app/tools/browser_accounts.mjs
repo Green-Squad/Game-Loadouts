@@ -7,9 +7,10 @@ const browser=await chromium.launch({headless:true,args:['--disable-dev-shm-usag
 const context=await browser.newContext({viewport:{width:1440,height:1000}});
 // External CAPTCHA and Disqus are separately covered by protocol fixtures. Do not contact them with test identities.
 await context.route('**/*',route=>new URL(route.request().url()).origin===new URL(base).origin?route.continue():route.abort());
-const page=await context.newPage();const errors=[];page.on('pageerror',e=>errors.push(e.message));
+const page=await context.newPage();const errors=[],failures=[];page.on('pageerror',e=>errors.push(e.message));page.on('response',r=>{if(new URL(r.url()).origin===new URL(base).origin && r.status()>=400)failures.push([r.status(),new URL(r.url()).pathname]);});
 const out=process.env.SCREENSHOT_DIR;await fs.mkdir(out,{recursive:true});
-await page.goto(base+'/login');
+await page.goto(base+'/login',{waitUntil:'networkidle'});
+assert(await page.evaluate(()=>document.styleSheets.length>=4),'stylesheets loaded');
 await page.getByLabel('Email or username').fill('NewMember');await page.getByLabel('Password',{exact:true}).fill('changed-password');
 await page.getByRole('button',{name:'Log in',exact:true}).click();await page.waitForURL('**/account');
 assert(await page.getByRole('heading',{name:'Your account'}).isVisible());
@@ -35,4 +36,5 @@ await page.goto(base+'/logout');await page.getByRole('button',{name:'Log out',ex
 await page.goto(base+'/account');await page.waitForURL('**/login');
 await page.goto(base+'/join');assert(await page.getByLabel('Email',{exact:true}).isVisible());
 await page.screenshot({path:out+'/mobile-join.png',fullPage:true});
-assert.deepEqual(errors,[]);await browser.close();console.log('PASS: native login, account, attachment selection, submission, vote removal, submissions, logout and mobile forms');
+assert.equal(await page.evaluate(()=>document.documentElement.scrollWidth>innerWidth),false,'join mobile overflow');
+assert.deepEqual(errors,[]);assert.deepEqual(failures,[]);await browser.close();console.log('PASS: native login, account, attachment selection, submission, vote removal, submissions, logout and mobile forms');

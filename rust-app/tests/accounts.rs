@@ -230,7 +230,15 @@ async fn fixture() -> (
             .unwrap(),
     });
     (
-        app(state, "public"),
+        app(
+            state,
+            std::path::Path::new(env!("CARGO_MANIFEST_DIR"))
+                .parent()
+                .unwrap()
+                .join("public")
+                .to_str()
+                .unwrap(),
+        ),
         pool,
         owner,
         messages,
