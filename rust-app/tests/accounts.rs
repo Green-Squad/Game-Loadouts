@@ -5,8 +5,9 @@ use axum::{
     http::{HeaderMap, Request},
 };
 use game_loadouts::{
-    account::{Accounts, digest},
+    account::Accounts,
     model::encode,
+    session::{CookieSessions, now},
     web::{AppState, app},
 };
 use http_body_util::BodyExt;
@@ -202,6 +203,7 @@ async fn fixture() -> (
         analytics_id: String::new(),
         accounts: Some(Arc::new(Accounts {
             pool: pool.clone(),
+            sessions: fixture_sessions(),
             secure_cookie: true,
             site_key: "fixture-key".into(),
             captcha_secret: "fixture-secret".into(),
@@ -245,13 +247,20 @@ async fn fixture() -> (
         vec![mail_task, captcha_task],
     )
 }
+fn fixture_sessions() -> CookieSessions {
+    CookieSessions::new(
+        b"synthetic-session-key-32-bytes-long",
+        "https://fixture.invalid",
+    )
+    .unwrap()
+}
 fn mail_token(mail: &str, route: &str) -> String {
     mail.replace("=\r\n", "")
         .split(&format!("https://fixture.invalid/{route}/"))
         .nth(1)
         .unwrap()
         .chars()
-        .take_while(|c| c.is_ascii_hexdigit())
+        .take_while(|c| c.is_ascii_alphanumeric())
         .collect()
 }
 
@@ -263,8 +272,12 @@ async fn public_write_flows_and_security() {
         .with_max_level(tracing::Level::ERROR)
         .try_init();
     let (app, pool, owner, messages, tasks) = fixture().await;
-    game_loadouts::schema::validate(&pool, true).await.unwrap();
-    game_loadouts::schema::migrate(&pool).await.unwrap();
+    game_loadouts::schema::validate(&pool).await.unwrap();
+    let extra_tables:i64=sqlx::query_scalar("SELECT COUNT(*) FROM information_schema.TABLES WHERE TABLE_SCHEMA=DATABASE() AND TABLE_NAME IN ('rust_sessions','rust_account_tokens')").fetch_one(&pool).await.unwrap();
+    assert_eq!(
+        extra_tables, 0,
+        "The account flows must work with only the existing Laravel schema"
+    );
     let mut member = Browser::default();
     let login = member.get(&app, "/login").await;
     assert_eq!(login.status, 200);
@@ -315,14 +328,47 @@ async fn public_write_flows_and_security() {
         303
     );
     let raw = member.cookie.split('=').nth(1).unwrap();
-    let stored: String = sqlx::query_scalar(
-        "SELECT CONVERT(token_hash USING utf8mb4) FROM rust_sessions WHERE user_email='tester@example.invalid'",
-    )
-    .fetch_one(&pool)
-    .await
-    .unwrap();
-    assert_eq!(stored, digest(raw));
-    assert_ne!(stored, raw);
+    let sessions = fixture_sessions();
+    let claims = sessions.open(raw).unwrap();
+    assert_eq!(claims.email, "tester@example.invalid");
+    assert!(claims.expires_at > now() + 29 * 24 * 3600);
+    assert!(raw.len() < 2048 && !raw.contains("tester"));
+    let mut expired = claims;
+    expired.expires_at = now() - 1;
+    let bad_cookie = format!(
+        "gameloadouts_rust_session={}",
+        sessions.seal(&expired).unwrap()
+    );
+    assert_eq!(
+        request(&app, &bad_cookie, "/account", "GET", &[])
+            .await
+            .status,
+        303
+    );
+    let mut tampered = raw.as_bytes().to_vec();
+    tampered[30] = if tampered[30] == b'a' { b'b' } else { b'a' };
+    let bad_cookie = format!(
+        "gameloadouts_rust_session={}",
+        String::from_utf8(tampered).unwrap()
+    );
+    assert_eq!(
+        request(&app, &bad_cookie, "/account", "GET", &[])
+            .await
+            .status,
+        303
+    );
+    assert_eq!(
+        request(
+            &app,
+            &bad_cookie,
+            "/login",
+            "POST",
+            &[("_token", member.csrf.as_str())]
+        )
+        .await
+        .status,
+        403
+    );
     let weapon = "/Call+of+Duty+Modern+Warfare/M4A1";
     let loadout = format!("{weapon}/1");
     assert_eq!(
@@ -491,13 +537,10 @@ async fn public_write_flows_and_security() {
             .status,
         303
     );
-    let guest_hash = digest(guest.cookie.split('=').nth(1).unwrap());
-    let old_email: String =
-        sqlx::query_scalar("SELECT user_email FROM rust_sessions WHERE token_hash=?")
-            .bind(&guest_hash)
-            .fetch_one(&pool)
-            .await
-            .unwrap();
+    let old_email = fixture_sessions()
+        .open(guest.cookie.split_once('=').unwrap().1)
+        .unwrap()
+        .email;
     guest.get(&app, "/join").await;
     assert_eq!(
         guest
@@ -537,7 +580,15 @@ async fn public_write_flows_and_security() {
         .unwrap();
     assert_eq!(stale, 0);
     let token = mail_token(&messages.lock().await[0], "user/confirm");
-    assert_eq!(token.len(), 64);
+    assert_eq!(token.len(), 82);
+    let stored_confirmation: String =
+        sqlx::query_scalar("SELECT confirm_token FROM users WHERE email='new@example.invalid'")
+            .fetch_one(&pool)
+            .await
+            .unwrap();
+    assert_eq!(stored_confirmation, token);
+    // Registration rotated the anonymous cookie; load the login form for its new CSRF token.
+    guest.get(&app, "/login").await;
     assert_eq!(
         guest
             .post(
@@ -587,6 +638,16 @@ async fn public_write_flows_and_security() {
     );
     let reset_token = mail_token(messages.lock().await.last().unwrap(), "password/reset");
     assert_eq!(reset_token.len(), 64);
+    let stored_reset: String = sqlx::query_scalar(
+        "SELECT token FROM password_reminders WHERE email='new@example.invalid'",
+    )
+    .fetch_one(&pool)
+    .await
+    .unwrap();
+    assert_eq!(
+        stored_reset, reset_token,
+        "Laravel 4.1 must be able to consume Rust-issued reset tokens"
+    );
     resetter
         .get(&app, &format!("/password/reset/{reset_token}"))
         .await;
@@ -609,12 +670,12 @@ async fn public_write_flows_and_security() {
             .status,
         422
     );
-    sqlx::query("UPDATE rust_account_tokens SET expires_at=TIMESTAMPADD(SECOND,-1,UTC_TIMESTAMP()) WHERE user_email='new@example.invalid' AND purpose='reset'").execute(&pool).await.unwrap();
+    sqlx::query("UPDATE password_reminders SET created_at=TIMESTAMPADD(MINUTE,-61,UTC_TIMESTAMP()) WHERE email='new@example.invalid'").execute(&pool).await.unwrap();
     assert_eq!(
         resetter.post(&app, "/password/reset", &fields).await.status,
         422
     );
-    sqlx::query("UPDATE rust_account_tokens SET expires_at=TIMESTAMPADD(HOUR,1,UTC_TIMESTAMP()) WHERE user_email='new@example.invalid' AND purpose='reset'").execute(&pool).await.unwrap();
+    sqlx::query("UPDATE password_reminders SET created_at=UTC_TIMESTAMP() WHERE email='new@example.invalid'").execute(&pool).await.unwrap();
     assert_eq!(
         resetter.post(&app, "/password/reset", &fields).await.status,
         303
@@ -724,6 +785,107 @@ async fn public_write_flows_and_security() {
     .await
     .unwrap();
     assert_eq!(member.get(&app, "/account").await.status, 303);
+    // Laravel-issued reminder rows (40-character SHA1 tokens) work on Rust, with no new tables.
+    let legacy_reset = "b".repeat(40);
+    sqlx::query("INSERT INTO password_reminders(email,token,created_at) VALUES('tester@example.invalid',?,UTC_TIMESTAMP())").bind(&legacy_reset).execute(&pool).await.unwrap();
+    let mut legacy_reset_browser = Browser::default();
+    legacy_reset_browser
+        .get(&app, &format!("/password/reset/{legacy_reset}"))
+        .await;
+    assert_eq!(
+        legacy_reset_browser
+            .post(
+                &app,
+                "/password/reset",
+                &[
+                    ("email", "tester@example.invalid"),
+                    ("token", &legacy_reset),
+                    ("password", "legacy-reset-password"),
+                    ("password_confirmation", "legacy-reset-password")
+                ]
+            )
+            .await
+            .status,
+        303
+    );
+    assert_eq!(
+        sqlx::query_scalar::<_, i64>(
+            "SELECT COUNT(*) FROM password_reminders WHERE email='tester@example.invalid'"
+        )
+        .fetch_one(&pool)
+        .await
+        .unwrap(),
+        0
+    );
+    // New confirmation links expire without adding columns; old Laravel links remain accepted.
+    let expired_confirmation = format!("r1{:016x}{}", now() - 24 * 3600 - 1, "c".repeat(64));
+    sqlx::query("INSERT INTO users(email,username,password,role,confirm_token) VALUES('expired@example.invalid','ExpiredConfirm','fixture-hash','Standard',?)").bind(&expired_confirmation).execute(&pool).await.unwrap();
+    assert_eq!(
+        legacy
+            .get(&app, &format!("/user/confirm/{expired_confirmation}"))
+            .await
+            .status,
+        422
+    );
+    // Simultaneous first-time guest votes derive a single shared identity from the encrypted cookie.
+    let mut parallel_guest = Browser::default();
+    parallel_guest.get(&app, &loadout).await;
+    let fields = [
+        ("_token", parallel_guest.csrf.as_str()),
+        ("g-recaptcha-response", "fixture-captcha"),
+    ];
+    let parallel_vote_path = format!("{loadout}/upvoteGuest");
+    let (left, right) = tokio::join!(
+        request(
+            &app,
+            &parallel_guest.cookie,
+            &parallel_vote_path,
+            "POST",
+            &fields
+        ),
+        request(
+            &app,
+            &parallel_guest.cookie,
+            &parallel_vote_path,
+            "POST",
+            &fields
+        )
+    );
+    assert_eq!(left.status, 303);
+    assert_eq!(right.status, 303);
+    let left_cookie = left.headers["set-cookie"]
+        .to_str()
+        .unwrap()
+        .split(';')
+        .next()
+        .unwrap()
+        .split_once('=')
+        .unwrap()
+        .1;
+    let right_cookie = right.headers["set-cookie"]
+        .to_str()
+        .unwrap()
+        .split(';')
+        .next()
+        .unwrap()
+        .split_once('=')
+        .unwrap()
+        .1;
+    let left_email = fixture_sessions().open(left_cookie).unwrap().email;
+    assert_eq!(
+        left_email,
+        fixture_sessions().open(right_cookie).unwrap().email
+    );
+    assert_eq!(
+        sqlx::query_scalar::<_, i64>(
+            "SELECT COUNT(*) FROM loadout_user WHERE user_id=? AND loadout_id=1"
+        )
+        .bind(left_email)
+        .fetch_one(&pool)
+        .await
+        .unwrap(),
+        1
+    );
     // Exercise the rendered forms in Chromium against this isolated service.
     if std::env::var("RUN_BROWSER_TESTS").as_deref() == Ok("1") {
         let listener = tokio::net::TcpListener::bind("127.0.0.1:0").await.unwrap();

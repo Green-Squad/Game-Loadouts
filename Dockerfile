@@ -4,7 +4,6 @@ WORKDIR /build
 COPY rust-app/Cargo.toml rust-app/Cargo.lock ./
 COPY rust-app/src ./src
 COPY rust-app/templates ./templates
-COPY rust-app/migrations ./migrations
 RUN cargo build --locked --release
 
 FROM debian:trixie-slim AS runtime

@@ -1,6 +1,6 @@
 # Rust Game Loadouts
 
-This branch keeps the Laravel source and implements public browsing, accounts, voting and submissions with Axum, SQLx/MySQL and Askama. The root Dockerfile builds Rust; `Dockerfile.php` retains PHP. Public writes are opt-in and use a separate pool; browsing retains its read-only guard. See [PUBLIC_PARITY.md](PUBLIC_PARITY.md) for activation, migration, security and validation details. Admin routes remain excluded.
+This branch keeps the Laravel source and implements public browsing, accounts, voting and submissions with Axum, SQLx/MySQL and Askama. The root Dockerfile builds Rust; `Dockerfile.php` retains PHP. Public writes are opt-in and use a separate pool; browsing retains its read-only guard. See [PUBLIC_PARITY.md](PUBLIC_PARITY.md) for activation, encrypted cookies, Laravel token compatibility and validation details. Admin routes remain excluded.
 
 ## Quick local run (isolated representative data)
 
@@ -90,7 +90,7 @@ Required tables/columns:
 - attachment_weapon: attachment_id, weapon_id.
 - loadout_user: loadout_id, created_at (count rows, not distinct users, matching legacy votes).
 
-IDs are assumed numeric except games/users; unsigned counts are cast to SIGNED for consistent SQLx decoding. Production collation, uniqueness, indexes, nullability and timestamp/timezone settings remain unverified. Intended useful existing indexes are weapons(game_id,name), loadouts(weapon_id), loadout_user(loadout_id), attachment_loadout(loadout_id), attachment_weapon(weapon_id), users(email). **Only the two additive Rust account tables are created by the explicit operator migration command. No existing indexes or tables are altered.** Inspect `SHOW CREATE TABLE`/`SHOW INDEX` with authorized access and EXPLAIN representative queries before drawing production conclusions. Match DB timezone/collation with PHP.
+IDs are assumed numeric except games/users; unsigned counts are cast to SIGNED for consistent SQLx decoding. Production collation, uniqueness, indexes, nullability and timestamp/timezone settings remain unverified. Intended useful existing indexes are weapons(game_id,name), loadouts(weapon_id), loadout_user(loadout_id), attachment_loadout(loadout_id), attachment_weapon(weapon_id), users(email). **Encrypted cookie sessions and the existing Laravel confirmation/reset storage require no schema migration. The schema-check command reads metadata; it never creates or alters tables or indexes.** Inspect `SHOW CREATE TABLE`/`SHOW INDEX` with authorized access and EXPLAIN representative queries before drawing production conclusions. Match DB timezone/collation with PHP.
 
 Current production `public/uploads` assets have been copied from the master content snapshot into the Rust branch, including Battlefield 6, Black Ops 7 and COD Mobile artwork. There are 13,165 tracked paths under `public/uploads`. Controllers upload directly into that directory and thumb/header subdirectories; runtime uploads can exist outside Git. The image copies tracked files and any deliberately supplied local upload snapshot. Audit against an authorized DB export before deployment:
 

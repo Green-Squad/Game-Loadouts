@@ -1,6 +1,7 @@
 //! Public accounts and writes use a separate pool; browse queries retain their read-only guard.
 use crate::{
     model::{decode, encode},
+    session::{Claims, CookieSessions, MAX_AGE, now},
     web::{self, AppState},
 };
 use axum::{
@@ -32,6 +33,7 @@ const COOKIE: &str = "gameloadouts_rust_session";
 pub struct Session {
     pub hash: String,
     pub csrf: String,
+    pub credential_hash: String,
     pub email: String,
     pub username: String,
     pub role: String,
@@ -44,6 +46,7 @@ impl Session {
 }
 pub struct Accounts {
     pub pool: MySqlPool,
+    pub sessions: CookieSessions,
     pub secure_cookie: bool,
     pub site_key: String,
     pub captcha_secret: String,
@@ -82,7 +85,15 @@ impl Accounts {
         {
             return Err("ACCOUNT_BASE_URL must be an HTTPS origin".into());
         }
+        let secret = std::env::var("RUST_SESSION_KEY").or_else(|_| std::env::var("KEY"))?;
+        let secret = if let Some(encoded) = secret.strip_prefix("base64:") {
+            base64::engine::general_purpose::STANDARD.decode(encoded)?
+        } else {
+            secret.into_bytes()
+        };
+        let sessions = CookieSessions::new(&secret, account_url.trim_end_matches('/'))?;
         Ok(Self {
+            sessions,
             pool,
             disqus_secret: std::env::var("DISQUS_SECRET_KEY").unwrap_or_default(),
             secure_cookie: true,
@@ -244,7 +255,7 @@ fn raw_cookie(headers: &HeaderMap) -> Option<String> {
         .split(';')
         .find_map(|part| {
             let (name, value) = part.trim().split_once('=')?;
-            (name == COOKIE && value.len() == 64 && value.bytes().all(|c| c.is_ascii_hexdigit()))
+            (name == COOKIE && value.starts_with("v1.") && value.len() <= 2048)
                 .then(|| value.into())
         })
 }
@@ -261,35 +272,47 @@ fn cookie(accounts: &Accounts, token: &str, ttl: i64) -> HeaderValue {
 }
 #[derive(FromRow)]
 struct SessionRow {
-    token_hash: String,
-    csrf: String,
     email: String,
     username: String,
     role: String,
+    credential_hash: String,
 }
 async fn load_session(a: &Accounts, token: &str) -> Result<Session, Error> {
-    let row=sqlx::query_as::<_,SessionRow>("SELECT CONVERT(s.token_hash USING utf8mb4) token_hash,CONVERT(s.csrf USING utf8mb4) csrf,COALESCE(u.email,'') email,COALESCE(u.username,'') username,COALESCE(u.role,'') role FROM rust_sessions s LEFT JOIN users u ON u.email=s.user_email AND (u.role='Guest' OR (u.confirm_token='1' AND s.credential_hash=SHA2(u.password,256))) WHERE s.token_hash=? AND s.expires_at>UTC_TIMESTAMP() AND (s.user_email IS NULL OR u.email IS NOT NULL)") .bind(digest(token)).fetch_optional(&a.pool).await?;
-    let Some(row) = row else {
+    let Some(claims) = a.sessions.open(token) else {
         return Ok(Session::default());
     };
     let mut session = Session {
-        hash: row.token_hash,
-        csrf: row.csrf,
-        email: row.email,
-        username: row.username,
-        role: row.role,
-        votes: BTreeSet::new(),
+        hash: claims.id,
+        csrf: claims.csrf,
+        credential_hash: claims.credential_hash,
+        ..Session::default()
     };
-    if !session.email.is_empty() {
-        session.votes = sqlx::query_scalar::<_, i64>(
-            "SELECT CAST(loadout_id AS SIGNED) FROM loadout_user WHERE user_id=?",
-        )
-        .bind(&session.email)
-        .fetch_all(&a.pool)
-        .await?
-        .into_iter()
-        .collect();
+    if claims.email.is_empty() {
+        return Ok(session);
     }
+    let row = sqlx::query_as::<_, SessionRow>("SELECT email,username,role,CONVERT(SHA2(CONCAT(password,CHAR(0),COALESCE(remember_token,'')),256) USING utf8mb4) credential_hash FROM users WHERE email=? AND (role='Guest' OR confirm_token='1')")
+        .bind(&claims.email).fetch_optional(&a.pool).await?;
+    let Some(row) = row else {
+        return Ok(Session::default());
+    };
+    if !bool::from(
+        row.credential_hash
+            .as_bytes()
+            .ct_eq(session.credential_hash.as_bytes()),
+    ) {
+        return Ok(Session::default());
+    }
+    session.email = row.email;
+    session.username = row.username;
+    session.role = row.role;
+    session.votes = sqlx::query_scalar::<_, i64>(
+        "SELECT CAST(loadout_id AS SIGNED) FROM loadout_user WHERE user_id=?",
+    )
+    .bind(&session.email)
+    .fetch_all(&a.pool)
+    .await?
+    .into_iter()
+    .collect();
     Ok(session)
 }
 async fn issue(
@@ -298,24 +321,26 @@ async fn issue(
     remember: bool,
     verified_password: Option<&str>,
 ) -> Result<(String, Session), Error> {
-    if rand::random::<u8>() < 26 {
-        sqlx::query("DELETE FROM rust_sessions WHERE expires_at<=UTC_TIMESTAMP() LIMIT 128")
-            .execute(&a.pool)
-            .await?;
-        sqlx::query("DELETE FROM rust_account_tokens WHERE expires_at<=UTC_TIMESTAMP() LIMIT 128")
-            .execute(&a.pool)
-            .await?;
-    }
-    let token = random_token();
-    let csrf = random_token();
-    let hash = digest(&token);
-    let ttl = if remember { 30 * 24 * 3600 } else { 2 * 3600 };
-    sqlx::query("INSERT INTO rust_sessions(token_hash,user_email,csrf,expires_at,created_at,credential_hash) VALUES(?,?,?,TIMESTAMPADD(SECOND,?,UTC_TIMESTAMP()),UTC_TIMESTAMP(),COALESCE(?,(SELECT SHA2(password,256) FROM users WHERE email=?)))").bind(&hash).bind(email).bind(&csrf).bind(ttl).bind(verified_password.map(digest)).bind(email).execute(&a.pool).await?;
+    let credential_hash = if let Some(email) = email {
+        sqlx::query_scalar::<_, String>("SELECT CONVERT(SHA2(CONCAT(password,CHAR(0),COALESCE(remember_token,'')),256) USING utf8mb4) FROM users WHERE email=? AND (role='Guest' OR confirm_token='1') AND (? IS NULL OR password=?)")
+            .bind(email).bind(verified_password).bind(verified_password).fetch_optional(&a.pool).await?.ok_or_else(Error::denied)?
+    } else {
+        String::new()
+    };
+    let claims = Claims {
+        id: random_token(),
+        csrf: random_token(),
+        email: email.unwrap_or_default().into(),
+        credential_hash: credential_hash.clone(),
+        expires_at: now() + if remember { MAX_AGE } else { 7200 },
+    };
+    let token = a.sessions.seal(&claims).map_err(|_| Error::internal())?;
     Ok((
         token,
         Session {
-            hash,
-            csrf,
+            hash: claims.id,
+            csrf: claims.csrf,
+            credential_hash,
             ..Session::default()
         },
     ))
@@ -429,18 +454,12 @@ async fn verify_password(password: String, hash: String) -> Result<bool, Error> 
 }
 async fn rotate(
     a: &Accounts,
-    old: &Session,
+    _old: &Session,
     email: &str,
     remember: bool,
     verified_password: Option<&str>,
 ) -> Result<Response, Error> {
     let (token, _) = issue(a, Some(email), remember, verified_password).await?;
-    if !old.hash.is_empty() {
-        sqlx::query("DELETE FROM rust_sessions WHERE token_hash=?")
-            .bind(&old.hash)
-            .execute(&a.pool)
-            .await?;
-    }
     let mut response = Redirect::to("/account").into_response();
     response.headers_mut().insert(
         header::SET_COOKIE,
@@ -491,7 +510,16 @@ pub async fn post_account(
         csrf(&session,&form)?;
         match path {
             "/login"=>login(a,&session,&form).await,
-            "/logout"=>{sqlx::query("DELETE FROM rust_sessions WHERE token_hash=?").bind(&session.hash).execute(&a.pool).await?;let mut response=Redirect::to("/").into_response();response.headers_mut().insert(header::SET_COOKIE,cookie(a,"",0));Ok(response)},
+            "/logout"=>{
+                // Existing remember_token supplies revocation without a session table.
+                // Logging out revokes this account's other Rust cookies and Laravel remember-me cookies.
+                if !session.email.is_empty() {
+                    sqlx::query("UPDATE users SET remember_token=? WHERE email=? AND SHA2(CONCAT(password,CHAR(0),COALESCE(remember_token,'')),256)=?")
+                        .bind(random_token()).bind(&session.email).bind(&session.credential_hash).execute(&a.pool).await?;
+                }
+                let mut response=Redirect::to("/").into_response();
+                response.headers_mut().insert(header::SET_COOKIE,cookie(a,"",0));Ok(response)
+            },
             "/join"=>join(&state,a,&session,&form).await,
             "/reminder"|"/resend-confirmation"=>send_token(a,&session,&form,if path=="/reminder" {"reset"} else {"confirm"},&state).await,
             "/account"=>{
@@ -503,8 +531,7 @@ pub async fn post_account(
                 let mut tx=a.pool.begin().await?;
                 let changed=sqlx::query("UPDATE users SET password=?,remember_token='',updated_at=UTC_TIMESTAMP() WHERE email=? AND password=?").bind(hash).bind(&session.email).bind(password).execute(&mut *tx).await?.rows_affected();
                 if changed!=1 {return Err(Error::invalid("Your password changed during this request. Sign in again."));}
-                sqlx::query("DELETE FROM rust_sessions WHERE user_email=?").bind(&session.email).execute(&mut *tx).await?;
-                sqlx::query("DELETE FROM rust_account_tokens WHERE user_email=?").bind(&session.email).execute(&mut *tx).await?;
+                sqlx::query("DELETE FROM password_reminders WHERE email=?").bind(&session.email).execute(&mut *tx).await?;
                 tx.commit().await?;rotate(a,&session,&session.email,false,None).await
             },
             "/password/reset"=>reset(a,&session,&form).await,
@@ -617,7 +644,7 @@ async fn join(
     let password = valid_password(f)?;
     a.captcha(state, value(f, "g-recaptcha-response")).await?;
     let hash = hash_password(password).await?;
-    let token = random_token();
+    let token = confirmation_token();
     let mut tx = a.pool.begin().await?;
     // A named lock serializes username uniqueness on legacy schemas without an index.
     let lock_name = format!(
@@ -641,16 +668,17 @@ async fn join(
         let exists:i64=sqlx::query_scalar("SELECT COUNT(*) FROM users WHERE email=? OR username=?").bind(email).bind(username).fetch_one(&mut *tx).await?;
         if exists>0 {return Err(Error::invalid("That username or email is already in use."));}
         let guest=!session.email.is_empty() && session.role=="Guest";
-        sqlx::query("INSERT INTO users(email,username,password,role,converted_guest,remember_token,disabled_until,failed_attempts,confirm_token,created_at,updated_at) VALUES(?,?,?,'Standard',?,'',UTC_TIMESTAMP(),0,'pending',UTC_TIMESTAMP(),UTC_TIMESTAMP())").bind(email).bind(username).bind(hash).bind(i64::from(guest)).execute(&mut *tx).await?;
+        sqlx::query("INSERT INTO users(email,username,password,role,converted_guest,remember_token,disabled_until,failed_attempts,confirm_token,created_at,updated_at) VALUES(?,?,?,'Standard',?,'',UTC_TIMESTAMP(),0,?,UTC_TIMESTAMP(),UTC_TIMESTAMP())").bind(email).bind(username).bind(hash).bind(i64::from(guest)).bind(&token).execute(&mut *tx).await?;
         if guest {
             sqlx::query("UPDATE loadout_user SET user_id=? WHERE user_id=?").bind(email).bind(&session.email).execute(&mut *tx).await?;
             sqlx::query("UPDATE loadouts SET user_id=? WHERE user_id=?").bind(email).bind(&session.email).execute(&mut *tx).await?;
-            sqlx::query("UPDATE rust_sessions SET user_email=NULL WHERE user_email=?").bind(&session.email).execute(&mut *tx).await?;
             sqlx::query("DELETE FROM users WHERE email=? AND role='Guest'").bind(&session.email).execute(&mut *tx).await?;
         }
-        insert_token(&mut tx,email,"confirm",&token,24*3600).await?;
         a.email(email,"Confirm your Game Loadouts email",&format!("{}/user/confirm/{token}",a.account_url)).await?;
-        tx.commit().await?;Ok(web::account_page(state,session,"info",200,"Your account was created. Please check your email to confirm it.","").await)
+        tx.commit().await?;
+        let (token,anonymous)=issue(a,None,false,None).await?;
+        let mut response=web::account_page(state,&anonymous,"info",200,"Your account was created. Please check your email to confirm it.","").await;
+        response.headers_mut().insert(header::SET_COOKIE,cookie(a,&token,7200));Ok(response)
     }.await;
     // Closing the connection also releases the lock if this future is cancelled.
     sqlx::query("SELECT RELEASE_LOCK(?)")
@@ -659,15 +687,18 @@ async fn join(
         .await?;
     result
 }
-async fn insert_token(
-    tx: &mut Transaction<'_, MySql>,
-    email: &str,
-    purpose: &str,
-    token: &str,
-    ttl: i64,
-) -> Result<(), Error> {
-    sqlx::query("INSERT INTO rust_account_tokens(user_email,purpose,token_hash,created_at,expires_at) VALUES(?,?,?,UTC_TIMESTAMP(),TIMESTAMPADD(SECOND,?,UTC_TIMESTAMP())) ON DUPLICATE KEY UPDATE token_hash=VALUES(token_hash),created_at=VALUES(created_at),expires_at=VALUES(expires_at)").bind(email).bind(purpose).bind(digest(token)).bind(ttl).execute(&mut **tx).await?;
-    Ok(())
+fn confirmation_token() -> String {
+    // Still an opaque Laravel-compatible value in users.confirm_token, with an issue time.
+    format!("r1{:016x}{}", now(), random_token())
+}
+fn confirmation_time(token: &str) -> Option<u64> {
+    if token.len() != 82
+        || !token.starts_with("r1")
+        || !token[2..].bytes().all(|c| c.is_ascii_hexdigit())
+    {
+        return None;
+    }
+    u64::from_str_radix(&token[2..18], 16).ok()
 }
 async fn send_token(
     a: &Accounts,
@@ -677,28 +708,48 @@ async fn send_token(
     state: &AppState,
 ) -> Result<Response, Error> {
     let email = value(f, "email");
+    if email.len() > 128 {
+        return Err(Error::invalid("Enter a valid email address."));
+    }
     a.captcha(state, value(f, "g-recaptcha-response")).await?;
     let mut tx = a.pool.begin().await?;
-    let found:Option<String>=sqlx::query_scalar("SELECT email FROM users WHERE email=? AND role<>'Guest' AND (?='reset' OR confirm_token<>'1') FOR UPDATE").bind(email).bind(purpose).fetch_optional(&mut *tx).await?;
-    if let Some(email) = found {
-        let recent:i64=sqlx::query_scalar("SELECT COUNT(*) FROM rust_account_tokens WHERE user_email=? AND created_at>TIMESTAMPADD(SECOND,-60,UTC_TIMESTAMP())").bind(&email).fetch_one(&mut *tx).await?;
-        if recent == 0 {
-            let token = random_token();
-            insert_token(
-                &mut tx,
-                &email,
-                purpose,
-                &token,
-                if purpose == "reset" { 3600 } else { 24 * 3600 },
-            )
-            .await?;
+    let found:Option<String>=sqlx::query_scalar("SELECT confirm_token FROM users WHERE email=? AND role<>'Guest' AND (?='reset' OR confirm_token<>'1') FOR UPDATE").bind(email).bind(purpose).fetch_optional(&mut *tx).await?;
+    if let Some(current_confirmation) = found {
+        let recent = if purpose == "reset" {
+            sqlx::query_scalar::<_,i64>("SELECT COUNT(*) FROM password_reminders WHERE email=? AND created_at>TIMESTAMPADD(SECOND,-60,UTC_TIMESTAMP())").bind(email).fetch_one(&mut *tx).await? > 0
+        } else {
+            confirmation_time(&current_confirmation)
+                .is_some_and(|issued| now().saturating_sub(issued) < 60)
+        };
+        if !recent {
+            let token = if purpose == "reset" {
+                random_token()
+            } else {
+                confirmation_token()
+            };
+            if purpose == "reset" {
+                // Laravel 4.1 stores the raw opaque token; reuse that format and its 60-minute lifetime.
+                sqlx::query("DELETE FROM password_reminders WHERE email=?")
+                    .bind(email)
+                    .execute(&mut *tx)
+                    .await?;
+                sqlx::query("INSERT INTO password_reminders(email,token,created_at) VALUES(?,?,UTC_TIMESTAMP())").bind(email).bind(&token).execute(&mut *tx).await?;
+            } else {
+                sqlx::query(
+                    "UPDATE users SET confirm_token=?,updated_at=UTC_TIMESTAMP() WHERE email=?",
+                )
+                .bind(&token)
+                .bind(email)
+                .execute(&mut *tx)
+                .await?;
+            }
             let route = if purpose == "reset" {
                 "password/reset"
             } else {
                 "user/confirm"
             };
             a.email(
-                &email,
+                email,
                 if purpose == "reset" {
                     "Reset your Game Loadouts password"
                 } else {
@@ -727,20 +778,35 @@ async fn reset(
 ) -> Result<Response, Error> {
     let token = value(f, "token");
     let email = value(f, "email");
+    if email.len() > 128
+        || !(32..=100).contains(&token.len())
+        || !token.bytes().all(|c| c.is_ascii_alphanumeric())
+    {
+        return Err(Error::invalid(
+            "The reset link is invalid or expired. Request another email.",
+        ));
+    }
     let hash = hash_password(valid_password(f)?).await?;
     let mut tx = a.pool.begin().await?;
-    let valid:Option<String>=sqlx::query_scalar("SELECT user_email FROM rust_account_tokens WHERE user_email=? AND purpose='reset' AND token_hash=? AND expires_at>UTC_TIMESTAMP() FOR UPDATE").bind(email).bind(digest(token)).fetch_optional(&mut *tx).await?;
+    // Use the same identity-first lock order as login, account changes, and token issuance.
+    let user: Option<String> =
+        sqlx::query_scalar("SELECT email FROM users WHERE email=? AND role<>'Guest' FOR UPDATE")
+            .bind(email)
+            .fetch_optional(&mut *tx)
+            .await?;
+    if user.is_none() {
+        return Err(Error::invalid(
+            "The reset link is invalid or expired. Request another email.",
+        ));
+    }
+    let valid:Option<String>=sqlx::query_scalar("SELECT email FROM password_reminders WHERE email=? AND BINARY token=BINARY ? AND created_at>TIMESTAMPADD(MINUTE,-60,UTC_TIMESTAMP()) AND created_at<=UTC_TIMESTAMP() LIMIT 1 FOR UPDATE").bind(email).bind(token).fetch_optional(&mut *tx).await?;
     if valid.is_none() {
         return Err(Error::invalid(
             "The reset link is invalid or expired. Request another email.",
         ));
     }
     sqlx::query("UPDATE users SET password=?,remember_token='',failed_attempts=0,disabled_until=UTC_TIMESTAMP(),updated_at=UTC_TIMESTAMP() WHERE email=? AND role<>'Guest'").bind(hash).bind(email).execute(&mut *tx).await?;
-    sqlx::query("DELETE FROM rust_account_tokens WHERE user_email=?")
-        .bind(email)
-        .execute(&mut *tx)
-        .await?;
-    sqlx::query("DELETE FROM rust_sessions WHERE user_email=?")
+    sqlx::query("DELETE FROM password_reminders WHERE email=?")
         .bind(email)
         .execute(&mut *tx)
         .await?;
@@ -767,10 +833,10 @@ pub async fn confirm(
     let result=async {
         if token.len()<32 || token.len()>100 {return Err(Error::invalid("The confirmation link is invalid or expired."));}
         let mut tx=a.pool.begin().await?;
-        let email:Option<String>=sqlx::query_scalar("SELECT user_email FROM rust_account_tokens WHERE purpose='confirm' AND token_hash=? AND expires_at>UTC_TIMESTAMP() FOR UPDATE").bind(digest(&token)).fetch_optional(&mut *tx).await?;
-        let email=match email {Some(email)=>email,None=>sqlx::query_scalar("SELECT email FROM users WHERE confirm_token=? AND role<>'Guest' AND confirm_token<>'1' FOR UPDATE").bind(&token).fetch_optional(&mut *tx).await?.ok_or_else(||Error::invalid("The confirmation link is invalid or expired."))?};
+        if token.len()==82 && token.starts_with("r1") && !confirmation_time(&token).is_some_and(|issued| issued<=now() && now()-issued<24*3600) { return Err(Error::invalid("The confirmation link is invalid or expired.")); }
+        let email=sqlx::query_scalar::<_,String>("SELECT email FROM users WHERE BINARY confirm_token=BINARY ? AND role<>'Guest' AND confirm_token<>'1' FOR UPDATE").bind(&token).fetch_optional(&mut *tx).await?.ok_or_else(||Error::invalid("The confirmation link is invalid or expired."))?;
         sqlx::query("UPDATE users SET confirm_token='1',updated_at=UTC_TIMESTAMP() WHERE email=?").bind(&email).execute(&mut *tx).await?;
-        sqlx::query("DELETE FROM rust_account_tokens WHERE user_email=? AND purpose='confirm'").bind(&email).execute(&mut *tx).await?;tx.commit().await?;rotate(a,&session,&email,false,None).await
+        tx.commit().await?;rotate(a,&session,&email,false,None).await
     }.await;
     match result {
         Ok(r) => r,
@@ -815,15 +881,17 @@ async fn guest(a: &Accounts, session: &Session) -> Result<String, Error> {
     if !session.email.is_empty() {
         return Ok(session.email.clone());
     }
-    let email = random_token();
+    // The encrypted anonymous session has a random ID; concurrent requests derive one guest identity.
+    let email = digest(&format!("rust-guest:{}", session.hash));
     let hash = hash_password(random_token()).await?;
     let mut tx = a.pool.begin().await?;
-    sqlx::query("INSERT INTO users(email,username,password,role,converted_guest,remember_token,disabled_until,failed_attempts,confirm_token,created_at,updated_at) VALUES(?,?,?,'Guest',0,'',UTC_TIMESTAMP(),0,'1',UTC_TIMESTAMP(),UTC_TIMESTAMP())").bind(&email).bind(&email).bind(hash).execute(&mut *tx).await?;
-    let updated=sqlx::query("UPDATE rust_sessions SET user_email=?,expires_at=TIMESTAMPADD(DAY,30,UTC_TIMESTAMP()) WHERE token_hash=? AND user_email IS NULL AND expires_at>UTC_TIMESTAMP()").bind(&email).bind(&session.hash).execute(&mut *tx).await?.rows_affected();
-    if updated != 1 {
-        return Err(Error::invalid(
-            "Your session changed. Refresh the page and try again.",
-        ));
+    sqlx::query("INSERT INTO users(email,username,password,role,converted_guest,remember_token,disabled_until,failed_attempts,confirm_token,created_at,updated_at) VALUES(?,?,?,'Guest',0,'',UTC_TIMESTAMP(),0,'1',UTC_TIMESTAMP(),UTC_TIMESTAMP()) ON DUPLICATE KEY UPDATE email=email").bind(&email).bind(&email).bind(hash).execute(&mut *tx).await?;
+    let role: String = sqlx::query_scalar("SELECT role FROM users WHERE email=? FOR UPDATE")
+        .bind(&email)
+        .fetch_one(&mut *tx)
+        .await?;
+    if role != "Guest" {
+        return Err(Error::denied());
     }
     tx.commit().await?;
     Ok(email)
@@ -844,7 +912,6 @@ pub async fn write_loadout(
     State(state): State<Arc<AppState>>,
     Extension(session): Extension<Session>,
     OriginalUri(uri): OriginalUri,
-    headers: HeaderMap,
     Form(form): Form<BTreeMap<String, String>>,
 ) -> Response {
     let Some(a) = &state.accounts else {
@@ -863,7 +930,7 @@ pub async fn write_loadout(
         if removing && session.email.is_empty() {return Err(Error::invalid("You have not voted for this loadout."));}
         let email=guest(a,&session).await?;
         let mut tx=a.pool.begin().await?;
-        let identity:Option<String>=sqlx::query_scalar("SELECT email FROM users WHERE email=? AND (role='Guest' OR confirm_token='1') FOR UPDATE").bind(&email).fetch_optional(&mut *tx).await?;
+        let identity:Option<String>=sqlx::query_scalar("SELECT email FROM users WHERE email=? AND (role='Guest' OR confirm_token='1') AND (?='' OR SHA2(CONCAT(password,CHAR(0),COALESCE(remember_token,'')),256)=?) FOR UPDATE").bind(&email).bind(&session.credential_hash).bind(&session.credential_hash).fetch_optional(&mut *tx).await?;
         if identity.is_none() {return Err(Error::invalid("Your account changed. Refresh and try again."));}
         // Lock the weapon for all writes, then loadout. This serializes both set deduplication
         // and votes on legacy pivot tables which do not have a UNIQUE constraint.
@@ -887,7 +954,7 @@ pub async fn write_loadout(
         if removing {sqlx::query("DELETE FROM loadout_user WHERE loadout_id=? AND user_id=?").bind(id).bind(&email).execute(&mut *tx).await?;} else {add_vote(&mut tx,id,&email).await?;}
         tx.commit().await?;
         let mut response=Redirect::to(&format!("/{}/{}/{id}",encode(&parts[0]),encode(&parts[1]))).into_response();
-        if is_guest && session.email.is_empty() && let Some(token)=raw_cookie(&headers) {response.headers_mut().insert(header::SET_COOKIE,cookie(a,&token,30*24*3600));}
+        if is_guest && session.email.is_empty() {let (token,_)=issue(a,Some(&email),true,None).await?;response.headers_mut().insert(header::SET_COOKIE,cookie(a,&token,30*24*3600));}
         Ok(response)
     }.await;
     match result {

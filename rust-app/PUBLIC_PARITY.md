@@ -16,32 +16,32 @@ The Rust service shares the Laravel users, loadouts, attachments and vote pivots
 
 ## Activation
 
-Writes are disabled by default. Browse connections still execute `SET SESSION TRANSACTION READ ONLY`. No migration runs as part of web-server startup.
+No schema migration is needed. The app uses the existing Laravel `users`, `password_reminders`, loadout and pivot tables. `--check-public-schema` only reads their metadata and validates the required columns and InnoDB engines. Never apply the disposable `fixtures/schema.sql` or `fixtures/data.sql` to production.
 
-1. Build and validate the Rust image against disposable fixtures.
-2. Use a schema owner to run the image with `--migrate-public-accounts`. It checks the required legacy columns and InnoDB engines, creates only `rust_sessions` and `rust_account_tokens`, and verifies them. Alternatively execute `migrations/001_public_accounts.sql` directly on the selected database. Never apply `fixtures/schema.sql` or `fixtures/data.sql` to production.
-3. Configure the writer and public settings on the Rust service, then set `INTERACTIVE_ENABLED=1`.
+Set `INTERACTIVE_ENABLED=1` and `ACCOUNT_BASE_URL=https://rust.gameloadouts.com` on the Rust service. The copied `KEY`, database, CAPTCHA and SMTP credentials are reused. Browsing keeps its separate read-only pool. An optional `DB_WRITE_USERNAME` / `DB_WRITE_PASSWORD` pair can override the existing database identity; no override is required.
 
 | Setting | Purpose |
 |---|---|
-| `DB_WRITE_USERNAME`, `DB_WRITE_PASSWORD` | Writer identity; host/database/TLS options come from the existing DB configuration. Credentials stay in service settings or secrets. |
-| `ACCOUNT_BASE_URL` | Required HTTPS origin for email links and the expected CAPTCHA hostname, e.g. `https://rust.gameloadouts.com`. Canonical content/Disqus URLs remain controlled separately by `PUBLIC_BASE_URL`. |
-| `RECAPTCHA_PRIVATE_KEY`, `RECAPTCHA_PUBLIC_KEY` | Existing secret and optional site key override. Server calls Google's verify endpoint; production has no bypass. |
-| `MAIL_USERNAME`, `MAIL_PASSWORD` | Existing SMTP credentials. |
-| `MAIL_HOST`, `MAIL_PORT`, `MAIL_ENCRYPTION`, `MAIL_FROM` | Defaults match Laravel: smtp.zoho.com, 465, ssl, Game Loadouts <mail@gameloadouts.com>. `tls` selects STARTTLS. |
-| `DISQUS_ENABLED`, `DISQUS_SECRET_KEY` | Async comments/counts and the existing signed SSO identity. |
-| `ADS_ENABLED` | Set 1 to load the existing AdSense unit. |
-| `GA4_MEASUREMENT_ID` | Optional current Analytics measurement ID. The old UA ID needs replacement to collect analytics. |
+| `KEY` | Existing application secret (at least 32 bytes); an origin- and purpose-specific AES-256-GCM session key is derived from it. `RUST_SESSION_KEY` optionally overrides it. A `base64:` prefix is supported. Keep the same secret across instances/revisions. |
+| `ACCOUNT_BASE_URL` | HTTPS origin used for encrypted-cookie binding, email links and the expected CAPTCHA hostname. |
+| `RECAPTCHA_PRIVATE_KEY`, `RECAPTCHA_PUBLIC_KEY` | Existing secret and optional site-key override; server verifies with Google. |
+| `MAIL_USERNAME`, `MAIL_PASSWORD` | Existing SMTP credentials. Defaults remain smtp.zoho.com:465 with SSL and Game Loadouts <mail@gameloadouts.com>. |
+| `DISQUS_SECRET_KEY` | Existing signed member SSO. |
+| `ADS_ENABLED`, `GA4_MEASUREMENT_ID` | Optional existing AdSense unit and a current Analytics measurement ID. |
 
-The writer needs SELECT on existing content/account tables; INSERT/UPDATE/DELETE on users and loadout_user; INSERT/UPDATE on loadouts; INSERT on attachment_loadout; and SELECT/INSERT/UPDATE/DELETE on the two Rust tables. `weapons` rows are locked for serialization; the database must support SELECT FOR UPDATE. The web writer does not need DDL privileges. Prefer a scoped writer over using the schema-owner credentials.
+The existing DB identity needs SELECT/INSERT/UPDATE on users and loadouts, DELETE on guest users, SELECT/INSERT/DELETE on loadout_user and password_reminders, and SELECT/INSERT on attachment_loadout. No DDL privileges are needed. Existing content rows are locked to serialize concurrent changes.
 
-## Sessions and email safety
+## Sessions and token compatibility
 
-Cookies are host-only, HttpOnly, Secure and SameSite=Lax. Random 256-bit session identifiers are hashed in MySQL; CSRF tokens are checked with constant-time equality. Login/confirmation/reset rotates the session. Sessions last two hours, or 30 days when remembered. A password fingerprint also invalidates sessions after a password change through Laravel. Rust cookies are separate from Laravel cookies.
+Session state lives in authenticated, encrypted, versioned cookies with random 96-bit nonces. Cookies are host-only, HttpOnly, Secure and SameSite=Lax. Login/confirmation/reset rotates the session and CSRF tokens. Sessions expire after two hours or 30 days when remembered. They work across instances without local files, server-side session rows or migrations. Authenticated requests check the shared user's password and remember_token fingerprint, so Laravel password changes invalidate Rust sessions.
 
-The shared session store works across Cloud Run instances without writable filesystem storage. Expired sessions/tokens are removed in bounded batches during a sample of new-session requests. Password hashing runs on bounded blocking workers.
+Logout changes the existing users.remember_token to revoke all of that account's Rust sessions, including a copied pre-logout cookie. This also invalidates Laravel remember-me cookies; active Laravel file sessions remain managed by Laravel. Clearing just one stolen/replayed Rust session independently would require shared server-side revocation storage.
 
-Confirmation/reset tokens are hashed, expire and are consumed once. Mail requests require CAPTCHA and have a per-account cooldown. Registration rolls back when SMTP delivery fails; existing pending accounts can resend confirmation. No credentials, raw SQL errors, request paths or submitted form data are logged.
+Confirmation tokens use users.confirm_token and the existing confirmed sentinel `1`. New opaque tokens include an issue time and expire after 24 hours on Rust; existing Laravel confirmation links remain accepted. Laravel can consume new tokens in its unchanged confirmation handler, which retains its original expiry behavior. Resending replaces the token, with a 60-second cooldown.
+
+Password reset tokens use the exact Laravel 4.1 password_reminders(email,token,created_at) format: raw random tokens with a 60-minute lifetime. Rust accepts existing Laravel-issued tokens and consumes reminder rows on successful reset. Issuance locks the user, replaces prior reminders, applies a 60-second cooldown, and rolls back if SMTP fails. Password changes update the shared bcrypt password and invalidate old Rust cookies; resetting an unconfirmed account does not confirm it.
+
+Guest identity is derived from the random ID inside the encrypted anonymous cookie, so concurrent first-time guest votes share one identity. Registration transfers guest data in a transaction. Real production mail and CAPTCHA integrations remain enabled, with isolated substitutes constructed only in tests.
 
 ## Validation
 
@@ -49,4 +49,4 @@ Confirmation/reset tokens are hashed, expire and are consumed once. Mail request
 
 With `RUN_BROWSER_TESTS=1`, Chromium exercises the rendered login, account, selection, submission, voting, submissions and logout forms and captures desktop/mobile screenshots. The existing read-only browser and query-budget tests still run against their original separate fixture. CI builds the production Docker image and checks non-root/read-only runtime, static media, graceful shutdown and browsing.
 
-[CI run 38170863320](https://github.com/Green-Squad/Game-Loadouts/actions/runs/38170863320) passed for commit `1df59288cf8bcfb3cf8ad0adbd4f2e6ac722715e`: formatting, warnings-as-errors lint, all unit/database tests, interactive Chromium flows, Docker build and read-only container browser/runtime checks. The workflow also checks the explicit migration command and account-enabled container startup with synthetic settings. Live activation still requires the operator migration and writer configuration described above. The historical measurements in `VALIDATION.md` describe the earlier browsing experiment and do not establish performance or memory for the new account flows.
+CI checks formatting, warnings-as-errors lint, unit/database tests, Chromium account flows, and the production Docker image against disposable fixtures. Cookie tests cover encryption, randomized nonces, tampering, expiry, key/origin separation and cross-instance compatibility. Integration tests use only the Laravel schema and exercise legacy token compatibility, guest conversion/concurrency, replay after logout and password-change invalidation. The historical measurements in `VALIDATION.md` describe the earlier browsing experiment, not the current account flows.
