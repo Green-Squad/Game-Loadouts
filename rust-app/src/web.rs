@@ -27,6 +27,8 @@ use tower_http::{
 
 pub struct AppState {
     pub accounts: Option<Arc<Accounts>>,
+    pub ads: bool,
+    pub analytics_id: String,
     pub pool: MySqlPool,
     pub query_timeout: Duration,
     pub public_url: String,
@@ -45,6 +47,10 @@ struct Page {
     screen: String,
     token: String,
     site_key: String,
+    disqus_auth: String,
+    account_origin: String,
+    ads: bool,
+    analytics_id: String,
     kind: String,
     title: String,
     description: String,
@@ -75,6 +81,14 @@ impl Page {
     fn new(state: &AppState) -> Self {
         Self {
             session: Session::default(),
+            disqus_auth: String::new(),
+            account_origin: state
+                .accounts
+                .as_ref()
+                .map(|a| a.account_url.clone())
+                .unwrap_or_default(),
+            ads: state.ads,
+            analytics_id: state.analytics_id.clone(),
             interactive: state.accounts.is_some(),
             screen: String::new(),
             token: String::new(),
@@ -245,6 +259,11 @@ pub(crate) fn account_page(
     p.kind = "account".into();
     p.title = "Account - Game Loadouts".into();
     p.session = session.clone();
+    p.disqus_auth = state
+        .accounts
+        .as_ref()
+        .map(|a| a.disqus_auth(session))
+        .unwrap_or_default();
     p.screen = screen.into();
     p.status = status;
     p.message = message.into();
@@ -321,13 +340,18 @@ async fn build_page(
     }
     let mut p = Page::new(state);
     p.session = session.clone();
+    p.disqus_auth = state
+        .accounts
+        .as_ref()
+        .map(|a| a.disqus_auth(session))
+        .unwrap_or_default();
     if parts.len() == 1 && parts[0] == "submissions" && state.accounts.is_some() {
         if !session.member() {
             return Ok(Redirect::to("/login").into_response());
         }
         p.kind = "submissions".into();
         p.title = "My submissions - Game Loadouts".into();
-        p.loadouts=db.loadouts("EXISTS (SELECT 1 FROM loadout_user mine WHERE mine.loadout_id=l.id AND mine.user_id=?)", "l.updated_at DESC,l.id", &[session.email.clone()]).await?;
+        p.loadouts=db.rows(&loadout_sql("EXISTS (SELECT 1 FROM loadout_user mine WHERE mine.loadout_id=l.id AND mine.user_id=?)", "(SELECT MAX(updated_at) FROM loadout_user mine WHERE mine.loadout_id=l.id AND mine.user_id=?) DESC,l.id"), &[session.email.clone(),session.email.clone(),session.email.clone()]).await?;
         db.attach(&mut [&mut p.loadouts]).await?;
         return Ok(render(p));
     }
@@ -601,16 +625,24 @@ async fn autocomplete(
     let response=match result {Ok(rows)=>axum::Json(serde_json::json!({"suggestions":rows.iter().map(|w|format!("{} / {}",w.name,w.game_id)).collect::<Vec<_>>()})).into_response(),Err(_)=>(StatusCode::SERVICE_UNAVAILABLE,axum::Json(serde_json::json!({"suggestions":[],"error":"Search unavailable"}))).into_response()};
     instrument(response, &db, start, "autocomplete", state.metrics)
 }
-async fn search_get(State(state): State<Arc<AppState>>, Query(search): Query<Search>) -> Response {
-    search_run(state, search).await
+async fn search_get(
+    State(state): State<Arc<AppState>>,
+    Extension(session): Extension<Session>,
+    Query(search): Query<Search>,
+) -> Response {
+    search_run(state, search, session).await
 }
-async fn search_post(State(state): State<Arc<AppState>>, Form(search): Form<Search>) -> Response {
-    search_run(state, search).await
+async fn search_post(
+    State(state): State<Arc<AppState>>,
+    Extension(session): Extension<Session>,
+    Form(search): Form<Search>,
+) -> Response {
+    search_run(state, search, session).await
 }
-async fn search_run(state: Arc<AppState>, search: Search) -> Response {
+async fn search_run(state: Arc<AppState>, search: Search, session: Session) -> Response {
     let start = Instant::now();
     let mut db = Db::new(&state.pool, state.query_timeout);
-    let result = search_build(&state, &mut db, &search.query).await;
+    let result = search_build(&state, &mut db, &search.query, &session).await;
     let response = match result {
         Ok(r) => r,
         Err(_) => render(error_page(
@@ -621,7 +653,12 @@ async fn search_run(state: Arc<AppState>, search: Search) -> Response {
     };
     instrument(response, &db, start, "search", state.metrics)
 }
-async fn search_build(state: &AppState, db: &mut Db<'_>, query: &str) -> Result<Response, DbError> {
+async fn search_build(
+    state: &AppState,
+    db: &mut Db<'_>,
+    query: &str,
+    session: &Session,
+) -> Result<Response, DbError> {
     let parts: Vec<_> = query.split('/').collect();
     if parts.len() > 1
         && let Some(w) = db.weapon(parts[1].trim(), parts[0].trim()).await?
@@ -630,6 +667,7 @@ async fn search_build(state: &AppState, db: &mut Db<'_>, query: &str) -> Result<
     }
     let mut p = Page::new(state);
     p.kind = "search".into();
+    p.session = session.clone();
     p.title = "Search Game Loadouts".into();
     p.description = "Game Loadouts search results page.".into();
     p.query = query.into();

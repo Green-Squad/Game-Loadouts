@@ -115,6 +115,12 @@ async fn run() -> Result<(), Box<dyn std::error::Error>> {
     let state = Arc::new(AppState {
         pool: pool.clone(),
         accounts,
+        ads: env::var("ADS_ENABLED").as_deref() == Ok("1"),
+        analytics_id: env::var("GA4_MEASUREMENT_ID")
+            .unwrap_or_default()
+            .chars()
+            .filter(|c| c.is_ascii_alphanumeric() || *c == '-')
+            .collect(),
         query_timeout: Duration::from_millis(number("DB_QUERY_TIMEOUT_MS", 5000)?),
         public_url: env::var("PUBLIC_BASE_URL")
             .unwrap_or_else(|_| "https://gameloadouts.com".into())
@@ -124,10 +130,12 @@ async fn run() -> Result<(), Box<dyn std::error::Error>> {
             .unwrap_or_default()
             .trim_end_matches('/')
             .into(),
-        disqus: env::var("DISQUS_ENABLED").as_deref() == Ok("1"),
+        disqus: env::var("DISQUS_ENABLED").as_deref() != Ok("0"),
         metrics: env::var("METRICS_HEADERS").as_deref() == Ok("1"),
         search_mode: env::var("SEARCH_MODE").unwrap_or_else(|_| "google".into()),
-        search_api_url: env::var("SEARCH_API_URL").unwrap_or_default(),
+        search_api_url: env::var("SEARCH_API_URL")
+            .or_else(|_| env::var("SEARCH_URL"))
+            .unwrap_or_default(),
         http: reqwest::Client::builder()
             .timeout(Duration::from_secs(5))
             .connect_timeout(Duration::from_secs(2))

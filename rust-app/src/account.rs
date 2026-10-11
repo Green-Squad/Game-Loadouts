@@ -10,6 +10,8 @@ use axum::{
     middleware::Next,
     response::{IntoResponse, Redirect, Response},
 };
+use base64::Engine;
+use hmac::{Hmac, Mac};
 use lettre::{
     AsyncSmtpTransport, AsyncTransport, Message, Tokio1Executor, message::Mailbox,
     transport::smtp::authentication::Credentials,
@@ -20,7 +22,7 @@ use sha2::{Digest, Sha256};
 use sqlx::{FromRow, MySql, MySqlPool, Row, Transaction};
 use std::{
     collections::{BTreeMap, BTreeSet},
-    sync::Arc,
+    sync::{Arc, OnceLock},
     time::Duration,
 };
 use subtle::ConstantTimeEq;
@@ -47,6 +49,7 @@ pub struct Accounts {
     pub captcha_secret: String,
     pub captcha_url: String,
     pub captcha_hostname: String,
+    pub disqus_secret: String,
     pub mailer: Option<AsyncSmtpTransport<Tokio1Executor>>,
     pub mail_from: Mailbox,
     pub account_url: String,
@@ -81,6 +84,7 @@ impl Accounts {
         }
         Ok(Self {
             pool,
+            disqus_secret: std::env::var("DISQUS_SECRET_KEY").unwrap_or_default(),
             secure_cookie: true,
             site_key: std::env::var("RECAPTCHA_PUBLIC_KEY")
                 .unwrap_or_else(|_| "6LdAYgITAAAAAIiGNHQnJvj0JYEW9xG7loWs7fls".into()),
@@ -99,6 +103,27 @@ impl Accounts {
                 .parse()?,
             account_url: account_url.trim_end_matches('/').into(),
         })
+    }
+    pub fn disqus_auth(&self, session: &Session) -> String {
+        if !session.member() || self.disqus_secret.is_empty() {
+            return String::new();
+        }
+        let message=base64::engine::general_purpose::STANDARD.encode(serde_json::json!({"id":session.email,"username":session.username,"email":session.email}).to_string());
+        let timestamp = std::time::SystemTime::now()
+            .duration_since(std::time::UNIX_EPOCH)
+            .unwrap_or_default()
+            .as_secs();
+        let input = format!("{message} {timestamp}");
+        let mut hmac = Hmac::<sha1::Sha1>::new_from_slice(self.disqus_secret.as_bytes())
+            .expect("HMAC accepts any key length");
+        hmac.update(input.as_bytes());
+        let signature = hmac
+            .finalize()
+            .into_bytes()
+            .iter()
+            .map(|b| format!("{b:02x}"))
+            .collect::<String>();
+        format!("{message} {signature} {timestamp}")
     }
     async fn email(&self, to: &str, subject: &str, link: &str) -> Result<(), Error> {
         let mail = Message::builder()
@@ -257,6 +282,14 @@ async fn issue(
     email: Option<&str>,
     remember: bool,
 ) -> Result<(String, Session), Error> {
+    if rand::random::<u8>() < 26 {
+        sqlx::query("DELETE FROM rust_sessions WHERE expires_at<=UTC_TIMESTAMP() LIMIT 128")
+            .execute(&a.pool)
+            .await?;
+        sqlx::query("DELETE FROM rust_account_tokens WHERE expires_at<=UTC_TIMESTAMP() LIMIT 128")
+            .execute(&a.pool)
+            .await?;
+    }
     let token = random_token();
     let csrf = random_token();
     let hash = digest(&token);
@@ -345,17 +378,38 @@ fn valid_password(f: &BTreeMap<String, String>) -> Result<String, Error> {
     }
     Ok(p.into())
 }
+static PASSWORD_WORK: OnceLock<Arc<tokio::sync::Semaphore>> = OnceLock::new();
+async fn password_permit() -> Result<tokio::sync::OwnedSemaphorePermit, Error> {
+    tokio::time::timeout(
+        Duration::from_secs(5),
+        PASSWORD_WORK
+            .get_or_init(|| Arc::new(tokio::sync::Semaphore::new(4)))
+            .clone()
+            .acquire_owned(),
+    )
+    .await
+    .map_err(|_| Error::internal())?
+    .map_err(|_| Error::internal())
+}
 async fn hash_password(password: String) -> Result<String, Error> {
-    tokio::task::spawn_blocking(move || bcrypt::hash(password, 12))
-        .await
-        .map_err(|_| Error::internal())?
-        .map_err(|_| Error::internal())
+    let permit = password_permit().await?;
+    tokio::task::spawn_blocking(move || {
+        let _permit = permit;
+        bcrypt::hash(password, 12)
+    })
+    .await
+    .map_err(|_| Error::internal())?
+    .map_err(|_| Error::internal())
 }
 async fn verify_password(password: String, hash: String) -> Result<bool, Error> {
-    tokio::task::spawn_blocking(move || bcrypt::verify(password, &hash))
-        .await
-        .map_err(|_| Error::internal())?
-        .map_err(|_| Error::internal())
+    let permit = password_permit().await?;
+    tokio::task::spawn_blocking(move || {
+        let _permit = permit;
+        bcrypt::verify(password, &hash)
+    })
+    .await
+    .map_err(|_| Error::internal())?
+    .map_err(|_| Error::internal())
 }
 async fn rotate(
     a: &Accounts,
@@ -757,6 +811,7 @@ pub async fn write_loadout(
     State(state): State<Arc<AppState>>,
     Extension(session): Extension<Session>,
     OriginalUri(uri): OriginalUri,
+    headers: HeaderMap,
     Form(form): Form<BTreeMap<String, String>>,
 ) -> Response {
     let Some(a) = &state.accounts else {
@@ -796,7 +851,9 @@ pub async fn write_loadout(
         };
         if removing {sqlx::query("DELETE FROM loadout_user WHERE loadout_id=? AND user_id=?").bind(id).bind(&email).execute(&mut *tx).await?;} else {add_vote(&mut tx,id,&email).await?;}
         tx.commit().await?;
-        Ok(Redirect::to(&format!("/{}/{}/{id}",encode(&parts[0]),encode(&parts[1]))).into_response())
+        let mut response=Redirect::to(&format!("/{}/{}/{id}",encode(&parts[0]),encode(&parts[1]))).into_response();
+        if is_guest && session.email.is_empty() && let Some(token)=raw_cookie(&headers) {response.headers_mut().insert(header::SET_COOKIE,cookie(a,&token,30*24*3600));}
+        Ok(response)
     }.await;
     match result {
         Ok(r) => r,

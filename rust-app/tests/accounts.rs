@@ -198,6 +198,8 @@ async fn fixture() -> (
         .await
         .unwrap();
     let state = Arc::new(AppState {
+        ads: false,
+        analytics_id: String::new(),
         accounts: Some(Arc::new(Accounts {
             pool: pool.clone(),
             secure_cookie: true,
@@ -205,6 +207,7 @@ async fn fixture() -> (
             captcha_secret: "fixture-secret".into(),
             captcha_url,
             captcha_hostname: "fixture.invalid".into(),
+            disqus_secret: "fixture-disqus-secret".into(),
             mailer: Some(
                 AsyncSmtpTransport::<Tokio1Executor>::builder_dangerous("127.0.0.1")
                     .port(port)
@@ -321,21 +324,10 @@ async fn public_write_flows_and_security() {
         403
     );
     let fields = [("_token", member.csrf.as_str())];
+    let vote_path = format!("{loadout}/upvote");
     let (r1, r2) = tokio::join!(
-        request(
-            &app,
-            &member.cookie,
-            &format!("{loadout}/upvote"),
-            "POST",
-            &fields
-        ),
-        request(
-            &app,
-            &member.cookie,
-            &format!("{loadout}/upvote"),
-            "POST",
-            &fields
-        )
+        request(&app, &member.cookie, &vote_path, "POST", &fields),
+        request(&app, &member.cookie, &vote_path, "POST", &fields)
     );
     assert_eq!((r1.status, r2.status), (303, 303));
     let votes: i64 = sqlx::query_scalar(
@@ -676,6 +668,29 @@ async fn public_write_flows_and_security() {
     .await
     .unwrap();
     assert_eq!(member.get(&app, "/account").await.status, 303);
+    // Exercise the rendered forms in Chromium against this isolated service.
+    if std::env::var("RUN_BROWSER_TESTS").as_deref() == Ok("1") {
+        let listener = tokio::net::TcpListener::bind("127.0.0.1:0").await.unwrap();
+        let port = listener.local_addr().unwrap().port();
+        let server_app = app.clone();
+        let server = tokio::spawn(async move {
+            axum::serve(listener, server_app).await.unwrap();
+        });
+        let script =
+            std::path::Path::new(env!("CARGO_MANIFEST_DIR")).join("tools/browser_accounts.mjs");
+        let status = tokio::task::spawn_blocking(move || {
+            std::process::Command::new("node")
+                .arg(script)
+                .env("BASE_URL", format!("http://127.0.0.1:{port}"))
+                .env("SCREENSHOT_DIR", "browser-screenshots/accounts")
+                .status()
+                .unwrap()
+        })
+        .await
+        .unwrap();
+        server.abort();
+        assert!(status.success(), "interactive browser smoke failed");
+    }
     // Public and admin boundaries.
     assert_eq!(member.get(&app, "/admin").await.status, 404);
     assert_eq!(member.get(&app, "/robots.txt").await.status, 200);
