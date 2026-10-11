@@ -42663,8 +42663,8 @@
   "review": [],
   "coverage": "63 weapons and 353 source attachment definitions (weapon-specific labels become separate CSV rows). One per supported slot. Users validate the point budget and other in-game constraints; no points enforcement.",
   "gameImages": {
-    "image_url": "uploads/Battlefield+6.png",
-    "thumb_url": "uploads/thumb/Battlefield+6.png",
-    "header_url": "uploads/header/Battlefield+6.png"
+    "image_url": "uploads/Battlefield+6-artwork-20261011.png",
+    "thumb_url": "uploads/thumb/Battlefield+6-artwork-20261011.png",
+    "header_url": "uploads/header/Battlefield+6-artwork-20261011.png"
   }
 }

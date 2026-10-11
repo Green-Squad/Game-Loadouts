@@ -1,0 +1,222 @@
+{
+  "as_of": "2026-10-11",
+  "games": [
+    {
+      "game": "Battlefield 6",
+      "slug": "bf6",
+      "source_page": "https://www.ea.com/games/battlefield/battlefield-6",
+      "source_image_url": "https://drop-assets.ea.com/images/QJdvWPvpEF9ZfNcVGAx9M/63380eb75fa6032593b2614df4fd6f71/BF6-Spotlight-S5B1-VegasActionShot-XL-3x1.jpg",
+      "source_sha256": "6506c586c3d8dc4a319e550d281b5c2511cccc3efce761908c310aba94040285",
+      "source_size": [
+        3840,
+        1280
+      ],
+      "game_images": {
+        "image_url": "uploads/Battlefield+6-artwork-20261011.png",
+        "thumb_url": "uploads/thumb/Battlefield+6-artwork-20261011.png",
+        "header_url": "uploads/header/Battlefield+6-artwork-20261011.png"
+      },
+      "assets": {
+        "image": {
+          "file": "uploads/Battlefield+6-artwork-20261011.png",
+          "size": [
+            1920,
+            657
+          ],
+          "sha256": "f865d21d14b4066bdf02f3e4a08f6bf82a8f75c413e53c2b18e869c36db4e98c",
+          "crop_center": [
+            0.5,
+            0.5
+          ]
+        },
+        "thumb": {
+          "file": "uploads/thumb/Battlefield+6-artwork-20261011.png",
+          "size": [
+            525,
+            179
+          ],
+          "sha256": "6bb0ea5dd6698e4509a47d181c3103a02d563c70cf7b0d330d7066cbe75bc834",
+          "crop_center": [
+            0.5,
+            0.5
+          ]
+        },
+        "header": {
+          "file": "uploads/header/Battlefield+6-artwork-20261011.png",
+          "size": [
+            1500,
+            215
+          ],
+          "sha256": "0b87dcffc8b733557a6e606c8b4bb0997053a0b9f0c2f424e469435f588430e5",
+          "crop_center": [
+            0.5,
+            0.45
+          ]
+        }
+      }
+    },
+    {
+      "game": "Call of Duty Black Ops 7",
+      "slug": "bo7",
+      "source_page": "https://www.callofduty.com/blackops7",
+      "source_image_url": "https://www.callofduty.com/content/dam/atvi/callofduty/cod-touchui/blackops7/home/game-modes/BO7_S3_VE-MLP_MultiplayerMP.webp",
+      "source_sha256": "d7a7133d8c3b21d574a52f3176b3f24162c6d33c126c713a2ac84ddb64311cac",
+      "source_size": [
+        1504,
+        846
+      ],
+      "game_images": {
+        "image_url": "uploads/Call+of+Duty+Black+Ops+7-artwork-20261011.png",
+        "thumb_url": "uploads/thumb/Call+of+Duty+Black+Ops+7-artwork-20261011.png",
+        "header_url": "uploads/header/Call+of+Duty+Black+Ops+7-artwork-20261011.png"
+      },
+      "assets": {
+        "image": {
+          "file": "uploads/Call+of+Duty+Black+Ops+7-artwork-20261011.png",
+          "size": [
+            1920,
+            657
+          ],
+          "sha256": "87f54a8ffde3c4b9a89cdb73ccc3ab564ab55c5be2570699b93eb15e6e483c2b",
+          "crop_center": [
+            0.5,
+            0.24
+          ]
+        },
+        "thumb": {
+          "file": "uploads/thumb/Call+of+Duty+Black+Ops+7-artwork-20261011.png",
+          "size": [
+            525,
+            179
+          ],
+          "sha256": "5be53f74eb704e4908ad6275f02b287232f030f8c642134fc22eb25b038a0f3c",
+          "crop_center": [
+            0.5,
+            0.24
+          ]
+        },
+        "header": {
+          "file": "uploads/header/Call+of+Duty+Black+Ops+7-artwork-20261011.png",
+          "size": [
+            1500,
+            215
+          ],
+          "sha256": "36e2b2591421e7ee960a8e5c3c904df2afc6e3ba161d9c5e4c4220e4e655c143",
+          "crop_center": [
+            0.5,
+            0.3
+          ]
+        }
+      }
+    },
+    {
+      "game": "Call of Duty Mobile",
+      "slug": "codm",
+      "source_page": "https://www.callofduty.com/mobile",
+      "source_image_url": "https://www.callofduty.com/content/dam/atvi/callofduty/cod-touchui/mobile/home/hero/CODM_Home_Hero-BG_Desktop-LG-11.webp",
+      "source_sha256": "d49aa66572a4915ee8277055666772b5831e273f7f18261a60d374599e9f9379",
+      "source_size": [
+        2880,
+        1200
+      ],
+      "game_images": {
+        "image_url": "uploads/Call+of+Duty+Mobile-artwork-20261011.png",
+        "thumb_url": "uploads/thumb/Call+of+Duty+Mobile-artwork-20261011.png",
+        "header_url": "uploads/header/Call+of+Duty+Mobile-artwork-20261011.png"
+      },
+      "assets": {
+        "image": {
+          "file": "uploads/Call+of+Duty+Mobile-artwork-20261011.png",
+          "size": [
+            1920,
+            657
+          ],
+          "sha256": "02a8f3ffc21ff455a98a2d25f64bffcc18d36441122cf613b1c6156c3dc4c6ab",
+          "crop_center": [
+            0.5,
+            0.45
+          ]
+        },
+        "thumb": {
+          "file": "uploads/thumb/Call+of+Duty+Mobile-artwork-20261011.png",
+          "size": [
+            525,
+            179
+          ],
+          "sha256": "8afbac8cea508d2e7bb99a08a594a3c694207e174aff53d111f79665d5fabc1c",
+          "crop_center": [
+            0.5,
+            0.45
+          ]
+        },
+        "header": {
+          "file": "uploads/header/Call+of+Duty+Mobile-artwork-20261011.png",
+          "size": [
+            1500,
+            215
+          ],
+          "sha256": "d2374b659e76ef843196585926e30939cf7e10a2f48b4f2c4effaa0cb78fc562",
+          "crop_center": [
+            0.5,
+            0.5
+          ]
+        }
+      }
+    },
+    {
+      "game": "Call of Duty Warzone",
+      "slug": "warzone",
+      "source_page": "https://www.callofduty.com/warzone",
+      "source_image_url": "https://www.callofduty.com/content/dam/atvi/callofduty/cod-touchui/warzone2/blackops7/evergreen/WZ_LP-Update_Hero-BG_Desktop-LG.webp",
+      "source_sha256": "510250377581c76c88ea91e46f8cf3d8aaa195b2d36165f26d4a6e7dd77e2ae5",
+      "source_size": [
+        2560,
+        1123
+      ],
+      "game_images": {
+        "image_url": "uploads/Call+of+Duty+Warzone-artwork-20261011.png",
+        "thumb_url": "uploads/thumb/Call+of+Duty+Warzone-artwork-20261011.png",
+        "header_url": "uploads/header/Call+of+Duty+Warzone-artwork-20261011.png"
+      },
+      "assets": {
+        "image": {
+          "file": "uploads/Call+of+Duty+Warzone-artwork-20261011.png",
+          "size": [
+            1920,
+            657
+          ],
+          "sha256": "8bfe1edd6056f98cf350922589229ce6f6a2b4621eac9a2e34e2c739fed14cd4",
+          "crop_center": [
+            0.5,
+            0.32
+          ]
+        },
+        "thumb": {
+          "file": "uploads/thumb/Call+of+Duty+Warzone-artwork-20261011.png",
+          "size": [
+            525,
+            179
+          ],
+          "sha256": "5dc76fbc8dc2eaaeaf6e29a2ae6a3be578b38ab70e54cd64270cbfa005cec1e1",
+          "crop_center": [
+            0.5,
+            0.32
+          ]
+        },
+        "header": {
+          "file": "uploads/header/Call+of+Duty+Warzone-artwork-20261011.png",
+          "size": [
+            1500,
+            215
+          ],
+          "sha256": "723fc7d521ca56b8fea41d7227ee44d512fb811c43211a9091a50f04525d6836",
+          "crop_center": [
+            0.5,
+            0.32
+          ]
+        }
+      }
+    }
+  ],
+  "notes": "Official artwork cropped and resized. No added captions, instructions, logos or generated artwork."
+}
