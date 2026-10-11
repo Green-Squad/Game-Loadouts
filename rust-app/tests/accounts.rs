@@ -587,6 +587,8 @@ async fn public_write_flows_and_security() {
             .await
             .unwrap();
     assert_eq!(stored_confirmation, token);
+    // Registration rotated the anonymous cookie; load the login form for its new CSRF token.
+    guest.get(&app, "/login").await;
     assert_eq!(
         guest
             .post(
