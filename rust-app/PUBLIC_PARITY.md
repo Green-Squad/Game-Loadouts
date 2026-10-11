@@ -16,7 +16,7 @@ The Rust service shares the Laravel users, loadouts, attachments and vote pivots
 
 ## Activation
 
-No schema migration is needed. The app uses the existing Laravel `users`, `password_reminders`, loadout and pivot tables. `--check-public-schema` only reads their metadata and validates the required columns and InnoDB engines. Never apply the disposable `fixtures/schema.sql` or `fixtures/data.sql` to production.
+No schema migration is needed. The app uses the existing Laravel `users`, `password_reminders`, loadout and pivot tables. `--check-public-schema` only reads their metadata and validates the required columns and transactional content/account tables. The existing reminder table may use InnoDB or MyISAM. Never apply the disposable `fixtures/schema.sql` or `fixtures/data.sql` to production.
 
 Set `INTERACTIVE_ENABLED=1` and `ACCOUNT_BASE_URL=https://rust.gameloadouts.com` on the Rust service. The copied `KEY`, database, CAPTCHA and SMTP credentials are reused. Browsing keeps its separate read-only pool. An optional `DB_WRITE_USERNAME` / `DB_WRITE_PASSWORD` pair can override the existing database identity; no override is required.
 
@@ -39,7 +39,7 @@ Logout changes the existing users.remember_token to revoke all of that account's
 
 Confirmation tokens use users.confirm_token and the existing confirmed sentinel `1`. New opaque tokens include an issue time and expire after 24 hours on Rust; existing Laravel confirmation links remain accepted. Laravel can consume new tokens in its unchanged confirmation handler, which retains its original expiry behavior. Resending replaces the token, with a 60-second cooldown.
 
-Password reset tokens use the exact Laravel 4.1 password_reminders(email,token,created_at) format: raw random tokens with a 60-minute lifetime. Rust accepts existing Laravel-issued tokens and consumes reminder rows on successful reset. Issuance locks the user, replaces prior reminders, applies a 60-second cooldown, and rolls back if SMTP fails. Password changes update the shared bcrypt password and invalidate old Rust cookies; resetting an unconfirmed account does not confirm it.
+Password reset tokens use the exact Laravel 4.1 password_reminders(email,token,created_at) format: raw random tokens with a 60-minute lifetime. Rust accepts existing Laravel-issued tokens and consumes reminder rows on successful reset. Issuance locks the user, replaces prior reminders, applies a 60-second cooldown, and sends SMTP before changing reminder rows so mail failure preserves existing links even with MyISAM. User-row locks serialize Rust reset/issuance flows. A database failure after nontransactional reminder deletion can require requesting another link; no engine conversion is performed. Password changes update the shared bcrypt password and invalidate old Rust cookies; resetting an unconfirmed account does not confirm it.
 
 Guest identity is derived from the random ID inside the encrypted anonymous cookie, so concurrent first-time guest votes share one identity. Registration transfers guest data in a transaction. Real production mail and CAPTCHA integrations remain enabled, with isolated substitutes constructed only in tests.
 

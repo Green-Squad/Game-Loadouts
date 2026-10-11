@@ -46,8 +46,19 @@ pub async fn validate(pool: &MySqlPool) -> Result<(), sqlx::Error> {
     let reminders = ("password_reminders", vec!["email", "token", "created_at"]);
     for (table, required) in tables.iter().chain(std::iter::once(&reminders)) {
         let engine:Option<String>=sqlx::query_scalar("SELECT ENGINE FROM information_schema.TABLES WHERE TABLE_SCHEMA=DATABASE() AND TABLE_NAME=?").bind(table).fetch_optional(pool).await?;
-        if engine.as_deref() != Some("InnoDB") {
-            tracing::error!(table, "Public writes require an existing InnoDB table");
+        // Reminder writes are serialized through the InnoDB users row. Laravel's existing
+        // reminder table may be MyISAM; accepting it does not require an engine conversion.
+        let valid_engine = if *table == "password_reminders" {
+            matches!(engine.as_deref(), Some("InnoDB" | "MyISAM"))
+        } else {
+            engine.as_deref() == Some("InnoDB")
+        };
+        if !valid_engine {
+            tracing::error!(
+                table,
+                engine = engine.as_deref().unwrap_or("missing"),
+                "Existing public account table validation failed"
+            );
             return Err(sqlx::Error::Protocol("Schema preflight failed".into()));
         }
         let columns:Vec<String>=sqlx::query_scalar("SELECT COLUMN_NAME FROM information_schema.COLUMNS WHERE TABLE_SCHEMA=DATABASE() AND TABLE_NAME=?").bind(table).fetch_all(pool).await?;

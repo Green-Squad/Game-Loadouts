@@ -159,6 +159,10 @@ async fn fixture() -> (
         .unwrap();
     let schema = include_str!("../fixtures/schema.sql")
         .replace("loadouts_fixture", "loadouts_accounts_fixture")
+        .replace(
+            ") ENGINE=InnoDB CHARACTER SET utf8mb4;",
+            ") ENGINE=MyISAM CHARACTER SET utf8mb4;",
+        )
         .lines()
         .filter(|l| !l.starts_with("CREATE USER "))
         .collect::<Vec<_>>()
@@ -273,6 +277,11 @@ async fn public_write_flows_and_security() {
         .try_init();
     let (app, pool, owner, messages, tasks) = fixture().await;
     game_loadouts::schema::validate(&pool).await.unwrap();
+    let reminder_engine:String=sqlx::query_scalar("SELECT ENGINE FROM information_schema.TABLES WHERE TABLE_SCHEMA=DATABASE() AND TABLE_NAME='password_reminders'").fetch_one(&pool).await.unwrap();
+    assert_eq!(
+        reminder_engine, "MyISAM",
+        "Exercise the legacy reminder engine without a production migration"
+    );
     let extra_tables:i64=sqlx::query_scalar("SELECT COUNT(*) FROM information_schema.TABLES WHERE TABLE_SCHEMA=DATABASE() AND TABLE_NAME IN ('rust_sessions','rust_account_tokens')").fetch_one(&pool).await.unwrap();
     assert_eq!(
         extra_tables, 0,
