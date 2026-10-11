@@ -16,6 +16,7 @@ await page.getByRole('button',{name:'Log in',exact:true}).click();await page.wai
 assert(await page.getByRole('heading',{name:'Your account'}).isVisible());
 await page.screenshot({path:out+'/account.png',fullPage:true});
 await page.goto(base+'/Call+of+Duty+Modern+Warfare/M4A1');
+await page.getByRole('link',{name:'Optic',exact:true}).click();
 await page.locator('input[name="Optic"][value="1"]').check();
 await page.getByRole('link',{name:'Barrel',exact:true}).click();
 await page.locator('input[name="Barrel"][value="3"]').check();
