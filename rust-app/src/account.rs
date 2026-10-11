@@ -228,7 +228,7 @@ struct SessionRow {
     role: String,
 }
 async fn load_session(a: &Accounts, token: &str) -> Result<Session, Error> {
-    let row=sqlx::query_as::<_,SessionRow>("SELECT s.token_hash,s.csrf,COALESCE(u.email,'') email,COALESCE(u.username,'') username,COALESCE(u.role,'') role FROM rust_sessions s LEFT JOIN users u ON u.email=s.user_email AND (u.role='Guest' OR (u.confirm_token='1' AND s.credential_hash=SHA2(u.password,256))) WHERE s.token_hash=? AND s.expires_at>UTC_TIMESTAMP()") .bind(digest(token)).fetch_optional(&a.pool).await?;
+    let row=sqlx::query_as::<_,SessionRow>("SELECT s.token_hash,s.csrf,COALESCE(u.email,'') email,COALESCE(u.username,'') username,COALESCE(u.role,'') role FROM rust_sessions s LEFT JOIN users u ON u.email=s.user_email AND (u.role='Guest' OR (u.confirm_token='1' AND s.credential_hash=SHA2(u.password,256))) WHERE s.token_hash=? AND s.expires_at>UTC_TIMESTAMP() AND (s.user_email IS NULL OR u.email IS NOT NULL)") .bind(digest(token)).fetch_optional(&a.pool).await?;
     let Some(row) = row else {
         return Ok(Session::default());
     };
@@ -261,7 +261,7 @@ async fn issue(
     let csrf = random_token();
     let hash = digest(&token);
     let ttl = if remember { 30 * 24 * 3600 } else { 2 * 3600 };
-    sqlx::query("INSERT INTO rust_sessions(token_hash,user_email,csrf,expires_at,created_at,credential_hash) VALUES(?,?,?,TIMESTAMPADD(SECOND,?,UTC_TIMESTAMP()),UTC_TIMESTAMP(),(SELECT SHA2(password,256) FROM users WHERE email=?))").bind(&hash).bind(email).bind(&csrf).bind(ttl).execute(&a.pool).await?;
+    sqlx::query("INSERT INTO rust_sessions(token_hash,user_email,csrf,expires_at,created_at,credential_hash) VALUES(?,?,?,TIMESTAMPADD(SECOND,?,UTC_TIMESTAMP()),UTC_TIMESTAMP(),(SELECT SHA2(password,256) FROM users WHERE email=?))").bind(&hash).bind(email).bind(&csrf).bind(ttl).bind(email).execute(&a.pool).await?;
     Ok((
         token,
         Session {
@@ -278,21 +278,23 @@ pub async fn session_layer(
 ) -> Response {
     let mut session = Session::default();
     let mut set_cookie = None;
+    let incoming_token = raw_cookie(request.headers());
+    let path = request.uri().path().to_owned();
+    let is_get = request.method() == axum::http::Method::GET;
     if let Some(a) = &state.accounts {
         let result = async {
-            if let Some(token) = raw_cookie(request.headers()) {
+            if let Some(token) = incoming_token {
                 session = load_session(a, &token).await?;
             }
             // Anonymous browsing stays read-only until a page needs an interactive form.
-            let path = request.uri().path();
+
             let needs_form = matches!(
-                path,
+                path.as_str(),
                 "/login" | "/join" | "/reminder" | "/resend-confirmation" | "/logout" | "/account"
             ) || path.starts_with("/password/reset/")
                 || (path.trim_matches('/').split('/').count() == 2 && !path.starts_with("/user/"))
                 || path.trim_matches('/').split('/').count() == 3;
-            if session.hash.is_empty() && request.method() == axum::http::Method::GET && needs_form
-            {
+            if session.hash.is_empty() && is_get && needs_form {
                 let (token, new) = issue(a, None, false).await?;
                 session = new;
                 set_cookie = Some(cookie(a, &token, 7200));
