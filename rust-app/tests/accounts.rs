@@ -167,7 +167,7 @@ async fn fixture() -> (
         .replace("loadouts_fixture", "loadouts_accounts_fixture")
         .replace(
             ") ENGINE=InnoDB CHARACTER SET utf8mb4;",
-            ") ENGINE=MyISAM CHARACTER SET utf8mb4;",
+            ") ENGINE=MyISAM CHARACTER SET utf8;",
         )
         .lines()
         .filter(|l| !l.starts_with("CREATE USER "))
