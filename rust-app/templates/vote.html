@@ -1,0 +1,9 @@
+{% if interactive %}
+{% if session.votes.contains(l.id) %}
+<form class="vote-form" method="post" action="{{ l.url() }}/detach" style="display:inline"><input type="hidden" name="_token" value="{{ session.csrf }}"><button type="submit" class="btn btn-primary">Remove vote ({{ l.votes }})</button></form>
+{% else if session.member() %}
+<form class="vote-form" method="post" action="{{ l.url() }}/upvote" style="display:inline"><input type="hidden" name="_token" value="{{ session.csrf }}"><button type="submit" class="btn btn-default">Vote ({{ l.votes }})</button></form>
+{% else if kind == "loadout" %}
+<form class="vote-form" method="post" action="{{ l.url() }}/upvoteGuest"><input type="hidden" name="_token" value="{{ session.csrf }}"><div class="g-recaptcha" data-sitekey="{{ site_key }}"></div><button type="submit" class="btn btn-default">Vote as guest ({{ l.votes }})</button> <a href="/login">Log in</a></form>
+{% else %}<a class="btn btn-default" href="{{ l.url() }}">Vote ({{ l.votes }})</a>{% endif %}
+{% else %}<button type="button" disabled class="btn btn-default" title="Voting is unavailable in this read-only experiment">vote ({{ l.votes }})</button>{% endif %}

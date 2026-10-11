@@ -1,9 +1,14 @@
-use crate::{db::*, model::*};
+use crate::{
+    account::{self, Accounts, Session},
+    db::*,
+    model::*,
+};
 use askama::Template;
 use axum::{
-    Router,
+    Extension, Router,
     extract::{Form, OriginalUri, Query, State},
     http::{HeaderValue, StatusCode},
+    middleware,
     response::{Html, IntoResponse, Redirect, Response},
     routing::get,
 };
@@ -21,6 +26,9 @@ use tower_http::{
 };
 
 pub struct AppState {
+    pub accounts: Option<Arc<Accounts>>,
+    pub ads: bool,
+    pub analytics_id: String,
     pub pool: MySqlPool,
     pub query_timeout: Duration,
     pub public_url: String,
@@ -34,6 +42,15 @@ pub struct AppState {
 #[derive(Template)]
 #[template(path = "page.html")]
 struct Page {
+    session: Session,
+    interactive: bool,
+    screen: String,
+    token: String,
+    site_key: String,
+    disqus_auth: String,
+    account_origin: String,
+    ads: bool,
+    analytics_id: String,
     kind: String,
     title: String,
     description: String,
@@ -63,6 +80,23 @@ struct Page {
 impl Page {
     fn new(state: &AppState) -> Self {
         Self {
+            session: Session::default(),
+            disqus_auth: String::new(),
+            account_origin: state
+                .accounts
+                .as_ref()
+                .map(|a| a.account_url.clone())
+                .unwrap_or_default(),
+            ads: state.ads,
+            analytics_id: state.analytics_id.clone(),
+            interactive: state.accounts.is_some(),
+            screen: String::new(),
+            token: String::new(),
+            site_key: state
+                .accounts
+                .as_ref()
+                .map(|a| a.site_key.clone())
+                .unwrap_or_default(),
             kind: String::new(),
             title: "Game Loadouts".into(),
             description: String::new(),
@@ -89,6 +123,20 @@ impl Page {
             disqus: state.disqus,
             public_url: state.public_url.clone(),
         }
+    }
+    fn recent_links(&mut self, recent: &[Game]) {
+        self.nav = recent
+            .iter()
+            .take(5)
+            .filter(|g| g.live == 1)
+            .cloned()
+            .collect();
+        self.footer = recent
+            .iter()
+            .take(4)
+            .filter(|g| g.live == 1)
+            .cloned()
+            .collect();
     }
     fn asset(&self, path: &str) -> String {
         if path.is_empty() {
@@ -123,7 +171,37 @@ pub fn app(state: Arc<AppState>, assets: &str) -> Router {
         .route("/", get(page))
         .route("/search", get(search_get).post(search_post))
         .route("/search_weapons", get(autocomplete))
-        .route("/{*path}", get(page));
+        .route("/{*path}", get(page).post(account::write_loadout));
+    for path in [
+        "/login",
+        "/join",
+        "/logout",
+        "/account",
+        "/reminder",
+        "/resend-confirmation",
+        "/password/reset",
+    ] {
+        router = router.route(path, get(account::get_account).post(account::post_account));
+    }
+    router = router
+        .route("/password/reset/{token}", get(account::get_account))
+        .route("/user/confirm/{token}", get(account::confirm))
+        .route(
+            "/robots.txt",
+            get(|| async {
+                (
+                    [(
+                        axum::http::header::CONTENT_TYPE,
+                        "text/plain; charset=utf-8",
+                    )],
+                    "User-agent: *\nDisallow: /admin\nDisallow: /account\nDisallow: /submissions\n",
+                )
+            }),
+        )
+        .route_layer(middleware::from_fn_with_state(
+            state.clone(),
+            account::session_layer,
+        ));
     for dir in [
         "css",
         "js",
@@ -183,6 +261,34 @@ fn instrument(
     }
     response
 }
+pub(crate) async fn account_page(
+    state: &AppState,
+    session: &Session,
+    screen: &str,
+    status: u16,
+    message: &str,
+    token: &str,
+) -> Response {
+    let mut p = Page::new(state);
+    p.kind = "account".into();
+    p.title = "Account - Game Loadouts".into();
+    p.session = session.clone();
+    p.disqus_auth = state
+        .accounts
+        .as_ref()
+        .map(|a| a.disqus_auth(session))
+        .unwrap_or_default();
+    p.screen = screen.into();
+    p.status = status;
+    p.message = message.into();
+    p.token = token.into();
+    if state.accounts.is_some()
+        && let Ok(recent) = Db::new(&state.pool, state.query_timeout).recent().await
+    {
+        p.recent_links(&recent);
+    }
+    render(p)
+}
 fn render(p: Page) -> Response {
     let status = StatusCode::from_u16(p.status).unwrap_or(StatusCode::INTERNAL_SERVER_ERROR);
     match p.render() {
@@ -190,7 +296,11 @@ fn render(p: Page) -> Response {
         Err(_) => (StatusCode::INTERNAL_SERVER_ERROR, "Rendering failed").into_response(),
     }
 }
-async fn page(State(state): State<Arc<AppState>>, OriginalUri(uri): OriginalUri) -> Response {
+async fn page(
+    State(state): State<Arc<AppState>>,
+    Extension(session): Extension<Session>,
+    OriginalUri(uri): OriginalUri,
+) -> Response {
     let start = Instant::now();
     let mut db = Db::new(&state.pool, state.query_timeout);
     let parts: Result<Vec<_>, _> = uri
@@ -213,7 +323,7 @@ async fn page(State(state): State<Arc<AppState>>, OriginalUri(uri): OriginalUri)
                 [_, _, _] => "loadout",
                 _ => "missing",
             };
-            (route, build_page(&state, &mut db, &parts).await)
+            (route, build_page(&state, &mut db, &parts, &session).await)
         }
         Err(_) => (
             "invalid",
@@ -242,11 +352,29 @@ async fn build_page(
     state: &AppState,
     db: &mut Db<'_>,
     parts: &[String],
+    session: &Session,
 ) -> Result<Response, DbError> {
     if parts.len() == 1 && parts[0] == "sitemap.xml" {
         return sitemap(state, db).await;
     }
     let mut p = Page::new(state);
+    p.session = session.clone();
+    p.disqus_auth = state
+        .accounts
+        .as_ref()
+        .map(|a| a.disqus_auth(session))
+        .unwrap_or_default();
+    if parts.len() == 1 && parts[0] == "submissions" && state.accounts.is_some() {
+        if !session.member() {
+            return Ok(Redirect::to("/login").into_response());
+        }
+        p.kind = "submissions".into();
+        p.title = "My submissions - Game Loadouts".into();
+        p.recent_links(&db.recent().await?);
+        p.loadouts=db.rows(&loadout_sql("EXISTS (SELECT 1 FROM loadout_user mine WHERE mine.loadout_id=l.id AND mine.user_id=?)", "(SELECT MAX(updated_at) FROM loadout_user mine WHERE mine.loadout_id=l.id AND mine.user_id=?) DESC,l.id"), &[session.email.clone(),session.email.clone(),session.email.clone()]).await?;
+        db.attach(&mut [&mut p.loadouts]).await?;
+        return Ok(render(p));
+    }
     let recent = if parts.len() == 1 && parts[0] == "games" {
         db.rows(
             &format!("SELECT {GAME_COLUMNS} FROM games ORDER BY created_at DESC,id"),
@@ -256,18 +384,7 @@ async fn build_page(
     } else {
         db.recent().await?
     };
-    p.nav = recent
-        .iter()
-        .take(5)
-        .filter(|g| g.live == 1)
-        .cloned()
-        .collect();
-    p.footer = recent
-        .iter()
-        .take(4)
-        .filter(|g| g.live == 1)
-        .cloned()
-        .collect();
+    p.recent_links(&recent);
     match parts {
         [] => {
             p.kind = "home".into();
@@ -445,7 +562,7 @@ async fn build_page(
                         )
                         .await?;
                     db.attach(&mut [&mut p.loadouts]).await?;
-                    let available: Vec<Attachment>=db.rows("SELECT CAST(0 AS SIGNED) loadout_id,a.name,COALESCE(a.slot,'') slot,COALESCE(a.image_url,'') image_url,COALESCE(a.thumb_url,'') thumb_url FROM attachment_weapon aw JOIN attachments a ON a.id=aw.attachment_id WHERE aw.weapon_id=? ORDER BY a.name,a.id",&[p.weapon.id.to_string()]).await?;
+                    let available: Vec<Attachment>=db.rows("SELECT CAST(a.id AS SIGNED) id, CAST(0 AS SIGNED) loadout_id,a.name,COALESCE(a.slot,'') slot,COALESCE(a.image_url,'') image_url,COALESCE(a.thumb_url,'') thumb_url FROM attachment_weapon aw JOIN attachments a ON a.id=aw.attachment_id WHERE aw.weapon_id=? ORDER BY a.name,a.id",&[p.weapon.id.to_string()]).await?;
                     let mut slots = BTreeMap::<String, Vec<Attachment>>::new();
                     for a in available {
                         slots.entry(a.slot.clone()).or_default().push(a);
@@ -517,16 +634,24 @@ async fn autocomplete(
     let response=match result {Ok(rows)=>axum::Json(serde_json::json!({"suggestions":rows.iter().map(|w|format!("{} / {}",w.name,w.game_id)).collect::<Vec<_>>()})).into_response(),Err(_)=>(StatusCode::SERVICE_UNAVAILABLE,axum::Json(serde_json::json!({"suggestions":[],"error":"Search unavailable"}))).into_response()};
     instrument(response, &db, start, "autocomplete", state.metrics)
 }
-async fn search_get(State(state): State<Arc<AppState>>, Query(search): Query<Search>) -> Response {
-    search_run(state, search).await
+async fn search_get(
+    State(state): State<Arc<AppState>>,
+    Extension(session): Extension<Session>,
+    Query(search): Query<Search>,
+) -> Response {
+    search_run(state, search, session).await
 }
-async fn search_post(State(state): State<Arc<AppState>>, Form(search): Form<Search>) -> Response {
-    search_run(state, search).await
+async fn search_post(
+    State(state): State<Arc<AppState>>,
+    Extension(session): Extension<Session>,
+    Form(search): Form<Search>,
+) -> Response {
+    search_run(state, search, session).await
 }
-async fn search_run(state: Arc<AppState>, search: Search) -> Response {
+async fn search_run(state: Arc<AppState>, search: Search, session: Session) -> Response {
     let start = Instant::now();
     let mut db = Db::new(&state.pool, state.query_timeout);
-    let result = search_build(&state, &mut db, &search.query).await;
+    let result = search_build(&state, &mut db, &search.query, &session).await;
     let response = match result {
         Ok(r) => r,
         Err(_) => render(error_page(
@@ -537,7 +662,12 @@ async fn search_run(state: Arc<AppState>, search: Search) -> Response {
     };
     instrument(response, &db, start, "search", state.metrics)
 }
-async fn search_build(state: &AppState, db: &mut Db<'_>, query: &str) -> Result<Response, DbError> {
+async fn search_build(
+    state: &AppState,
+    db: &mut Db<'_>,
+    query: &str,
+    session: &Session,
+) -> Result<Response, DbError> {
     let parts: Vec<_> = query.split('/').collect();
     if parts.len() > 1
         && let Some(w) = db.weapon(parts[1].trim(), parts[0].trim()).await?
@@ -546,6 +676,7 @@ async fn search_build(state: &AppState, db: &mut Db<'_>, query: &str) -> Result<
     }
     let mut p = Page::new(state);
     p.kind = "search".into();
+    p.session = session.clone();
     p.title = "Search Game Loadouts".into();
     p.description = "Game Loadouts search results page.".into();
     p.query = query.into();

@@ -25,6 +25,9 @@ async fn fixture() -> (axum::Router, sqlx::MySqlPool) {
         .await
         .unwrap();
     let state = Arc::new(AppState {
+        ads: false,
+        analytics_id: String::new(),
+        accounts: None,
         pool: MySqlPoolOptions::new()
             .max_connections(4)
             .after_connect(|c, _| {
@@ -284,6 +287,9 @@ async fn google_search_fallback_and_provider() {
         .unwrap();
     let make_state = |api: String| {
         Arc::new(AppState {
+            ads: false,
+            analytics_id: String::new(),
+            accounts: None,
             pool: pool.clone(),
             query_timeout: Duration::from_secs(2),
             public_url: "https://gameloadouts.com".into(),

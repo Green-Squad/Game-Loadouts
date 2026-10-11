@@ -1,6 +1,6 @@
-# Rust public browsing experiment
+# Rust Game Loadouts
 
-This branch keeps the Laravel source for comparison and adds an uncached, read-only Axum + SQLx/MySQL + Askama server in `rust-app`. The root Dockerfile builds Rust; `Dockerfile.php` retains the original PHP container definition. No deployment is replaced, no migration runs, and there are no data-write routes.
+This branch keeps the Laravel source and implements public browsing, accounts, voting and submissions with Axum, SQLx/MySQL and Askama. The root Dockerfile builds Rust; `Dockerfile.php` retains PHP. Public writes are opt-in and use a separate pool; browsing retains its read-only guard. See [PUBLIC_PARITY.md](PUBLIC_PARITY.md) for activation, migration, security and validation details. Admin routes remain excluded.
 
 ## Quick local run (isolated representative data)
 
@@ -49,9 +49,9 @@ Use environment variables or mounted secrets. `rust-app/.env.example` is a refer
 | `ASSET_DIR` | `public` locally, `/app/public` in image |
 | `PUBLIC_BASE_URL` | `https://gameloadouts.com`; used for sitemap and Disqus canonical URLs |
 | `MEDIA_ORIGIN` | Empty; optional image host prefix for DB paths under `/uploads/` |
-| `DISQUS_ENABLED` | 0; set 1 to embed existing browser-side threads |
+| `DISQUS_ENABLED` | 1; set 0 to disable browser-side threads and comment counts for controlled comparisons |
 | `SEARCH_MODE` | `google`; `local` explicitly opts into complete database weapon/game-name search |
-| `SEARCH_API_URL` | Optional original Google Custom Search URL **prefix**, including query/key parameters. Treated as a secret; bounded to a 5s request and a 2 MiB response. Without it, use Laravel's external Google fallback. |
+| `SEARCH_API_URL` | Optional original Google Custom Search URL **prefix**, falling back to the copied `SEARCH_URL` environment variable, including query/key parameters. Treated as a secret; bounded to a 5s request and a 2 MiB response. Without it, use Laravel's external Google fallback. |
 | `METRICS_HEADERS` | 0; set 1 for X-DB-Queries and Server-Timing |
 | `RUST_LOG` | `game_loadouts=info`; JSON stdout, no SQL text, input paths, credentials or raw database errors |
 
@@ -68,16 +68,16 @@ Connections execute `SET SESSION TRANSACTION READ ONLY` once, complementing SELE
 - Navigation/footer share one recent-games result. The legacy limit-before-live-filter behavior is preserved (five rows for navigation, four for footer).
 - Search: `/search_weapons?query=...` keeps the original `{ "suggestions": ["weapon / game", ...] }` contract, first slash-delimited term, LIKE wildcards and full results. Exact `weapon / game` searches redirect to the weapon URL. GET `/search` supports the browsing form; POST `/search` remains a **read-only compatibility alias**, never a write endpoint. Google Custom Search results can be rendered with the original API prefix; API failure/missing configuration falls back to the legacy Google site-search redirect. Local search is an explicit optional mode, not asserted to match Google ranking/snippets.
 - Stats: per-game votes/unique loadouts and the last 30 days of vote activity; legacy inclusion rules remain (totals omit games with no votes; recent chart has only dates with recorded votes and zero fills missing game/date combinations). Existing Chart.js/colors are reused. The inaccurate “cached hourly” label is removed.
-- Sitemap: static homepage/games and complete legacy dynamic game/weapon/loadout results, with original priority/change frequency/lastmod values. Login/join entries are removed because those pages are unavailable. The legacy inclusion of non-live games in the sitemap is retained, though their browsing pages remain 404; reconsider separately if desired.
+- Sitemap: static homepage/games and complete legacy dynamic game/weapon/loadout results, with original priority/change frequency/lastmod values. Login/join pages are kept out of the sitemap and marked noindex. The legacy inclusion of non-live games in the sitemap is retained, though their browsing pages remain 404; reconsider separately if desired.
 - Identical vote rankings need a stable tie-break: loadout ID ascending, consistent with primary-key retrieval and the fixture oracle. Legacy top queries specified no tie-break, so exact tied ordering on production is not guaranteed until verified there.
-- Auth, voting, submission, password reset, admin controls and their CAPTCHA/write handlers are absent or visibly disabled. No guest users, sessions, cookies or account writes are created.
-- Weapon comment counts are omitted, avoiding the legacy synchronous count fetch. `loadout-<id>` threads on **tryharddev** can load asynchronously in the browser with `DISQUS_ENABLED=1`. SSO pointing to omitted login/account routes is removed. Enable comments only if you intend comparison-site visitors to access the existing public threads.
-- Existing Bootstrap/CSS/fonts/images and the autocomplete plugin are reused. Browsing-only JS replaces the monolithic bundle so irrelevant form POST handlers, InstantClick prefetch, advertising and analytics do not skew measurements. Ads/analytics are omitted on this experiment; compare HTML endpoints separately from third-party browser work.
+- Public accounts, voting, guest CAPTCHA, attachment submission, email confirmation, password recovery, account password updates and user submissions are available when `INTERACTIVE_ENABLED=1`; they remain disabled otherwise. Admin remains unavailable.
+- `loadout-<id>` threads and comment counts on **tryharddev** load asynchronously in the browser with `DISQUS_ENABLED=1`. Confirmed members use the existing signed Disqus SSO protocol when `DISQUS_SECRET_KEY` is configured.
+- Existing Bootstrap/CSS/fonts/images and autocomplete are reused. Native forms support voting and attachment selection with optional JavaScript enhancements. `ADS_ENABLED=1` restores the existing AdSense unit; `GA4_MEASUREMENT_ID` enables current Google Analytics. The old Universal Analytics ID is not reused because that product no longer collects data. Disable external integrations for controlled browser comparisons.
 - Real infrastructure failures return a styled 503, malformed URL text 400, missing records 404, unsupported write methods 405. Legacy PHP converted most failures into 404.
 
 ## Schema evidence and media
 
-No authorized production DB/cloud credentials were present during implementation. The tracked SQLite file is empty; core tables have no complete migrations. The representative MySQL schema is inferred from `app/models`, controllers, templates, seeders and the partial migrations. **It is not a production schema dump.**
+The original browsing fixture was built without production DB/cloud credentials. Public parity activation now requires an authorized schema preflight; the fixture remains isolated. The tracked SQLite file is empty; core tables have no complete migrations. The representative MySQL schema is inferred from `app/models`, controllers, templates, seeders and the partial migrations. **It is not a production schema dump.**
 
 Required tables/columns:
 
@@ -90,9 +90,9 @@ Required tables/columns:
 - attachment_weapon: attachment_id, weapon_id.
 - loadout_user: loadout_id, created_at (count rows, not distinct users, matching legacy votes).
 
-IDs are assumed numeric except games/users; unsigned counts are cast to SIGNED for consistent SQLx decoding. Production collation, uniqueness, indexes, nullability and timestamp/timezone settings remain unverified. Intended useful existing indexes are weapons(game_id,name), loadouts(weapon_id), loadout_user(loadout_id), attachment_loadout(loadout_id), attachment_weapon(weapon_id), users(email). **No index/schema changes are applied.** Inspect `SHOW CREATE TABLE`/`SHOW INDEX` with authorized access and EXPLAIN representative queries before drawing production conclusions. Match DB timezone/collation with PHP.
+IDs are assumed numeric except games/users; unsigned counts are cast to SIGNED for consistent SQLx decoding. Production collation, uniqueness, indexes, nullability and timestamp/timezone settings remain unverified. Intended useful existing indexes are weapons(game_id,name), loadouts(weapon_id), loadout_user(loadout_id), attachment_loadout(loadout_id), attachment_weapon(weapon_id), users(email). **Only the two additive Rust account tables are created by the explicit operator migration command. No existing indexes or tables are altered.** Inspect `SHOW CREATE TABLE`/`SHOW INDEX` with authorized access and EXPLAIN representative queries before drawing production conclusions. Match DB timezone/collation with PHP.
 
-There are 1,571 tracked paths under `public/uploads`. Controllers upload directly into that directory and thumb/header subdirectories; runtime uploads can exist outside Git. The image copies tracked files and any deliberately supplied local upload snapshot. Audit against an authorized DB export before deployment:
+Current production `public/uploads` assets have been copied from the master content snapshot into the Rust branch, including Battlefield 6, Black Ops 7 and COD Mobile artwork. There are 13,165 tracked paths under `public/uploads`. Controllers upload directly into that directory and thumb/header subdirectories; runtime uploads can exist outside Git. The image copies tracked files and any deliberately supplied local upload snapshot. Audit against an authorized DB export before deployment:
 
 ```sql
 SELECT image_url FROM games UNION SELECT thumb_url FROM games UNION SELECT header_url FROM games

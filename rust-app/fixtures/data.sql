@@ -16,7 +16,7 @@ INSERT INTO weapons VALUES
 (6,'Hidden New Game','Secret','Pistol','uploads/Call+of+Duty+Warzone-M4A1.png','uploads/thumb/Call+of+Duty+Warzone-M4A1.png',1,3,'2020-01-01','2020-01-01'),
 (7,'Call of Duty Advanced Warfare','BAL-27','Assault Rifle','uploads/Call+of+Duty+Warzone-M4A1.png','uploads/thumb/Call+of+Duty+Warzone-M4A1.png',1,3,'2020-01-01','2020-01-01'),
 (8,'No Votes','Unvoted','Pistol','uploads/Call+of+Duty+Warzone-M4A1.png','uploads/thumb/Call+of+Duty+Warzone-M4A1.png',1,3,'2020-01-01','2020-01-01');
-INSERT INTO users VALUES
+INSERT INTO users (email,username,role) VALUES
 ('author@example.invalid','Fixture author <script>','Standard'),
 ('guest@example.invalid','ignored','Guest'),
 ('v0@example.invalid','V0','Standard'),
@@ -85,7 +85,7 @@ INSERT INTO loadouts VALUES
 (22,4,'author@example.invalid','2020-01-01','2020-01-01'),
 (43,7,'author@example.invalid','2020-01-01','2020-01-01'),
 (50,8,'author@example.invalid','2020-01-01','2020-01-01');
-INSERT INTO loadout_user VALUES
+INSERT INTO loadout_user (loadout_id,user_id,created_at,updated_at) VALUES
 (1,'v0@example.invalid','2026-10-10','2026-10-10'),
 (1,'v1@example.invalid','2026-10-10','2026-10-10'),
 (1,'v2@example.invalid','2026-10-10','2026-10-10'),
@@ -125,7 +125,7 @@ INSERT INTO loadout_user VALUES
 (43,'v0@example.invalid','2026-10-10','2026-10-10'),
 (43,'v1@example.invalid','2026-10-10','2026-10-10'),
 (43,'v2@example.invalid','2026-10-10','2026-10-10');
-INSERT INTO attachment_loadout VALUES
+INSERT INTO attachment_loadout (attachment_id,loadout_id,created_at,updated_at) VALUES
 (1,1,'2020-01-01','2020-01-01'),
 (2,1,'2020-01-01','2020-01-01'),
 (3,1,'2020-01-01','2020-01-01'),

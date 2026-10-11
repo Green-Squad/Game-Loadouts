@@ -1,3 +1,4 @@
+use game_loadouts::account::Accounts;
 use game_loadouts::web::{AppState, app};
 use sqlx::ConnectOptions;
 use sqlx::mysql::{MySqlConnectOptions, MySqlPoolOptions, MySqlSslMode};
@@ -57,12 +58,61 @@ async fn run() -> Result<(), Box<dyn std::error::Error>> {
         options = options.ssl_ca(ca);
     }
     let connect_timeout = Duration::from_millis(number("DB_CONNECT_TIMEOUT_MS", 5000)?);
+    let command = env::args().nth(1);
+    if let Some(command) = command {
+        if !matches!(
+            command.as_str(),
+            "--check-public-schema" | "--migrate-public-accounts"
+        ) {
+            return Err("Unknown command".into());
+        }
+        let operator_pool = MySqlPoolOptions::new()
+            .max_connections(2)
+            .acquire_timeout(connect_timeout)
+            .connect_lazy_with(options.clone().disable_statement_logging());
+        tokio::time::timeout(connect_timeout, operator_pool.acquire()).await??;
+        if command == "--migrate-public-accounts" {
+            game_loadouts::schema::migrate(&operator_pool).await?;
+        } else {
+            game_loadouts::schema::validate(&operator_pool, true).await?;
+            tracing::info!("Public account schema verified");
+        }
+        operator_pool.close().await;
+        return Ok(());
+    }
     let max = number("DB_POOL_MAX", 10)?;
     if !(1..=100).contains(&max) {
         return Err("DB_POOL_MAX must be 1..100".into());
     }
-    // No migrations, cache, warmup queries or write endpoints. Session-level guard
-    // complements SELECT-only privileges; no user data is changed.
+    // Browse queries always retain the read-only guard. Public writes are opt-in
+    // and use a separately configured pool; migrations are never run at startup.
+    let accounts = if env::var("INTERACTIVE_ENABLED").as_deref() == Ok("1") {
+        let write_options = options
+            .clone()
+            .username(&env::var("DB_WRITE_USERNAME")?)
+            .password(&env::var("DB_WRITE_PASSWORD")?)
+            .disable_statement_logging();
+        let write_pool = MySqlPoolOptions::new()
+            .max_connections(max as u32)
+            .acquire_timeout(connect_timeout)
+            .idle_timeout(Duration::from_secs(300))
+            .max_lifetime(Duration::from_secs(1800))
+            .connect_lazy_with(write_options);
+        tokio::time::timeout(
+            connect_timeout,
+            sqlx::query("SELECT token_hash FROM rust_sessions LIMIT 0").execute(&write_pool),
+        )
+        .await??;
+        tokio::time::timeout(
+            connect_timeout,
+            sqlx::query("SELECT token_hash FROM rust_account_tokens LIMIT 0").execute(&write_pool),
+        )
+        .await??;
+        game_loadouts::schema::validate(&write_pool, true).await?;
+        Some(Arc::new(Accounts::from_env(write_pool)?))
+    } else {
+        None
+    };
     let pool = MySqlPoolOptions::new()
         .max_connections(max as u32)
         .min_connections(0)
@@ -87,6 +137,13 @@ async fn run() -> Result<(), Box<dyn std::error::Error>> {
     let port = u16::try_from(number("PORT", 8080)?)?;
     let state = Arc::new(AppState {
         pool: pool.clone(),
+        accounts,
+        ads: env::var("ADS_ENABLED").as_deref() == Ok("1"),
+        analytics_id: env::var("GA4_MEASUREMENT_ID")
+            .unwrap_or_default()
+            .chars()
+            .filter(|c| c.is_ascii_alphanumeric() || *c == '-')
+            .collect(),
         query_timeout: Duration::from_millis(number("DB_QUERY_TIMEOUT_MS", 5000)?),
         public_url: env::var("PUBLIC_BASE_URL")
             .unwrap_or_else(|_| "https://gameloadouts.com".into())
@@ -96,10 +153,12 @@ async fn run() -> Result<(), Box<dyn std::error::Error>> {
             .unwrap_or_default()
             .trim_end_matches('/')
             .into(),
-        disqus: env::var("DISQUS_ENABLED").as_deref() == Ok("1"),
+        disqus: env::var("DISQUS_ENABLED").as_deref() != Ok("0"),
         metrics: env::var("METRICS_HEADERS").as_deref() == Ok("1"),
         search_mode: env::var("SEARCH_MODE").unwrap_or_else(|_| "google".into()),
-        search_api_url: env::var("SEARCH_API_URL").unwrap_or_default(),
+        search_api_url: env::var("SEARCH_API_URL")
+            .or_else(|_| env::var("SEARCH_URL"))
+            .unwrap_or_default(),
         http: reqwest::Client::builder()
             .timeout(Duration::from_secs(5))
             .connect_timeout(Duration::from_secs(2))

@@ -85,6 +85,7 @@ impl Weapon {
 }
 #[derive(Clone, Debug, Default, FromRow)]
 pub struct Attachment {
+    pub id: i64,
     pub loadout_id: i64,
     pub name: String,
     pub slot: String,
