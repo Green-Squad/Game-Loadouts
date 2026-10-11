@@ -412,6 +412,22 @@ async fn public_write_flows_and_security() {
         .await
         .unwrap();
     assert_eq!(count, 1);
+    // Legacy pivots allow duplicate rows; the same attachment set must still reuse the loadout.
+    sqlx::query("INSERT INTO attachment_loadout (attachment_id,loadout_id) VALUES (1,?)")
+        .bind(new_id)
+        .execute(&pool)
+        .await
+        .unwrap();
+    let repeated = member
+        .post(&app, weapon, &[("Optic", "1"), ("Underbarrel", "2")])
+        .await;
+    assert_eq!(repeated.status, 303);
+    assert_eq!(repeated.headers["location"], r1.headers["location"]);
+    let new_count: i64 = sqlx::query_scalar("SELECT COUNT(*) FROM loadouts WHERE id>50")
+        .fetch_one(&pool)
+        .await
+        .unwrap();
+    assert_eq!(new_count, 1);
     let submissions = member.get(&app, "/submissions").await;
     assert_eq!(submissions.status, 200);
     assert!(submissions.body.contains(&format!("/{new_id}")));
@@ -655,6 +671,13 @@ async fn public_write_flows_and_security() {
         303
     );
     // Legacy email confirmation links remain valid and the sentinel '1' cannot log in anyone.
+    let legacy_token = "a".repeat(100);
+    sqlx::query("INSERT INTO users (email,username,password,role,confirm_token) VALUES ('legacy-confirm@example.invalid','LegacyConfirm','fixture-hash','Standard',?)")
+        .bind(&legacy_token).execute(&pool).await.unwrap();
+    let legacy_path = format!("/user/confirm/{legacy_token}");
+    let mut legacy = Browser::default();
+    assert_eq!(legacy.get(&app, &legacy_path).await.status, 303);
+    assert_eq!(legacy.get(&app, &legacy_path).await.status, 422);
     assert_eq!(member.get(&app, "/user/confirm/1").await.status, 422);
     let mut locked = Browser::default();
     locked.get(&app, "/login").await;
@@ -707,7 +730,13 @@ async fn public_write_flows_and_security() {
             std::process::Command::new("node")
                 .arg(script)
                 .env("BASE_URL", format!("http://127.0.0.1:{port}"))
-                .env("SCREENSHOT_DIR", "browser-screenshots/accounts")
+                .env(
+                    "SCREENSHOT_DIR",
+                    std::path::Path::new(env!("CARGO_MANIFEST_DIR"))
+                        .parent()
+                        .unwrap()
+                        .join("browser-screenshots/accounts"),
+                )
                 .status()
                 .unwrap()
         })

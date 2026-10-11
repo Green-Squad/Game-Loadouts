@@ -483,7 +483,7 @@ pub async fn post_account(
     Form(form): Form<BTreeMap<String, String>>,
 ) -> Response {
     let Some(a) = &state.accounts else {
-        return StatusCode::NOT_FOUND.into_response();
+        return StatusCode::METHOD_NOT_ALLOWED.into_response();
     };
     let path = uri.path();
     let result=async {
@@ -630,6 +630,10 @@ async fn join(
         return Err(Error::internal());
     }
     let result=async {
+        if !session.email.is_empty() && session.role=="Guest" {
+            let still_guest:Option<String>=sqlx::query_scalar("SELECT email FROM users WHERE email=? AND role='Guest' FOR UPDATE").bind(&session.email).fetch_optional(&mut *tx).await?;
+            if still_guest.is_none() {return Err(Error::invalid("Your guest session changed. Refresh and try again."));}
+        }
         let exists:i64=sqlx::query_scalar("SELECT COUNT(*) FROM users WHERE email=? OR username=?").bind(email).bind(username).fetch_one(&mut *tx).await?;
         if exists>0 {return Err(Error::invalid("That username or email is already in use."));}
         let guest=!session.email.is_empty() && session.role=="Guest";
@@ -839,7 +843,7 @@ pub async fn write_loadout(
     Form(form): Form<BTreeMap<String, String>>,
 ) -> Response {
     let Some(a) = &state.accounts else {
-        return StatusCode::NOT_FOUND.into_response();
+        return StatusCode::METHOD_NOT_ALLOWED.into_response();
     };
     let result=async {
         csrf(&session,&form)?;
@@ -854,6 +858,8 @@ pub async fn write_loadout(
         if removing && session.email.is_empty() {return Err(Error::invalid("You have not voted for this loadout."));}
         let email=guest(a,&session).await?;
         let mut tx=a.pool.begin().await?;
+        let identity:Option<String>=sqlx::query_scalar("SELECT email FROM users WHERE email=? AND (role='Guest' OR confirm_token='1') FOR UPDATE").bind(&email).fetch_optional(&mut *tx).await?;
+        if identity.is_none() {return Err(Error::invalid("Your account changed. Refresh and try again."));}
         // Lock the weapon for all writes, then loadout. This serializes both set deduplication
         // and votes on legacy pivot tables which do not have a UNIQUE constraint.
         let w=sqlx::query("SELECT CAST(w.id AS SIGNED) id,CAST(w.min_attachments AS SIGNED) min_attachments,CAST(w.max_attachments AS SIGNED) max_attachments FROM weapons w JOIN games g ON g.id=w.game_id WHERE w.game_id=? AND w.name=? AND g.live=1 ORDER BY w.id LIMIT 1 FOR UPDATE").bind(&parts[0]).bind(&parts[1]).fetch_optional(&mut *tx).await?.ok_or_else(||Error::invalid("Weapon not found."))?;
@@ -864,8 +870,8 @@ pub async fn write_loadout(
         } else {
             let allowed:Vec<(i64,String)>=sqlx::query_as("SELECT CAST(a.id AS SIGNED),a.slot FROM attachments a JOIN attachment_weapon aw ON aw.attachment_id=a.id WHERE aw.weapon_id=?").bind(wid).fetch_all(&mut *tx).await?;
             let ids=validate_attachments(&parts[0],w.try_get::<i64,_>("min_attachments")?,w.try_get::<i64,_>("max_attachments")?,&allowed,&form).map_err(Error::invalid)?;
-            let mut query=sqlx::QueryBuilder::<MySql>::new("SELECT CAST(l.id AS SIGNED) FROM loadouts l LEFT JOIN attachment_loadout al ON al.loadout_id=l.id WHERE l.weapon_id=");query.push_bind(wid).push(" GROUP BY l.id HAVING COUNT(al.attachment_id)=").push_bind(ids.len() as i64);
-            if !ids.is_empty() {query.push(" AND SUM(al.attachment_id IN (");let mut list=query.separated(",");for id in &ids {list.push_bind(id);}list.push_unseparated("))=");query.push_bind(ids.len() as i64);}
+            let mut query=sqlx::QueryBuilder::<MySql>::new("SELECT CAST(l.id AS SIGNED) FROM loadouts l LEFT JOIN attachment_loadout al ON al.loadout_id=l.id WHERE l.weapon_id=");query.push_bind(wid).push(" GROUP BY l.id HAVING COUNT(DISTINCT al.attachment_id)=").push_bind(ids.len() as i64);
+            if !ids.is_empty() {query.push(" AND SUM(al.attachment_id NOT IN (");let mut list=query.separated(",");for id in &ids {list.push_bind(id);}list.push_unseparated("))=0");}
             query.push(" ORDER BY l.id LIMIT 1");
             let existing=query.build_query_scalar::<i64>().fetch_optional(&mut *tx).await?;
             if let Some(id)=existing {id} else {
