@@ -268,7 +268,7 @@ struct SessionRow {
     role: String,
 }
 async fn load_session(a: &Accounts, token: &str) -> Result<Session, Error> {
-    let row=sqlx::query_as::<_,SessionRow>("SELECT s.token_hash,s.csrf,COALESCE(u.email,'') email,COALESCE(u.username,'') username,COALESCE(u.role,'') role FROM rust_sessions s LEFT JOIN users u ON u.email=s.user_email AND (u.role='Guest' OR (u.confirm_token='1' AND s.credential_hash=SHA2(u.password,256))) WHERE s.token_hash=? AND s.expires_at>UTC_TIMESTAMP() AND (s.user_email IS NULL OR u.email IS NOT NULL)") .bind(digest(token)).fetch_optional(&a.pool).await?;
+    let row=sqlx::query_as::<_,SessionRow>("SELECT CONVERT(s.token_hash USING utf8mb4) token_hash,CONVERT(s.csrf USING utf8mb4) csrf,COALESCE(u.email,'') email,COALESCE(u.username,'') username,COALESCE(u.role,'') role FROM rust_sessions s LEFT JOIN users u ON u.email=s.user_email AND (u.role='Guest' OR (u.confirm_token='1' AND s.credential_hash=SHA2(u.password,256))) WHERE s.token_hash=? AND s.expires_at>UTC_TIMESTAMP() AND (s.user_email IS NULL OR u.email IS NOT NULL)") .bind(digest(token)).fetch_optional(&a.pool).await?;
     let Some(row) = row else {
         return Ok(Session::default());
     };

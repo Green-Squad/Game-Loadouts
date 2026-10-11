@@ -308,7 +308,7 @@ async fn public_write_flows_and_security() {
     );
     let raw = member.cookie.split('=').nth(1).unwrap();
     let stored: String = sqlx::query_scalar(
-        "SELECT token_hash FROM rust_sessions WHERE user_email='tester@example.invalid'",
+        "SELECT CONVERT(token_hash USING utf8mb4) FROM rust_sessions WHERE user_email='tester@example.invalid'",
     )
     .fetch_one(&pool)
     .await

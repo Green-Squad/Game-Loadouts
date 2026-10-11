@@ -29,6 +29,7 @@ jobs:
       - uses: Swatinem/rust-cache@v2
         with:
           workspaces: rust-app
+          cache-on-failure: true
       - name: Prepare isolated fixture
         run: |
           sudo apt-get update
