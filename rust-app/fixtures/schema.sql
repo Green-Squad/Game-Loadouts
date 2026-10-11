@@ -10,22 +10,4 @@ CREATE TABLE attachment_weapon (attachment_id INT, weapon_id INT, created_at DAT
 CREATE TABLE loadout_user (id INT AUTO_INCREMENT PRIMARY KEY, loadout_id INT, user_id VARCHAR(255), created_at DATETIME, updated_at DATETIME, INDEX(loadout_id), INDEX(user_id));
 CREATE USER 'loadouts_reader'@'%' IDENTIFIED BY '';
 GRANT SELECT ON loadouts_fixture.* TO 'loadouts_reader'@'%';
--- Additive Rust tables only. Apply once with a schema owner, never at app startup.
--- Existing users, loadouts and votes remain shared with Laravel.
-CREATE TABLE IF NOT EXISTS rust_sessions (
- token_hash CHAR(64) CHARACTER SET ascii COLLATE ascii_bin PRIMARY KEY,
- user_email VARCHAR(128) NULL,
- credential_hash CHAR(64) CHARACTER SET ascii COLLATE ascii_bin NULL,
- csrf CHAR(64) CHARACTER SET ascii COLLATE ascii_bin NOT NULL,
- expires_at DATETIME NOT NULL,
- created_at DATETIME NOT NULL,
- INDEX(user_email), INDEX(expires_at)
-) ENGINE=InnoDB;
-CREATE TABLE IF NOT EXISTS rust_account_tokens (
- user_email VARCHAR(128) NOT NULL,
- purpose VARCHAR(16) NOT NULL,
- token_hash CHAR(64) CHARACTER SET ascii COLLATE ascii_bin NOT NULL,
- created_at DATETIME NOT NULL,
- expires_at DATETIME NOT NULL,
- PRIMARY KEY(user_email,purpose), UNIQUE(token_hash), INDEX(expires_at)
-) ENGINE=InnoDB;
+CREATE TABLE password_reminders (email VARCHAR(255), token VARCHAR(255), created_at TIMESTAMP NOT NULL, INDEX(email), INDEX(token)) ENGINE=InnoDB CHARACTER SET utf8mb4;

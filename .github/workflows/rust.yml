@@ -63,14 +63,15 @@ jobs:
           docker stop --time 10 rust-smoke
           test "$(docker inspect rust-smoke --format '{{.State.ExitCode}}')" = 0
           docker logs rust-smoke > container-log.jsonl
-          # Validate the explicit operator command and opt-in account startup using only fixtures.
+          # Check the unchanged Laravel schema and encrypted-cookie account startup using only fixtures.
           docker run --rm --network host --read-only --cap-drop ALL \
             -e DB_HOST=127.0.0.1 -e DB_PORT=3307 -e DB_DATABASE=loadouts_fixture \
-            -e DB_USERNAME=root game-loadouts-rust:test --migrate-public-accounts
+            -e DB_USERNAME=root game-loadouts-rust:test --check-public-schema
           docker run --detach --name rust-account-smoke --network host --read-only --cap-drop ALL \
             -e PORT=8081 -e DB_HOST=127.0.0.1 -e DB_PORT=3307 -e DB_DATABASE=loadouts_fixture \
             -e DB_USERNAME=loadouts_reader -e DB_WRITE_USERNAME=root -e DB_WRITE_PASSWORD= \
             -e INTERACTIVE_ENABLED=1 -e ACCOUNT_BASE_URL=https://rust.gameloadouts.com \
+            -e KEY=synthetic-session-key-32-bytes-long \
             -e MAIL_USERNAME=fixture@example.invalid -e MAIL_PASSWORD=synthetic-fixture-password \
             -e RECAPTCHA_PRIVATE_KEY=synthetic-fixture-secret -e DISQUS_ENABLED=0 game-loadouts-rust:test
           for attempt in $(seq 1 30); do curl --fail http://127.0.0.1:8081/healthz && break; sleep 1; done

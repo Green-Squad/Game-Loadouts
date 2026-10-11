@@ -60,10 +60,7 @@ async fn run() -> Result<(), Box<dyn std::error::Error>> {
     let connect_timeout = Duration::from_millis(number("DB_CONNECT_TIMEOUT_MS", 5000)?);
     let command = env::args().nth(1);
     if let Some(command) = command {
-        if !matches!(
-            command.as_str(),
-            "--check-public-schema" | "--migrate-public-accounts"
-        ) {
+        if command != "--check-public-schema" {
             return Err("Unknown command".into());
         }
         let operator_pool = MySqlPoolOptions::new()
@@ -71,12 +68,8 @@ async fn run() -> Result<(), Box<dyn std::error::Error>> {
             .acquire_timeout(connect_timeout)
             .connect_lazy_with(options.clone().disable_statement_logging());
         tokio::time::timeout(connect_timeout, operator_pool.acquire()).await??;
-        if command == "--migrate-public-accounts" {
-            game_loadouts::schema::migrate(&operator_pool).await?;
-        } else {
-            game_loadouts::schema::validate(&operator_pool, true).await?;
-            tracing::info!("Public account schema verified");
-        }
+        game_loadouts::schema::validate(&operator_pool).await?;
+        tracing::info!("Existing public account schema verified");
         operator_pool.close().await;
         return Ok(());
     }
@@ -85,13 +78,17 @@ async fn run() -> Result<(), Box<dyn std::error::Error>> {
         return Err("DB_POOL_MAX must be 1..100".into());
     }
     // Browse queries always retain the read-only guard. Public writes are opt-in
-    // and use a separately configured pool; migrations are never run at startup.
+    // and use a separate pool with the existing credentials or an optional writer override.
     let accounts = if env::var("INTERACTIVE_ENABLED").as_deref() == Ok("1") {
-        let write_options = options
-            .clone()
-            .username(&env::var("DB_WRITE_USERNAME")?)
-            .password(&env::var("DB_WRITE_PASSWORD")?)
-            .disable_statement_logging();
+        let write_options = options.clone().disable_statement_logging();
+        let write_options = match (env::var("DB_WRITE_USERNAME"), env::var("DB_WRITE_PASSWORD")) {
+            (Ok(user), Ok(password)) => write_options.username(&user).password(&password),
+            (Err(_), Err(_)) => write_options,
+            _ => return Err(
+                "Set both DB_WRITE_USERNAME and DB_WRITE_PASSWORD, or use existing DB credentials"
+                    .into(),
+            ),
+        };
         let write_pool = MySqlPoolOptions::new()
             .max_connections(max as u32)
             .acquire_timeout(connect_timeout)
@@ -100,15 +97,9 @@ async fn run() -> Result<(), Box<dyn std::error::Error>> {
             .connect_lazy_with(write_options);
         tokio::time::timeout(
             connect_timeout,
-            sqlx::query("SELECT token_hash FROM rust_sessions LIMIT 0").execute(&write_pool),
+            game_loadouts::schema::validate(&write_pool),
         )
         .await??;
-        tokio::time::timeout(
-            connect_timeout,
-            sqlx::query("SELECT token_hash FROM rust_account_tokens LIMIT 0").execute(&write_pool),
-        )
-        .await??;
-        game_loadouts::schema::validate(&write_pool, true).await?;
         Some(Arc::new(Accounts::from_env(write_pool)?))
     } else {
         None
