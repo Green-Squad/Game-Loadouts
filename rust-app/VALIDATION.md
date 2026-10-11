@@ -1,5 +1,7 @@
 # Validation and measurements — 2026-10-10
 
+This record describes the earlier public browsing build. See [PUBLIC_PARITY.md](PUBLIC_PARITY.md) for current account/voting/submission validation; the latency, startup and memory measurements below have not been repeated for those new flows.
+
 ## Completed
 
 - Built release binary with Rust 1.99.0; Cargo.lock checked in, no build-time DB required.
