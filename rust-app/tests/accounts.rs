@@ -107,6 +107,12 @@ async fn smtp() -> (u16, Arc<Mutex<Vec<String>>>, tokio::task::JoinHandle<()>) {
                     }
                     if line.starts_with("EHLO") {
                         w.write_all(b"250 fixture\r\n").await.unwrap();
+                    } else if line.starts_with("RCPT TO:")
+                        && line.contains("mail-failure@example.invalid")
+                    {
+                        w.write_all(b"550 fixture rejects recipient\r\n")
+                            .await
+                            .unwrap();
                     } else if line.starts_with("DATA") {
                         w.write_all(b"354 send mail\r\n").await.unwrap();
                         let mut mail = String::new();
@@ -159,6 +165,10 @@ async fn fixture() -> (
         .unwrap();
     let schema = include_str!("../fixtures/schema.sql")
         .replace("loadouts_fixture", "loadouts_accounts_fixture")
+        .replace(
+            ") ENGINE=InnoDB CHARACTER SET utf8mb4;",
+            ") ENGINE=MyISAM CHARACTER SET utf8;",
+        )
         .lines()
         .filter(|l| !l.starts_with("CREATE USER "))
         .collect::<Vec<_>>()
@@ -273,6 +283,11 @@ async fn public_write_flows_and_security() {
         .try_init();
     let (app, pool, owner, messages, tasks) = fixture().await;
     game_loadouts::schema::validate(&pool).await.unwrap();
+    let reminder_engine:String=sqlx::query_scalar("SELECT ENGINE FROM information_schema.TABLES WHERE TABLE_SCHEMA=DATABASE() AND TABLE_NAME='password_reminders'").fetch_one(&pool).await.unwrap();
+    assert_eq!(
+        reminder_engine, "MyISAM",
+        "Exercise the legacy reminder engine without a production migration"
+    );
     let extra_tables:i64=sqlx::query_scalar("SELECT COUNT(*) FROM information_schema.TABLES WHERE TABLE_SCHEMA=DATABASE() AND TABLE_NAME IN ('rust_sessions','rust_account_tokens')").fetch_one(&pool).await.unwrap();
     assert_eq!(
         extra_tables, 0,
@@ -785,6 +800,35 @@ async fn public_write_flows_and_security() {
     .await
     .unwrap();
     assert_eq!(member.get(&app, "/account").await.status, 303);
+    // SMTP failure preserves an existing raw reminder row even on nontransactional MyISAM.
+    sqlx::query("INSERT INTO users(email,username,password,role,confirm_token) VALUES('mail-failure@example.invalid','MailFailure','fixture-hash','Standard','1')").execute(&pool).await.unwrap();
+    let previous_reminder = "d".repeat(40);
+    sqlx::query("INSERT INTO password_reminders(email,token,created_at) VALUES('mail-failure@example.invalid',?,TIMESTAMPADD(MINUTE,-2,UTC_TIMESTAMP()))").bind(&previous_reminder).execute(&pool).await.unwrap();
+    let mut mail_failure = Browser::default();
+    mail_failure.get(&app, "/reminder").await;
+    assert_eq!(
+        mail_failure
+            .post(
+                &app,
+                "/reminder",
+                &[
+                    ("email", "mail-failure@example.invalid"),
+                    ("g-recaptcha-response", "fixture-captcha")
+                ]
+            )
+            .await
+            .status,
+        422
+    );
+    assert_eq!(
+        sqlx::query_scalar::<_, String>(
+            "SELECT token FROM password_reminders WHERE email='mail-failure@example.invalid'"
+        )
+        .fetch_one(&pool)
+        .await
+        .unwrap(),
+        previous_reminder
+    );
     // Laravel-issued reminder rows (40-character SHA1 tokens) work on Rust, with no new tables.
     let legacy_reset = "b".repeat(40);
     sqlx::query("INSERT INTO password_reminders(email,token,created_at) VALUES('tester@example.invalid',?,UTC_TIMESTAMP())").bind(&legacy_reset).execute(&pool).await.unwrap();

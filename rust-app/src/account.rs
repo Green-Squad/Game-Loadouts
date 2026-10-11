@@ -727,6 +727,22 @@ async fn send_token(
             } else {
                 confirmation_token()
             };
+            // Send before mutating reminders: a legacy MyISAM table cannot roll back a failed SMTP delivery.
+            let route = if purpose == "reset" {
+                "password/reset"
+            } else {
+                "user/confirm"
+            };
+            a.email(
+                email,
+                if purpose == "reset" {
+                    "Reset your Game Loadouts password"
+                } else {
+                    "Confirm your Game Loadouts email"
+                },
+                &format!("{}/{route}/{token}", a.account_url),
+            )
+            .await?;
             if purpose == "reset" {
                 // Laravel 4.1 stores the raw opaque token; reuse that format and its 60-minute lifetime.
                 sqlx::query("DELETE FROM password_reminders WHERE email=?")
@@ -743,21 +759,6 @@ async fn send_token(
                 .execute(&mut *tx)
                 .await?;
             }
-            let route = if purpose == "reset" {
-                "password/reset"
-            } else {
-                "user/confirm"
-            };
-            a.email(
-                email,
-                if purpose == "reset" {
-                    "Reset your Game Loadouts password"
-                } else {
-                    "Confirm your Game Loadouts email"
-                },
-                &format!("{}/{route}/{token}", a.account_url),
-            )
-            .await?;
         }
     }
     tx.commit().await?;
