@@ -1,0 +1,15 @@
+# Content-only release: reuse the exact runtime currently serving gameloadouts.com.
+# Authenticate to the project's Artifact Registry before building this image.
+FROM us-central1-docker.pkg.dev/game-loadouts/cloud-run-source-deploy/game-loadouts/game-loadouts@sha256:7bef5809b875280aff8ccc9311fee056efd8e903f1f6e43477c6862db4396905
+
+WORKDIR /var/www/html
+COPY public/uploads/ /var/www/html/public/uploads/
+COPY content/warzone-2026-10-11/ /var/www/html/content/warzone-2026-10-11/
+
+RUN mkdir -p /var/www/html/public/uploads/thumb /var/www/html/public/uploads/header \
+    && chown -R www-data:www-data /var/www/html/app/storage /var/www/html/public/uploads \
+    && chmod -R 775 /var/www/html/app/storage \
+    && find /var/www/html/public/uploads -type d -exec chmod 755 {} + \
+    && find /var/www/html/public/uploads -type f -exec chmod 644 {} +
+
+# Apache configuration, PHP dependencies, application code and entrypoint are inherited.

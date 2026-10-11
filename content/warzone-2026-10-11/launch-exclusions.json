@@ -1,0 +1,261 @@
+{
+  "weapons": 270,
+  "attachments": 3279,
+  "compatibility_pairs": 11884,
+  "conditional_options_omitted": 63,
+  "conditional_links_omitted": 78,
+  "excluded_options": [
+    {
+      "name": "AK-27 Battle-Scar Conversion",
+      "slot": "Barrel"
+    },
+    {
+      "name": "Broodmother .45 Kit",
+      "slot": "ConversionKit"
+    },
+    {
+      "name": "Burst Fire Conversion",
+      "slot": "FireMods"
+    },
+    {
+      "name": "CHF Semi-Auto Conversion",
+      "slot": "Barrel"
+    },
+    {
+      "name": "DS20 Mirage Dual Fire Kit",
+      "slot": "Underbarrel"
+    },
+    {
+      "name": "Echo 12 Backlash Launcher Kit",
+      "slot": "FireMods"
+    },
+    {
+      "name": "GPR91 Double-Barrel Conversion",
+      "slot": "Barrel"
+    },
+    {
+      "name": "Goblin Mk2 7.62 Mini-Rocket Conversion",
+      "slot": "FireMods"
+    },
+    {
+      "name": "JAK Annihilator Bullpup Kit",
+      "slot": "ConversionKit"
+    },
+    {
+      "name": "JAK Atlas Kit",
+      "slot": "ConversionKit"
+    },
+    {
+      "name": "JAK Backsaw Kit",
+      "slot": "ConversionKit"
+    },
+    {
+      "name": "JAK Beholder Rifle Kit",
+      "slot": "ConversionKit"
+    },
+    {
+      "name": "JAK Burnout",
+      "slot": "ConversionKit"
+    },
+    {
+      "name": "JAK Cataclysm",
+      "slot": "ConversionKit"
+    },
+    {
+      "name": "JAK Deathmarch",
+      "slot": "ConversionKit"
+    },
+    {
+      "name": "JAK Decimator",
+      "slot": "ConversionKit"
+    },
+    {
+      "name": "JAK Devastators",
+      "slot": "ConversionKit"
+    },
+    {
+      "name": "JAK Ettin Double Barrel Kit",
+      "slot": "ConversionKit"
+    },
+    {
+      "name": "JAK Ferocity Carbine Kit",
+      "slot": "ConversionKit"
+    },
+    {
+      "name": "JAK Gunslinger",
+      "slot": "ConversionKit"
+    },
+    {
+      "name": "JAK Harbinger Kit",
+      "slot": "ConversionKit"
+    },
+    {
+      "name": "JAK Headhunter Carbine Conversion",
+      "slot": "ConversionKit"
+    },
+    {
+      "name": "JAK Heretic Carbine Kit",
+      "slot": "ConversionKit"
+    },
+    {
+      "name": "JAK Intimidator",
+      "slot": "ConversionKit"
+    },
+    {
+      "name": "JAK Jawbreaker",
+      "slot": "ConversionKit"
+    },
+    {
+      "name": "JAK Lance",
+      "slot": "ConversionKit"
+    },
+    {
+      "name": "JAK Maglift Kit",
+      "slot": "ConversionKit"
+    },
+    {
+      "name": "JAK Nightshade Rifle Kit",
+      "slot": "ConversionKit"
+    },
+    {
+      "name": "JAK Outlaw-277 Kit",
+      "slot": "ConversionKit"
+    },
+    {
+      "name": "JAK Patriot",
+      "slot": "ConversionKit"
+    },
+    {
+      "name": "JAK Protean (Full Auto)",
+      "slot": "ConversionKit"
+    },
+    {
+      "name": "JAK Protean (Single Fire)",
+      "slot": "ConversionKit"
+    },
+    {
+      "name": "JAK Raven Kit",
+      "slot": "ConversionKit"
+    },
+    {
+      "name": "JAK Requiem",
+      "slot": "ConversionKit"
+    },
+    {
+      "name": "JAK Revenger Kit",
+      "slot": "ConversionKit"
+    },
+    {
+      "name": "JAK Salvo",
+      "slot": "ConversionKit"
+    },
+    {
+      "name": "JAK Scimitar Kit",
+      "slot": "ConversionKit"
+    },
+    {
+      "name": "JAK Shadow Titan Kit",
+      "slot": "ConversionKit"
+    },
+    {
+      "name": "JAK Signal Burst",
+      "slot": "ConversionKit"
+    },
+    {
+      "name": "JAK Thumper-656",
+      "slot": "ConversionKit"
+    },
+    {
+      "name": "JAK Thunder LMG Kit",
+      "slot": "ConversionKit"
+    },
+    {
+      "name": "JAK Tyrant 762 Kit",
+      "slot": "ConversionKit"
+    },
+    {
+      "name": "JAK Volkh",
+      "slot": "ConversionKit"
+    },
+    {
+      "name": "JAK Voltstorm",
+      "slot": "ConversionKit"
+    },
+    {
+      "name": "JAK Wardens",
+      "slot": "ConversionKit"
+    },
+    {
+      "name": "JAK Widemouth Barrel",
+      "slot": "ConversionKit"
+    },
+    {
+      "name": "Jäger 45 Grid-Breaker Kit",
+      "slot": "Barrel"
+    },
+    {
+      "name": "M15 Mod 0 AMR .50 Cal Kit",
+      "slot": "FireMods"
+    },
+    {
+      "name": "M34 Novaline Garand Conversion",
+      "slot": "Stock"
+    },
+    {
+      "name": "M8A1 AutoStrike-X8 Conversion",
+      "slot": "Barrel"
+    },
+    {
+      "name": "MCW 6.8 Full-Auto Conversion",
+      "slot": "ConversionKit"
+    },
+    {
+      "name": "MFS 5.56M Defense Conversion",
+      "slot": "FireMods"
+    },
+    {
+      "name": "MK.78 Lightframe PDW Conversion",
+      "slot": "Stock"
+    },
+    {
+      "name": "MXR-17 ANVL Conversion",
+      "slot": "Barrel"
+    },
+    {
+      "name": "Razor 9mm Wildfire Conversion",
+      "slot": "FireMods"
+    },
+    {
+      "name": "SWAT 5.56 Grau Conversion",
+      "slot": "FireMods"
+    },
+    {
+      "name": "Sokol 545 Warpath Blitz Kit",
+      "slot": "FireMods"
+    },
+    {
+      "name": "TR2 CQB Auto Conversion",
+      "slot": "FireMods"
+    },
+    {
+      "name": "The Ettin",
+      "slot": "ConversionKit"
+    },
+    {
+      "name": "WSP Akimbo Brace Stock",
+      "slot": "ConversionKit"
+    },
+    {
+      "name": "Warden 308 Badlands Pistol Kit",
+      "slot": "Comb"
+    },
+    {
+      "name": "XRK IP-V2 Conversion Kit",
+      "slot": "ConversionKit"
+    },
+    {
+      "name": "XTEN Black Kite",
+      "slot": "Muzzle"
+    }
+  ]
+}

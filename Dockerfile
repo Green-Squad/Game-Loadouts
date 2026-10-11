@@ -35,9 +35,12 @@ RUN curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/local
 # Copy the current directory contents into the container at /var/www/html
 COPY . /var/www/html
 
-# Set ownership and permissions for the storage directory
-RUN chown -R www-data:www-data /var/www/html/app/storage \
-    && chmod -R 775 /var/www/html/app/storage
+# Allow Apache to write Laravel storage and uploaded artwork.
+RUN mkdir -p /var/www/html/public/uploads/thumb /var/www/html/public/uploads/header \
+    && chown -R www-data:www-data /var/www/html/app/storage /var/www/html/public/uploads \
+    && chmod -R 775 /var/www/html/app/storage \
+    && find /var/www/html/public/uploads -type d -exec chmod 755 {} + \
+    && find /var/www/html/public/uploads -type f -exec chmod 644 {} +
 
 # Set Apache document root to Laravel public directory
 ENV APACHE_DOCUMENT_ROOT /var/www/html/public
