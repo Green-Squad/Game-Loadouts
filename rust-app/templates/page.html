@@ -51,6 +51,7 @@
 {% endfor %}
 </ul>
 </li>
+{% if interactive %}{% if session.member() %}<li><a href="/submissions">My submissions</a></li><li><a href="/account">{{ session.username }}</a></li><li><a href="/logout">Log out</a></li>{% else %}<li><a href="/login">Log in</a></li><li><a href="/join">Join</a></li>{% endif %}{% endif %}
 </ul>
 </div>
 <form action="/search" method="get" id="navbar-search" class="navbar-form" role="search">
@@ -191,7 +192,7 @@
 <div class="row">
 <div class="col-md-12">
 <h2>{{ loadout.votes }} {% if loadout.votes == 1 %}Vote{% else %}Votes{% endif %}
-<button type="button" disabled class="btn btn-default pull-right" title="Voting is unavailable in this read-only experiment">Voting unavailable</button>
+{% let l = loadout %}{% include "vote.html" %}
 </h2>
 </div>
 </div>
@@ -283,5 +284,7 @@
 {% if disqus %}{% if kind == "loadout" %}
 <script>var thread=document.getElementById('disqus_thread');var disqus_shortname='tryharddev';var disqus_identifier=thread.dataset.disqusIdentifier;var disqus_config=function(){this.page.identifier=disqus_identifier;this.page.url=thread.dataset.disqusUrl;};(function(){var s=document.createElement('script');s.async=true;s.src='https://tryharddev.disqus.com/embed.js';document.body.appendChild(s);})();</script>
 {% endif %}{% endif %}
+{% if interactive %}{% if kind == "weapon" || kind == "loadout" || (kind == "account" && (screen == "join" || screen == "reminder" || screen == "resend-confirmation")) %}<script src="https://www.google.com/recaptcha/api.js" async defer></script>{% endif %}{% endif %}
+{% if disqus && (kind == "weapon" || kind == "submissions") %}<script id="dsq-count-scr" src="https://tryharddev.disqus.com/count.js" async></script>{% endif %}
 </body>
 </html>

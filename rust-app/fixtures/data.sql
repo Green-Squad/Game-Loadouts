@@ -16,7 +16,7 @@ INSERT INTO weapons VALUES
 (6,'Hidden New Game','Secret','Pistol','uploads/Call+of+Duty+Warzone-M4A1.png','uploads/thumb/Call+of+Duty+Warzone-M4A1.png',1,3,'2020-01-01','2020-01-01'),
 (7,'Call of Duty Advanced Warfare','BAL-27','Assault Rifle','uploads/Call+of+Duty+Warzone-M4A1.png','uploads/thumb/Call+of+Duty+Warzone-M4A1.png',1,3,'2020-01-01','2020-01-01'),
 (8,'No Votes','Unvoted','Pistol','uploads/Call+of+Duty+Warzone-M4A1.png','uploads/thumb/Call+of+Duty+Warzone-M4A1.png',1,3,'2020-01-01','2020-01-01');
-INSERT INTO users VALUES
+INSERT INTO users (email,username,role) VALUES
 ('author@example.invalid','Fixture author <script>','Standard'),
 ('guest@example.invalid','ignored','Guest'),
 ('v0@example.invalid','V0','Standard'),

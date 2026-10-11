@@ -141,7 +141,7 @@ impl<'a> Db<'a> {
                 ids.iter().map(ToString::to_string).collect(),
             )
         };
-        let rows: Vec<Attachment> = self.rows(&format!("SELECT CAST(al.loadout_id AS SIGNED) loadout_id, a.name, COALESCE(a.slot,'') slot, COALESCE(a.image_url,'') image_url, COALESCE(a.thumb_url,'') thumb_url FROM attachment_loadout al JOIN attachments a ON a.id=al.attachment_id WHERE {filter} ORDER BY al.loadout_id,a.id"), &binds).await?;
+        let rows: Vec<Attachment> = self.rows(&format!("SELECT CAST(a.id AS SIGNED) id, CAST(al.loadout_id AS SIGNED) loadout_id, a.name, COALESCE(a.slot,'') slot, COALESCE(a.image_url,'') image_url, COALESCE(a.thumb_url,'') thumb_url FROM attachment_loadout al JOIN attachments a ON a.id=al.attachment_id WHERE {filter} ORDER BY al.loadout_id,a.id"), &binds).await?;
         let mut by_id = std::collections::HashMap::<i64, Vec<Attachment>>::new();
         for row in rows {
             by_id.entry(row.loadout_id).or_default().push(row);
