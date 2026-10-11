@@ -352,7 +352,7 @@ pub async fn session_layer(
         }
         .await;
         if let Err(e) = result {
-            return web::account_page(&state, &session, "info", e.status, e.message, "");
+            return web::account_page(&state, &session, "info", e.status, e.message, "").await;
         }
     }
     request.extensions_mut().insert(session);
@@ -461,7 +461,8 @@ pub async fn get_account(
             404,
             "Accounts are not enabled yet.",
             "",
-        );
+        )
+        .await;
     }
     let path = uri.path();
     if path == "/account" && !session.member() {
@@ -472,9 +473,9 @@ pub async fn get_account(
     }
     let screen = path.trim_start_matches('/');
     if let Some(token) = path.strip_prefix("/password/reset/") {
-        return web::account_page(&state, &session, "reset", 200, "", token);
+        return web::account_page(&state, &session, "reset", 200, "", token).await;
     }
-    web::account_page(&state, &session, screen, 200, "", "")
+    web::account_page(&state, &session, screen, 200, "", "").await
 }
 pub async fn post_account(
     State(state): State<Arc<AppState>>,
@@ -512,18 +513,21 @@ pub async fn post_account(
     }.await;
     match result {
         Ok(response) => response,
-        Err(e) => web::account_page(
-            &state,
-            &session,
-            if path == "/password/reset" {
-                "reset"
-            } else {
-                path.trim_start_matches('/')
-            },
-            e.status,
-            e.message,
-            value(&form, "token"),
-        ),
+        Err(e) => {
+            web::account_page(
+                &state,
+                &session,
+                if path == "/password/reset" {
+                    "reset"
+                } else {
+                    path.trim_start_matches('/')
+                },
+                e.status,
+                e.message,
+                value(&form, "token"),
+            )
+            .await
+        }
     }
 }
 #[derive(FromRow)]
@@ -646,7 +650,7 @@ async fn join(
         }
         insert_token(&mut tx,email,"confirm",&token,24*3600).await?;
         a.email(email,"Confirm your Game Loadouts email",&format!("{}/user/confirm/{token}",a.account_url)).await?;
-        tx.commit().await?;Ok(web::account_page(state,session,"info",200,"Your account was created. Please check your email to confirm it.",""))
+        tx.commit().await?;Ok(web::account_page(state,session,"info",200,"Your account was created. Please check your email to confirm it.","").await)
     }.await;
     // Closing the connection also releases the lock if this future is cancelled.
     sqlx::query("SELECT RELEASE_LOCK(?)")
@@ -713,7 +717,8 @@ async fn send_token(
         200,
         "If the account is eligible, an email has been sent. Check your spam folder too.",
         "",
-    ))
+    )
+    .await)
 }
 async fn reset(
     a: &Accounts,
@@ -769,7 +774,7 @@ pub async fn confirm(
     }.await;
     match result {
         Ok(r) => r,
-        Err(e) => web::account_page(&state, &session, "info", e.status, e.message, ""),
+        Err(e) => web::account_page(&state, &session, "info", e.status, e.message, "").await,
     }
 }
 
@@ -887,7 +892,7 @@ pub async fn write_loadout(
     }.await;
     match result {
         Ok(r) => r,
-        Err(e) => web::account_page(&state, &session, "info", e.status, e.message, ""),
+        Err(e) => web::account_page(&state, &session, "info", e.status, e.message, "").await,
     }
 }
 

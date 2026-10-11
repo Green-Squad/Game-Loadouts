@@ -29,8 +29,14 @@ await page.getByRole('button',{name:/^Vote \(0\)/}).click();await page.waitForLo
 assert(await page.getByRole('button',{name:/Remove vote \(1\)/}).isVisible());
 await page.screenshot({path:out+'/loadout-voted.png',fullPage:true});
 await page.goto(base+'/submissions');assert(await page.locator(`a[href$="/${id}"]`).count()>0);
+assert(await page.locator('#submissions-table').isVisible());
+await page.getByRole('columnheader',{name:'Weapon',exact:true}).click();
+assert.equal(await page.locator('header a[href="/Call+of+Duty+Modern+Warfare"]').count(),1,'account navigation games present');
 await page.screenshot({path:out+'/submissions.png',fullPage:true});
-await page.setViewportSize({width:390,height:844});await page.goto(base+'/account');
+await page.setViewportSize({width:390,height:844});
+assert.equal(await page.evaluate(()=>document.documentElement.scrollWidth>innerWidth),false,'submissions mobile overflow');
+await page.screenshot({path:out+'/mobile-submissions.png',fullPage:true});
+await page.goto(base+'/account');
 assert.equal(await page.evaluate(()=>document.documentElement.scrollWidth>innerWidth),false,'account mobile overflow');
 await page.screenshot({path:out+'/mobile-account.png',fullPage:true});
 await page.goto(base+'/logout');await page.getByRole('button',{name:'Log out',exact:true}).click();await page.waitForURL(base+'/');

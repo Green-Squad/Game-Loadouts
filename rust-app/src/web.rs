@@ -124,6 +124,20 @@ impl Page {
             public_url: state.public_url.clone(),
         }
     }
+    fn recent_links(&mut self, recent: &[Game]) {
+        self.nav = recent
+            .iter()
+            .take(5)
+            .filter(|g| g.live == 1)
+            .cloned()
+            .collect();
+        self.footer = recent
+            .iter()
+            .take(4)
+            .filter(|g| g.live == 1)
+            .cloned()
+            .collect();
+    }
     fn asset(&self, path: &str) -> String {
         if path.is_empty() {
             return String::new();
@@ -247,7 +261,7 @@ fn instrument(
     }
     response
 }
-pub(crate) fn account_page(
+pub(crate) async fn account_page(
     state: &AppState,
     session: &Session,
     screen: &str,
@@ -268,6 +282,11 @@ pub(crate) fn account_page(
     p.status = status;
     p.message = message.into();
     p.token = token.into();
+    if state.accounts.is_some()
+        && let Ok(recent) = Db::new(&state.pool, state.query_timeout).recent().await
+    {
+        p.recent_links(&recent);
+    }
     render(p)
 }
 fn render(p: Page) -> Response {
@@ -351,6 +370,7 @@ async fn build_page(
         }
         p.kind = "submissions".into();
         p.title = "My submissions - Game Loadouts".into();
+        p.recent_links(&db.recent().await?);
         p.loadouts=db.rows(&loadout_sql("EXISTS (SELECT 1 FROM loadout_user mine WHERE mine.loadout_id=l.id AND mine.user_id=?)", "(SELECT MAX(updated_at) FROM loadout_user mine WHERE mine.loadout_id=l.id AND mine.user_id=?) DESC,l.id"), &[session.email.clone(),session.email.clone(),session.email.clone()]).await?;
         db.attach(&mut [&mut p.loadouts]).await?;
         return Ok(render(p));
@@ -364,18 +384,7 @@ async fn build_page(
     } else {
         db.recent().await?
     };
-    p.nav = recent
-        .iter()
-        .take(5)
-        .filter(|g| g.live == 1)
-        .cloned()
-        .collect();
-    p.footer = recent
-        .iter()
-        .take(4)
-        .filter(|g| g.live == 1)
-        .cloned()
-        .collect();
+    p.recent_links(&recent);
     match parts {
         [] => {
             p.kind = "home".into();

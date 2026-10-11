@@ -293,7 +293,9 @@
 </div>
 {% else if kind == "account" %}{% include "account.html" %}
 {% else if kind == "submissions" %}<h2>My submissions and votes</h2>{% if loadouts.is_empty() %}<p>You have not submitted or voted for any loadouts yet.</p>{% endif %}
-{% for l in loadouts %}<div class="loadout"><h3><a href="{{ l.url() }}">{{ l.game_id }} — {{ l.weapon_name }}</a></h3>{% include "small_attachments.html" %}{% include "vote.html" %}<a href="{{ l.url() }}#disqus_thread" data-disqus-identifier="loadout-{{ l.id }}">Comments</a></div>{% endfor %}
+{% if !loadouts.is_empty() %}<div class="table-responsive"><table id="submissions-table" class="table table-striped tablesorter"><thead><tr><th>Game</th><th>Weapon</th><th>Attachments</th><th>Actions</th></tr></thead><tbody>
+{% for l in loadouts %}<tr><td>{{ l.game_id }}</td><td><a href="{{ l.url() }}">{{ l.weapon_name }}</a></td><td><ul>{% for a in l.attachments %}<li>{{ a.name }}</li>{% endfor %}</ul></td><td>{% include "vote.html" %} <a class="btn btn-default" href="{{ l.url() }}#disqus_thread" data-disqus-identifier="loadout-{{ l.id }}">Comments</a></td></tr>{% endfor %}
+</tbody></table></div>{% endif %}
 {% else if kind == "terms" %}{% include "terms.html" %}
 {% else %}
 <div class="row errorpage">

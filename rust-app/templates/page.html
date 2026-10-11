@@ -282,6 +282,7 @@
 <script src="/js/Chart.min.js">
 </script>
 {% endif %}
+{% if kind == "submissions" %}<script src="/js/tablesorter/jquery.tablesorter.js"></script><script>$(function(){$("#submissions-table").tablesorter({headers:{3:{sorter:false}}});});</script>{% endif %}
 <script src="/js/rust-public.js">
 </script>
 {% if disqus %}{% if kind == "loadout" %}
