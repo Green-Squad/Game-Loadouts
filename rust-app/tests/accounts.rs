@@ -832,18 +832,19 @@ async fn public_write_flows_and_security() {
         ("_token", parallel_guest.csrf.as_str()),
         ("g-recaptcha-response", "fixture-captcha"),
     ];
+    let parallel_vote_path = format!("{loadout}/upvoteGuest");
     let (left, right) = tokio::join!(
         request(
             &app,
             &parallel_guest.cookie,
-            &format!("{loadout}/upvoteGuest"),
+            &parallel_vote_path,
             "POST",
             &fields
         ),
         request(
             &app,
             &parallel_guest.cookie,
-            &format!("{loadout}/upvoteGuest"),
+            &parallel_vote_path,
             "POST",
             &fields
         )
