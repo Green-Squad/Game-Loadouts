@@ -244,7 +244,7 @@ class WeaponController extends BaseController {
             }
         }
         
-        $count_js = @file_get_contents($count_js);
+        $count_js = Config::get('hand_forged_demo', false) ? '' : @file_get_contents($count_js);
         
         // Strip it of spaces, hard to parse later on
         str_replace(' ', '', $count_js);
@@ -339,6 +339,14 @@ class WeaponController extends BaseController {
                     urlencode($weaponName) 
                 ));
             }
+        }
+        if (Config::get('hand_forged_demo', false)) {
+            $items=array();
+            foreach (Weapon::where('name','LIKE','%'.$query.'%')->orWhere('game_id','LIKE','%'.$query.'%')->take(50)->get() as $weapon) {
+                $items[]=array('title'=>$weapon->name.' / '.$weapon->game_id,'snippet'=>'Explore attachments and sample loadouts.','link'=>URL::route('showLoadouts',array(urlencode($weapon->game_id),urlencode($weapon->name))));
+            }
+            $googleRequestDecoded=json_decode(json_encode(array('queries'=>array('request'=>array(array('searchTerms'=>$query))),'items'=>$items)));
+            return View::make('search',compact('googleRequestDecoded'));
         }
         try {
             $googleRequest = file_get_contents($_ENV ['search_url'] . urlencode($query));

@@ -137,6 +137,7 @@
         <!-- End header -->
 
         <!-- Content -->
+        @if(Config::get('hand_forged_demo', false))<div class="container">@include('hand-forged.banner')</div>@endif
         @yield('sub-header')
         @yield('intro')
         <article class="article-container">
@@ -318,7 +319,7 @@
         </script>
         @yield('scripts')
 		<!-- Google Analytics -->
-        @if(Auth::guest() || Auth::user() -> role != 'Admin')
+        @if(!Config::get('hand_forged_demo', false) && (Auth::guest() || Auth::user() -> role != 'Admin'))
 		<script>
  			(function(i,s,o,g,r,a,m) {
 				i['GoogleAnalyticsObject']=r;i[r]=i[r]||function() {(i[r].q=i[r].q||[]).push(arguments)},

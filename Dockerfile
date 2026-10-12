@@ -1,62 +1,18 @@
-# Use PHP 5.6 with Apache as the base image
-FROM php:5.6-apache
-
-# Set the working directory inside the container
+FROM php:5.6.40-apache@sha256:24c791995c1e498255393db857040793a7a040fa0f8ddd4bbe8fb230648e37d7
 WORKDIR /var/www/html
-
-# set hostname
-ENV HOSTNAME docker
-
-# Update repository URLs to archive and update packages
-RUN sed -i 's/http:\/\/deb.debian.org/http:\/\/archive.debian.org/g' /etc/apt/sources.list \
-    && sed -i 's/http:\/\/security.debian.org/http:\/\/archive.debian.org/g' /etc/apt/sources.list \
-    && sed -i '/stretch-updates/d' /etc/apt/sources.list \
-    && echo 'Acquire::Check-Valid-Until "false";' > /etc/apt/apt.conf.d/99no-check-valid-until \
-    && echo 'Acquire::AllowInsecureRepositories "true";' > /etc/apt/apt.conf.d/99allow-insecure \
-    && apt-get update
-
-# Install dependencies one by one
-RUN apt-get install -y libpng-dev \
-    && apt-get install -y libjpeg-dev \
-    && apt-get install -y libfreetype6-dev \
-    && apt-get install -y libmcrypt-dev \
-    && apt-get install -y libzip-dev \
-    && apt-get install -y zip \
-    && apt-get install -y git \
-    && apt-get install -y libxml2-dev
-
-# Configure and install PHP extensions
-RUN docker-php-ext-configure gd --with-freetype-dir=/usr/include/ --with-jpeg-dir=/usr/include/ \
-    && docker-php-ext-install -j$(nproc) gd pdo pdo_mysql mbstring tokenizer xml zip mcrypt
-
-# Install Composer
-RUN curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/local/bin --filename=composer
-
-# Copy the current directory contents into the container at /var/www/html
-COPY . /var/www/html
-
-# Allow Apache to write Laravel storage and uploaded artwork.
-RUN mkdir -p /var/www/html/public/uploads/thumb /var/www/html/public/uploads/header \
-    && chown -R www-data:www-data /var/www/html/app/storage /var/www/html/public/uploads \
-    && chmod -R 775 /var/www/html/app/storage \
-    && find /var/www/html/public/uploads -type d -exec chmod 755 {} + \
-    && find /var/www/html/public/uploads -type f -exec chmod 644 {} +
-
-# Set Apache document root to Laravel public directory
-ENV APACHE_DOCUMENT_ROOT /var/www/html/public
-
-# Update Apache configuration with the new document root
-RUN sed -ri -e 's!/var/www/html!${APACHE_DOCUMENT_ROOT}!g' /etc/apache2/sites-available/*.conf \
-    && sed -ri -e 's!/var/www/!${APACHE_DOCUMENT_ROOT}!g' /etc/apache2/apache2.conf /etc/apache2/conf-available/*.conf
-
-# Enable Apache modules
-RUN a2enmod rewrite
-
-# Install all PHP dependencies
-RUN composer install
-
-# Expose port 80
-EXPOSE 80
-
-# Run Apache server in the foreground
-CMD ["apache2-foreground"]
+RUN printf "deb https://archive.debian.org/debian stretch main\n deb https://archive.debian.org/debian-security stretch/updates main\n" > /etc/apt/sources.list && apt-get -o Acquire::Check-Valid-Until=false update && apt-get install -y --no-install-recommends libpng-dev libjpeg-dev libfreetype6-dev libmcrypt-dev libxml2-dev zlib1g-dev unzip git openssl && rm -rf /var/lib/apt/lists/*
+RUN docker-php-ext-configure gd --with-freetype-dir=/usr/include/ --with-jpeg-dir=/usr/include/ && docker-php-ext-install -j2 gd pdo_mysql mbstring xml zip mcrypt
+COPY --from=composer:2.2.25@sha256:be23a9c3f73293f966a981be03896f9aaaade6c2cc9415f4cf828d1f39c5005c /usr/bin/composer /usr/local/bin/composer
+COPY composer.json ./
+RUN composer install --no-dev --no-scripts --prefer-dist --no-interaction
+# Keep large original asset layers stable across demo source updates.
+COPY public ./public
+COPY app ./app
+COPY bootstrap ./bootstrap
+COPY artisan .env.php ./
+COPY hand-forged ./hand-forged
+RUN composer dump-autoload --no-dev --no-scripts --optimize && mkdir -p app/storage/logs app/storage/cache app/storage/views app/storage/sessions public/uploads/thumb public/uploads/header && chown -R www-data:www-data app/storage public/uploads && a2enmod rewrite && sed -i 's/AllowOverride None/AllowOverride All/g' /etc/apache2/apache2.conf && printf '<VirtualHost *:8080>\n DocumentRoot /var/www/html/public\n <Directory /var/www/html/public>\n Require all granted\n AllowOverride All\n </Directory>\n</VirtualHost>\n' > /etc/apache2/sites-available/000-default.conf && printf 'Listen 8080\n' > /etc/apache2/ports.conf
+RUN printf '<IfModule mpm_prefork_module>\n StartServers 2\n MinSpareServers 1\n MaxSpareServers 3\n ServerLimit 4\n MaxRequestWorkers 4\n MaxConnectionsPerChild 500\n</IfModule>\n' > /etc/apache2/mods-available/mpm_prefork.conf && printf '<Directory /var/www/html/public/uploads>\n php_admin_flag engine off\n Options -ExecCGI\n <FilesMatch "\\.(php|phtml|phar)$">\n Require all denied\n </FilesMatch>\n</Directory>\n' > /etc/apache2/conf-available/hand-forged.conf && a2enconf hand-forged
+ENV HAND_FORGED_DEMO=true HAND_FORGED_HOST=handforged.gameloadouts.com PORT=8080
+EXPOSE 8080
+ENTRYPOINT ["sh","hand-forged/start.sh"]

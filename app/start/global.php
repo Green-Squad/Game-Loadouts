@@ -85,3 +85,5 @@ App::before(function ($request) {
 
 require app_path().'/filters.php';
 require app_path() . '/observers.php';
+
+if (getenv('HAND_FORGED_DEMO') === 'true') { require app_path().'/../hand-forged/bootstrap.php'; }

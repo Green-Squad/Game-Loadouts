@@ -1,0 +1,11 @@
+[mysqld]
+innodb_buffer_pool_size=32M
+innodb_log_file_size=8M
+innodb_log_buffer_size=1M
+performance_schema=OFF
+max_connections=12
+table_open_cache=128
+key_buffer_size=4M
+sql_mode=NO_ENGINE_SUBSTITUTION
+skip_name_resolve=ON
+skip-log-bin

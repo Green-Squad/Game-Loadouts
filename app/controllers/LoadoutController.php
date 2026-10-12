@@ -257,6 +257,7 @@ class LoadoutController extends BaseController {
     }
 
     public function captchaCheck() {
+        if (Config::get('hand_forged_demo', false)) return Input::get('g-recaptcha-response') === 'hand-forged-demo';
         $url = 'https://www.google.com/recaptcha/api/siteverify';
         $response = Input::get('g-recaptcha-response');
         $secret = $_ENV ['RECAPTCHA_PRIVATE_KEY'];

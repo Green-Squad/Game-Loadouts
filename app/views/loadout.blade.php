@@ -162,6 +162,7 @@ The {{ $weapon -> name }} in {{ $game -> id }}@if($game -> short_name) ({{ $game
 	<div class="well">
 	    <div class="col-md-12">
 	        <div class="row">
+@if(!Config::get('hand_forged_demo', false))
 	            <?php
 	            define('DISQUS_SECRET_KEY', $_ENV['DISQUS_SECRET_KEY']);
 	            define('DISQUS_PUBLIC_KEY', 'HXGfl9wP4NuXd15qCTPIprKv2rJhzqCp38NlZs5YmA2i3LOlFzTnBAiiWK8MQKI9');
@@ -233,6 +234,8 @@ The {{ $weapon -> name }} in {{ $game -> id }}@if($game -> short_name) ({{ $game
 	                Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a>
 	            </noscript>
 	            <a href="http://disqus.com" class="dsq-brlink">comments powered by <span class="logo-disqus">Disqus</span></a>
+@else<p>External comments are disabled in this historical demo.</p>@endif
+
 	        </div>
 	    </div>
 	</div>
@@ -310,7 +313,7 @@ The {{ $weapon -> name }} in {{ $game -> id }}@if($game -> short_name) ({{ $game
 @stop
 
 @section('scripts')
-<script src='https://www.google.com/recaptcha/api.js'></script>
+@if(Config::get('hand_forged_demo', false))<script src=\"{{ asset('js/hand-forged-captcha.js') }}\"></script>@else<script src='https://www.google.com/recaptcha/api.js'></script>@endif
 <script type="text/javascript">
     $('.clickable').click(function() {
         var game_id = '<?php echo $game -> id; ?>';

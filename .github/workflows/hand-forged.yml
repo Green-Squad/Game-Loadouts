@@ -1,0 +1,37 @@
+name: Hand-Forged validation
+on:
+  push:
+    branches: [hand-forged]
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  disposable-demo:
+    if: github.ref == 'refs/heads/hand-forged'
+    runs-on: ubuntu-latest
+    timeout-minutes: 35
+    steps:
+    - uses: actions/checkout@v4
+    - name: Build original Laravel application and private MySQL snapshot
+      run: |
+        docker build -t hand-forged-db -f hand-forged/Database.Dockerfile .
+        docker build -t hand-forged-web .
+    - name: Prepare focused browser checks
+      run: |
+        python3 -m pip install requests==2.32.3 beautifulsoup4==4.13.4
+        npm install --no-save playwright@1.64.0
+        npx playwright install --with-deps chromium
+    - name: Startup, original forms, resource measurements and reset
+      run: bash hand-forged/check-container.sh
+    - name: Save reproducible original PHP dependency resolution
+      if: always()
+      run: |
+        mkdir -p hand-forged/test-results
+        docker create --name hf-dependencies hand-forged-web || exit 0
+        docker cp hf-dependencies:/var/www/html/composer.lock hand-forged/test-results/composer.lock || true
+        docker rm hf-dependencies
+    - uses: actions/upload-artifact@v4
+      if: always()
+      with:
+        name: hand-forged-validation
+        path: hand-forged/test-results

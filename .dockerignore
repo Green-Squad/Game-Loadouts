@@ -1,0 +1,12 @@
+.git
+.env
+.env.*
+!.env.php
+node_modules
+content
+app/storage/logs/*
+app/storage/cache/*
+app/storage/sessions/*
+app/storage/views/*
+hand-forged/test-results
+hand-forged/catalog.json.gz

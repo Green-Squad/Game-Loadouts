@@ -33,7 +33,7 @@ class HelperController extends BaseController {
 	}
 
     public static function adsEnabled() {
-        return $_ENV ['ads'];
+        return !Config::get('hand_forged_demo', false) && $_ENV ['ads'];
     }
 
     public function toggleAds() {
