@@ -1,0 +1,23 @@
+{
+  "type": "package",
+  "package": {
+    "name": "roumen/sitemap",
+    "version": "2.4.12",
+    "description": "Original Laravel sitemap release retained in the publisher archive",
+    "license": "MIT",
+    "require": {
+      "php": ">=5.4.0",
+      "illuminate/support": "~4|~5"
+    },
+    "autoload": {
+      "psr-0": {
+        "Roumen\\Sitemap": "src/"
+      }
+    },
+    "dist": {
+      "type": "zip",
+      "url": "https://api.github.com/repos/RumenDamyanov/php-sitemap/zipball/16683b264dd8bfedca0c1e96e32dd00f2aacc379",
+      "reference": "16683b264dd8bfedca0c1e96e32dd00f2aacc379"
+    }
+  }
+}

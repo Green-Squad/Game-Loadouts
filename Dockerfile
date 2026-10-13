@@ -5,7 +5,8 @@ RUN printf "deb http://archive.debian.org/debian stretch main\n deb http://archi
 RUN docker-php-ext-configure gd --with-freetype-dir=/usr/include/ --with-jpeg-dir=/usr/include/ && docker-php-ext-install -j2 gd pdo_mysql mbstring xml zip mcrypt
 COPY --from=composer:2.2.25@sha256:be23a9c3f73293f966a981be03896f9aaaade6c2cc9415f4cf828d1f39c5005c /usr/bin/composer /usr/local/bin/composer
 COPY composer.json ./
-RUN composer install --no-dev --no-scripts --prefer-dist --no-interaction
+COPY hand-forged/sitemap-package.json /tmp/sitemap-package.json
+RUN composer config repositories.hand-forged-sitemap "$(cat /tmp/sitemap-package.json)" && composer install --no-dev --no-scripts --prefer-dist --no-interaction
 # Keep large original asset layers stable across demo source updates.
 COPY public ./public
 COPY app ./app
