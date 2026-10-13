@@ -1,9 +1,11 @@
+#![cfg(feature = "fixture-tests")]
 //! All writes and emails stay inside a separate loopback fixture database and SMTP receiver.
 use axum::{
     Router,
     body::Body,
     http::{HeaderMap, Request},
 };
+use game_loadouts::remote::{self as sqlx, Pool};
 use game_loadouts::{
     account::Accounts,
     model::encode,
@@ -12,7 +14,7 @@ use game_loadouts::{
 };
 use http_body_util::BodyExt;
 use lettre::{AsyncSmtpTransport, Tokio1Executor};
-use sqlx::{MySqlPool, mysql::MySqlPoolOptions};
+use sqlx_source::{MySqlPool, mysql::MySqlPoolOptions};
 use std::{collections::BTreeMap, sync::Arc, time::Duration};
 use tokio::{
     io::{AsyncBufReadExt, AsyncWriteExt, BufReader},
@@ -148,7 +150,7 @@ async fn captcha() -> (String, tokio::task::JoinHandle<()>) {
 }
 async fn fixture() -> (
     Router,
-    MySqlPool,
+    Pool,
     MySqlPool,
     Arc<Mutex<Vec<String>>>,
     Vec<tokio::task::JoinHandle<()>>,
@@ -156,30 +158,33 @@ async fn fixture() -> (
     let url = std::env::var("TEST_DATABASE_URL").expect("isolated fixture URL required");
     assert!(
         url.ends_with("/loadouts_fixture")
-            && (url.contains("@127.0.0.1:") || url.contains("@localhost:"))
+            && (url.contains("@127.0.0.1:")
+                || url.contains("@localhost:")
+                || (url.contains("@fixture-mysql:3306/")
+                    && std::env::var("TURSO_TEST_DATABASE").as_deref() == Ok("isolated")))
     );
     let owner = MySqlPoolOptions::new().connect(&url).await.unwrap();
-    sqlx::query("CREATE DATABASE loadouts_accounts_fixture")
+    sqlx_source::query("CREATE DATABASE loadouts_accounts_fixture")
         .execute(&owner)
         .await
         .unwrap();
     let schema = include_str!("../fixtures/schema.sql")
         .replace("loadouts_fixture", "loadouts_accounts_fixture")
         .replace(
-            ") ENGINE=InnoDB CHARACTER SET utf8mb4;",
-            ") ENGINE=MyISAM CHARACTER SET utf8;",
+            ") ENGINE=InnoDB CHARACTER SET utf8mb3 COLLATE utf8mb3_unicode_ci;",
+            ") ENGINE=MyISAM CHARACTER SET utf8mb3 COLLATE utf8mb3_unicode_ci;",
         )
         .lines()
         .filter(|l| !l.starts_with("CREATE USER "))
         .collect::<Vec<_>>()
         .join("\n");
-    sqlx::raw_sql(&schema).execute(&owner).await.unwrap();
+    sqlx_source::raw_sql(&schema).execute(&owner).await.unwrap();
     let pool = MySqlPoolOptions::new()
         .max_connections(12)
         .connect(&url.replace("/loadouts_fixture", "/loadouts_accounts_fixture"))
         .await
         .unwrap();
-    sqlx::raw_sql(
+    sqlx_source::raw_sql(
         &include_str!("../fixtures/data.sql")
             .replace("loadouts_fixture", "loadouts_accounts_fixture"),
     )
@@ -189,25 +194,23 @@ async fn fixture() -> (
     let hash = bcrypt::hash("legacy-password", 4)
         .unwrap()
         .replace("$2b$", "$2y$");
-    sqlx::query("INSERT INTO users(email,username,role,password,confirm_token) VALUES('tester@example.invalid','SecurityTester','Standard',?,'1')").bind(hash).execute(&pool).await.unwrap();
+    sqlx_source::query("INSERT INTO users(email,username,role,password,confirm_token) VALUES('tester@example.invalid','SecurityTester','Standard',?,'1')").bind(hash).execute(&pool).await.unwrap();
+    let target = std::env::var("TEST_TURSO_ACCOUNTS_URL").unwrap();
+    assert!(
+        std::process::Command::new("python3")
+            .arg("migration/fixture_copy.py")
+            .arg("--source-database")
+            .arg("loadouts_accounts_fixture")
+            .arg("--target")
+            .arg(&target)
+            .status()
+            .unwrap()
+            .success()
+    );
+    let pool = Pool::connect_isolated(&target, true).await.unwrap();
+    let read = Pool::connect_isolated(&target, false).await.unwrap();
     let (port, messages, mail_task) = smtp().await;
     let (captcha_url, captcha_task) = captcha().await;
-    let read = MySqlPoolOptions::new()
-        .max_connections(4)
-        .after_connect(|c, _| {
-            Box::pin(async move {
-                sqlx::query("SET SESSION TRANSACTION READ ONLY")
-                    .execute(c)
-                    .await?;
-                Ok(())
-            })
-        })
-        .connect(
-            &url.replace("root@", "loadouts_reader@")
-                .replace("/loadouts_fixture", "/loadouts_accounts_fixture"),
-        )
-        .await
-        .unwrap();
     let state = Arc::new(AppState {
         ads: false,
         analytics_id: String::new(),
@@ -283,16 +286,50 @@ async fn public_write_flows_and_security() {
         .try_init();
     let (app, pool, owner, messages, tasks) = fixture().await;
     game_loadouts::schema::validate(&pool).await.unwrap();
-    let reminder_engine:String=sqlx::query_scalar("SELECT ENGINE FROM information_schema.TABLES WHERE TABLE_SCHEMA=DATABASE() AND TABLE_NAME='password_reminders'").fetch_one(&pool).await.unwrap();
-    assert_eq!(
-        reminder_engine, "MyISAM",
-        "Exercise the legacy reminder engine without a production migration"
-    );
-    let extra_tables:i64=sqlx::query_scalar("SELECT COUNT(*) FROM information_schema.TABLES WHERE TABLE_SCHEMA=DATABASE() AND TABLE_NAME IN ('rust_sessions','rust_account_tokens')").fetch_one(&pool).await.unwrap();
+    let reminder_table: i64 = sqlx::query_scalar(
+        "SELECT COUNT(*) FROM sqlite_master WHERE type='table' AND name='_g1_password_reminders'",
+    )
+    .fetch_one(&pool)
+    .await
+    .unwrap();
+    assert_eq!(reminder_table, 1);
+    let extra_tables: i64 = sqlx::query_scalar(
+        "SELECT COUNT(*) FROM sqlite_master WHERE name IN ('rust_sessions','rust_account_tokens')",
+    )
+    .fetch_one(&pool)
+    .await
+    .unwrap();
     assert_eq!(
         extra_tables, 0,
-        "The account flows must work with only the existing Laravel schema"
+        "Account state continues using the imported Laravel tables and encrypted cookies"
     );
+    // Prove all facade writes use the actual transaction stream and FK policy.
+    let tx = pool.begin().await.unwrap();
+    let foreign_keys: i64 = sqlx::query_scalar("PRAGMA foreign_keys")
+        .fetch_one(&*tx)
+        .await
+        .unwrap();
+    assert_eq!(foreign_keys, 1);
+    sqlx::query("UPDATE users SET username=? WHERE email=?")
+        .bind("uncommitted-fixture")
+        .bind("tester@example.invalid")
+        .execute(&*tx)
+        .await
+        .unwrap();
+    let outside: String = sqlx::query_scalar("SELECT username FROM users WHERE email=?")
+        .bind("tester@example.invalid")
+        .fetch_one(&pool)
+        .await
+        .unwrap();
+    assert_eq!(outside, "SecurityTester");
+    drop(tx);
+    tokio::time::sleep(Duration::from_millis(100)).await;
+    let rolled_back: String = sqlx::query_scalar("SELECT username FROM users WHERE email=?")
+        .bind("tester@example.invalid")
+        .fetch_one(&pool)
+        .await
+        .unwrap();
+    assert_eq!(rolled_back, "SecurityTester");
     let mut member = Browser::default();
     let login = member.get(&app, "/login").await;
     assert_eq!(login.status, 200);
@@ -575,7 +612,7 @@ async fn public_write_flows_and_security() {
         200
     );
     let converted: i64 = sqlx::query_scalar(
-        "SELECT CAST(converted_guest AS SIGNED) FROM users WHERE email='new@example.invalid'",
+        "SELECT CAST(converted_guest AS INTEGER) FROM users WHERE email='new@example.invalid'",
     )
     .fetch_one(&pool)
     .await
@@ -685,12 +722,12 @@ async fn public_write_flows_and_security() {
             .status,
         422
     );
-    sqlx::query("UPDATE password_reminders SET created_at=TIMESTAMPADD(MINUTE,-61,UTC_TIMESTAMP()) WHERE email='new@example.invalid'").execute(&pool).await.unwrap();
+    sqlx::query("UPDATE password_reminders SET created_at=strftime('%Y-%m-%d %H:%M:%f','now','-61 minutes') WHERE email='new@example.invalid'").execute(&pool).await.unwrap();
     assert_eq!(
         resetter.post(&app, "/password/reset", &fields).await.status,
         422
     );
-    sqlx::query("UPDATE password_reminders SET created_at=UTC_TIMESTAMP() WHERE email='new@example.invalid'").execute(&pool).await.unwrap();
+    sqlx::query("UPDATE password_reminders SET created_at=strftime('%Y-%m-%d %H:%M:%f','now') WHERE email='new@example.invalid'").execute(&pool).await.unwrap();
     assert_eq!(
         resetter.post(&app, "/password/reset", &fields).await.status,
         303
@@ -803,7 +840,7 @@ async fn public_write_flows_and_security() {
     // SMTP failure preserves an existing raw reminder row even on nontransactional MyISAM.
     sqlx::query("INSERT INTO users(email,username,password,role,confirm_token) VALUES('mail-failure@example.invalid','MailFailure','fixture-hash','Standard','1')").execute(&pool).await.unwrap();
     let previous_reminder = "d".repeat(40);
-    sqlx::query("INSERT INTO password_reminders(email,token,created_at) VALUES('mail-failure@example.invalid',?,TIMESTAMPADD(MINUTE,-2,UTC_TIMESTAMP()))").bind(&previous_reminder).execute(&pool).await.unwrap();
+    sqlx::query("INSERT INTO password_reminders(email,token,created_at) VALUES('mail-failure@example.invalid',?,strftime('%Y-%m-%d %H:%M:%f','now','-2 minutes'))").bind(&previous_reminder).execute(&pool).await.unwrap();
     let mut mail_failure = Browser::default();
     mail_failure.get(&app, "/reminder").await;
     assert_eq!(
@@ -821,7 +858,7 @@ async fn public_write_flows_and_security() {
         422
     );
     assert_eq!(
-        sqlx::query_scalar::<_, String>(
+        sqlx::query_scalar::<String>(
             "SELECT token FROM password_reminders WHERE email='mail-failure@example.invalid'"
         )
         .fetch_one(&pool)
@@ -831,7 +868,7 @@ async fn public_write_flows_and_security() {
     );
     // Laravel-issued reminder rows (40-character SHA1 tokens) work on Rust, with no new tables.
     let legacy_reset = "b".repeat(40);
-    sqlx::query("INSERT INTO password_reminders(email,token,created_at) VALUES('tester@example.invalid',?,UTC_TIMESTAMP())").bind(&legacy_reset).execute(&pool).await.unwrap();
+    sqlx::query("INSERT INTO password_reminders(email,token,created_at) VALUES('tester@example.invalid',?,strftime('%Y-%m-%d %H:%M:%f','now'))").bind(&legacy_reset).execute(&pool).await.unwrap();
     let mut legacy_reset_browser = Browser::default();
     legacy_reset_browser
         .get(&app, &format!("/password/reset/{legacy_reset}"))
@@ -853,7 +890,7 @@ async fn public_write_flows_and_security() {
         303
     );
     assert_eq!(
-        sqlx::query_scalar::<_, i64>(
+        sqlx::query_scalar::<i64>(
             "SELECT COUNT(*) FROM password_reminders WHERE email='tester@example.invalid'"
         )
         .fetch_one(&pool)
@@ -921,7 +958,7 @@ async fn public_write_flows_and_security() {
         fixture_sessions().open(right_cookie).unwrap().email
     );
     assert_eq!(
-        sqlx::query_scalar::<_, i64>(
+        sqlx::query_scalar::<i64>(
             "SELECT COUNT(*) FROM loadout_user WHERE user_id=? AND loadout_id=1"
         )
         .bind(left_email)
@@ -966,7 +1003,7 @@ async fn public_write_flows_and_security() {
         task.abort();
     }
     pool.close().await;
-    sqlx::query("DROP DATABASE loadouts_accounts_fixture")
+    sqlx_source::query("DROP DATABASE loadouts_accounts_fixture")
         .execute(&owner)
         .await
         .unwrap();

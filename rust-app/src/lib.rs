@@ -4,3 +4,5 @@ pub mod model;
 pub mod schema;
 pub mod session;
 pub mod web;
+
+pub mod remote;

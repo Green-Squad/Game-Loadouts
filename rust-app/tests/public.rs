@@ -1,46 +1,23 @@
+#![cfg(feature = "fixture-tests")]
 use axum::{body::Body, http::Request};
+use game_loadouts::remote::{self as sqlx, Pool};
 use game_loadouts::{
     model::encode,
     web::{AppState, app},
 };
 use http_body_util::BodyExt;
-use sqlx::mysql::MySqlPoolOptions;
 use std::{sync::Arc, time::Duration};
 use tower::ServiceExt;
 
-async fn fixture() -> (axum::Router, sqlx::MySqlPool) {
-    let url = std::env::var("TEST_DATABASE_URL")
-        .expect("Set TEST_DATABASE_URL to the isolated loadouts_fixture database");
-    assert!(
-        url.contains("/loadouts_fixture"),
-        "Only the fixture database may be tested"
-    );
-    assert!(
-        url.contains("@127.0.0.1:") || url.contains("@localhost:"),
-        "Tests require loopback database"
-    );
-    let pool = MySqlPoolOptions::new()
-        .max_connections(4)
-        .connect(&url)
-        .await
-        .unwrap();
+async fn fixture() -> (axum::Router, Pool) {
+    let target = std::env::var("TEST_TURSO_PUBLIC_URL").unwrap();
+    let pool = Pool::connect_isolated(&target, true).await.unwrap();
+    let read = Pool::connect_isolated(&target, false).await.unwrap();
     let state = Arc::new(AppState {
         ads: false,
         analytics_id: String::new(),
         accounts: None,
-        pool: MySqlPoolOptions::new()
-            .max_connections(4)
-            .after_connect(|c, _| {
-                Box::pin(async move {
-                    sqlx::query("SET SESSION TRANSACTION READ ONLY")
-                        .execute(c)
-                        .await?;
-                    Ok(())
-                })
-            })
-            .connect(&url.replace("root@", "loadouts_reader@"))
-            .await
-            .unwrap(),
+        pool: read,
         query_timeout: Duration::from_secs(2),
         public_url: "https://gameloadouts.com".into(),
         media_origin: String::new(),
@@ -234,7 +211,11 @@ async fn public_correctness_and_query_budgets() {
     assert_eq!((s, q), (200, 2));
     assert!(html.contains("/Call+of+Duty+Modern+Warfare/M4A1"));
     // Constant query budget after growing the COMPLETE weapon list: test-side writes only.
-    sqlx::query("INSERT INTO loadouts(id,weapon_id,user_id,created_at,updated_at) SELECT 10000+n,1,'guest@example.invalid',NOW(),NOW() FROM (SELECT a.n*100+b.n*10+c.n n FROM (SELECT 0 n UNION ALL SELECT 1 UNION ALL SELECT 2 UNION ALL SELECT 3 UNION ALL SELECT 4 UNION ALL SELECT 5 UNION ALL SELECT 6 UNION ALL SELECT 7 UNION ALL SELECT 8 UNION ALL SELECT 9) a CROSS JOIN (SELECT 0 n UNION ALL SELECT 1 UNION ALL SELECT 2 UNION ALL SELECT 3 UNION ALL SELECT 4 UNION ALL SELECT 5 UNION ALL SELECT 6 UNION ALL SELECT 7 UNION ALL SELECT 8 UNION ALL SELECT 9) b CROSS JOIN (SELECT 0 n UNION ALL SELECT 1 UNION ALL SELECT 2 UNION ALL SELECT 3 UNION ALL SELECT 4 UNION ALL SELECT 5 UNION ALL SELECT 6 UNION ALL SELECT 7 UNION ALL SELECT 8 UNION ALL SELECT 9) c) numbers").execute(&pool).await.unwrap();
+    let tx = pool.begin().await.unwrap();
+    for n in 0..1000i64 {
+        sqlx::query("INSERT INTO loadouts(id,weapon_id,user_id,created_at,updated_at) VALUES(?,?,?,CURRENT_TIMESTAMP,CURRENT_TIMESTAMP)").bind(10000+n).bind(1i64).bind("guest@example.invalid").execute(&*tx).await.unwrap();
+    }
+    tx.commit().await.unwrap();
     let (s, q, html) = request(&app, "/Call+of+Duty+Modern+Warfare/M4A1", "GET", "").await;
     let cleanup = sqlx::query("DELETE FROM loadouts WHERE id>=10000")
         .execute(&pool)
@@ -242,9 +223,7 @@ async fn public_correctness_and_query_budgets() {
     cleanup.unwrap();
     assert_eq!((s, q), (200, 6));
     assert_eq!(html.matches("data-loadout-id=").count(), 1007);
-    let reader = MySqlPoolOptions::new()
-        .max_connections(1)
-        .connect(&url_for_reader())
+    let reader = Pool::connect_isolated(&std::env::var("TEST_TURSO_PUBLIC_URL").unwrap(), false)
         .await
         .unwrap();
     assert!(
@@ -255,13 +234,13 @@ async fn public_correctness_and_query_budgets() {
     );
     let mut db = game_loadouts::db::Db::new(&reader, Duration::from_millis(5));
     assert!(matches!(
-        db.rows::<(i64,)>("SELECT CAST(SLEEP(0.05) AS SIGNED)", &[])
+        db.rows::<(i64,)>("WITH RECURSIVE numbers(n) AS (SELECT 1 UNION ALL SELECT n+1 FROM numbers WHERE n<1000000) SELECT SUM(n) FROM numbers", &[])
             .await,
         Err(game_loadouts::db::DbError::Timeout)
     ));
     db.timeout = Duration::from_secs(2);
     assert_eq!(
-        db.rows::<(i64,)>("SELECT CAST(1 AS SIGNED)", &[])
+        db.rows::<(i64,)>("SELECT CAST(1 AS INTEGER)", &[])
             .await
             .unwrap(),
         vec![(1,)]
@@ -270,19 +249,10 @@ async fn public_correctness_and_query_budgets() {
     pool.close().await;
 }
 
-fn url_for_reader() -> String {
-    std::env::var("TEST_DATABASE_URL")
-        .unwrap()
-        .replace("root@", "loadouts_reader@")
-}
-
 #[tokio::test]
 #[ignore = "requires explicitly isolated fixture MySQL/MariaDB"]
 async fn google_search_fallback_and_provider() {
-    let url = url_for_reader();
-    let pool = MySqlPoolOptions::new()
-        .max_connections(2)
-        .connect(&url)
+    let pool = Pool::connect_isolated(&std::env::var("TEST_TURSO_PUBLIC_URL").unwrap(), false)
         .await
         .unwrap();
     let make_state = |api: String| {

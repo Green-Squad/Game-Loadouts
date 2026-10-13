@@ -1,3 +1,4 @@
+use crate::remote::Pool;
 use crate::{
     account::{self, Accounts, Session},
     db::*,
@@ -13,7 +14,6 @@ use axum::{
     routing::get,
 };
 use serde::Deserialize;
-use sqlx::MySqlPool;
 use std::{
     collections::BTreeMap,
     sync::Arc,
@@ -29,7 +29,7 @@ pub struct AppState {
     pub accounts: Option<Arc<Accounts>>,
     pub ads: bool,
     pub analytics_id: String,
-    pub pool: MySqlPool,
+    pub pool: Pool,
     pub query_timeout: Duration,
     pub public_url: String,
     pub media_origin: String,
@@ -396,7 +396,7 @@ async fn build_page(
                     .iter()
                     .map(|_| {
                         format!(
-                            "({})",
+                            "SELECT * FROM ({})",
                             loadout_sql("w.game_id=? AND v.votes>0", "votes DESC,l.id LIMIT 5")
                         )
                     })
@@ -455,8 +455,8 @@ async fn build_page(
             p.title = "Game Loadouts Stats".into();
             p.description =
                 "View the stats we have collected on all the game loadout submissions.".into();
-            p.stats=db.rows("SELECT A.game_id game, CAST(A.votes AS SIGNED) votes, CAST(B.loadouts AS SIGNED) loadouts FROM (SELECT w.game_id, COUNT(lu.loadout_id) votes FROM weapons w JOIN loadouts l ON l.weapon_id=w.id JOIN loadout_user lu ON lu.loadout_id=l.id GROUP BY w.game_id) A JOIN (SELECT w.game_id, COUNT(l.id) loadouts FROM weapons w JOIN loadouts l ON l.weapon_id=w.id GROUP BY w.game_id) B ON A.game_id=B.game_id ORDER BY A.game_id",&[]).await?;
-            let days: Vec<Day>=db.rows("SELECT d.game,CAST(d.vote_date AS CHAR) date,CAST(d.votes AS SIGNED) votes FROM (SELECT w.game_id game,DATE(lu.created_at) vote_date,COUNT(*) votes FROM weapons w JOIN loadouts l ON l.weapon_id=w.id JOIN loadout_user lu ON lu.loadout_id=l.id WHERE DATE(lu.created_at)>=DATE_SUB(CURDATE(),INTERVAL 30 DAY) GROUP BY w.game_id,DATE(lu.created_at)) d ORDER BY d.vote_date,d.game",&[]).await?;
+            p.stats=db.rows("SELECT A.game_id game, CAST(A.votes AS INTEGER) votes, CAST(B.loadouts AS INTEGER) loadouts FROM (SELECT w.game_id,w._key_game_id, COUNT(lu.loadout_id) votes FROM weapons w JOIN loadouts l ON l.weapon_id=w.id JOIN loadout_user lu ON lu.loadout_id=l.id GROUP BY w._key_game_id) A JOIN (SELECT w.game_id,w._key_game_id, COUNT(l.id) loadouts FROM weapons w JOIN loadouts l ON l.weapon_id=w.id GROUP BY w._key_game_id) B ON A.game_id=B.game_id ORDER BY A._key_game_id",&[]).await?;
+            let days: Vec<Day>=db.rows("SELECT d.game,CAST(d.vote_date AS TEXT) date,CAST(d.votes AS INTEGER) votes FROM (SELECT w.game_id game,w._key_game_id game_key,DATE(lu.created_at) vote_date,COUNT(*) votes FROM weapons w JOIN loadouts l ON l.weapon_id=w.id JOIN loadout_user lu ON lu.loadout_id=l.id WHERE DATE(lu.created_at)>=DATE('now','-30 days') GROUP BY w._key_game_id,DATE(lu.created_at)) d ORDER BY d.vote_date,d.game_key",&[]).await?;
             let dates: std::collections::BTreeSet<_> =
                 days.iter().map(|d| d.date.clone()).collect();
             let mut names = vec![];
@@ -562,7 +562,7 @@ async fn build_page(
                         )
                         .await?;
                     db.attach(&mut [&mut p.loadouts]).await?;
-                    let available: Vec<Attachment>=db.rows("SELECT CAST(a.id AS SIGNED) id, CAST(0 AS SIGNED) loadout_id,a.name,COALESCE(a.slot,'') slot,COALESCE(a.image_url,'') image_url,COALESCE(a.thumb_url,'') thumb_url FROM attachment_weapon aw JOIN attachments a ON a.id=aw.attachment_id WHERE aw.weapon_id=? ORDER BY a.name,a.id",&[p.weapon.id.to_string()]).await?;
+                    let available: Vec<Attachment>=db.rows("SELECT CAST(a.id AS INTEGER) id, CAST(0 AS INTEGER) loadout_id,a.name,COALESCE(a.slot,'') slot,COALESCE(a.image_url,'') image_url,COALESCE(a.thumb_url,'') thumb_url FROM attachment_weapon aw JOIN attachments a ON a.id=aw.attachment_id WHERE aw.weapon_id=? ORDER BY a.name,a.id",&[p.weapon.id.to_string()]).await?;
                     let mut slots = BTreeMap::<String, Vec<Attachment>>::new();
                     for a in available {
                         slots.entry(a.slot.clone()).or_default().push(a);
@@ -772,7 +772,7 @@ async fn sitemap(state: &AppState, db: &mut Db<'_>) -> Result<Response, DbError>
             &[],
         )
         .await?;
-    let loads:Vec<Loadout>=db.rows("SELECT CAST(l.id AS SIGNED) id,CAST(w.id AS SIGNED) weapon_id,w.game_id,w.name weapon_name,CAST(0 AS SIGNED) votes,'' author FROM loadouts l JOIN weapons w ON w.id=l.weapon_id ORDER BY l.id",&[]).await?;
+    let loads:Vec<Loadout>=db.rows("SELECT CAST(l.id AS INTEGER) id,CAST(w.id AS INTEGER) weapon_id,w.game_id,w.name weapon_name,CAST(0 AS INTEGER) votes,'' author FROM loadouts l JOIN weapons w ON w.id=l.weapon_id ORDER BY l.id",&[]).await?;
     let mut out = String::from(
         "<?xml version=\"1.0\" encoding=\"UTF-8\"?><urlset xmlns=\"http://www.sitemaps.org/schemas/sitemap/0.9\">",
     );

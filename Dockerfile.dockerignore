@@ -6,6 +6,8 @@
 !rust-app/src/**
 !rust-app/templates/
 !rust-app/templates/**
+!rust-app/data/
+!rust-app/data/**
 !public/
 !public/css/
 !public/css/**

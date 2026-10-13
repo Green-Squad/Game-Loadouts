@@ -1,6 +1,7 @@
 //! Read-only validation of the existing Laravel schema. No migrations or DDL.
-use sqlx::MySqlPool;
-pub async fn validate(pool: &MySqlPool) -> Result<(), sqlx::Error> {
+use crate::remote::{self as sqlx, Pool};
+use serde::Deserialize;
+pub async fn validate(pool: &Pool) -> Result<(), sqlx::Error> {
     let tables = [
         (
             "users",
@@ -44,30 +45,24 @@ pub async fn validate(pool: &MySqlPool) -> Result<(), sqlx::Error> {
         ("attachments", vec!["id", "slot"]),
     ];
     let reminders = ("password_reminders", vec!["email", "token", "created_at"]);
+    let conn = pool.acquire().await?;
+    #[derive(Deserialize)]
+    struct Column {
+        name: String,
+    }
     for (table, required) in tables.iter().chain(std::iter::once(&reminders)) {
-        let engine:Option<String>=sqlx::query_scalar("SELECT ENGINE FROM information_schema.TABLES WHERE TABLE_SCHEMA=DATABASE() AND TABLE_NAME=?").bind(table).fetch_optional(pool).await?;
-        // Reminder writes are serialized through the InnoDB users row. Laravel's existing
-        // reminder table may be MyISAM; accepting it does not require an engine conversion.
-        let valid_engine = if *table == "password_reminders" {
-            matches!(engine.as_deref(), Some("InnoDB" | "MyISAM"))
-        } else {
-            engine.as_deref() == Some("InnoDB")
-        };
-        if !valid_engine {
-            tracing::error!(
-                table,
-                engine = engine.as_deref().unwrap_or("missing"),
-                "Existing public account table validation failed"
-            );
-            return Err(sqlx::Error::Protocol("Schema preflight failed".into()));
-        }
-        let columns:Vec<String>=sqlx::query_scalar("SELECT COLUMN_NAME FROM information_schema.COLUMNS WHERE TABLE_SCHEMA=DATABASE() AND TABLE_NAME=?").bind(table).fetch_all(pool).await?;
+        let columns: Vec<Column> = sqlx::query_as(&format!(
+            "PRAGMA table_info(_g{}_{table})",
+            conn.generation()
+        ))
+        .fetch_all(&conn)
+        .await?;
         if required
             .iter()
-            .any(|column| !columns.iter().any(|found| found == column))
+            .any(|name| !columns.iter().any(|c| c.name == *name))
         {
-            tracing::error!(table, "Schema is missing public account columns");
-            return Err(sqlx::Error::Protocol("Schema preflight failed".into()));
+            tracing::error!(table, "Migrated schema is missing public account columns");
+            return Err(sqlx::Error::Configuration);
         }
     }
     Ok(())

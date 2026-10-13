@@ -1,5 +1,5 @@
+use serde::Deserialize;
 use serde::Serialize;
-use sqlx::FromRow;
 
 // PHP urlencode: spaces are '+', literal '+' is %2B, '~' is %7E.
 pub fn encode(s: &str) -> String {
@@ -39,7 +39,7 @@ pub fn pretty(names: &[String]) -> String {
         n => format!("{} and {}", names[..n - 1].join(", "), names[n - 1]),
     }
 }
-#[derive(Clone, Debug, Default, FromRow)]
+#[derive(Clone, Debug, Default, Deserialize)]
 pub struct Game {
     pub id: String,
     pub live: i64,
@@ -67,7 +67,7 @@ impl Game {
         }
     }
 }
-#[derive(Clone, Debug, Default, FromRow)]
+#[derive(Clone, Debug, Default, Deserialize)]
 pub struct Weapon {
     pub id: i64,
     pub name: String,
@@ -83,7 +83,7 @@ impl Weapon {
         format!("/{}/{}", encode(&self.game_id), encode(&self.name))
     }
 }
-#[derive(Clone, Debug, Default, FromRow)]
+#[derive(Clone, Debug, Default, Deserialize)]
 pub struct Attachment {
     pub id: i64,
     pub loadout_id: i64,
@@ -92,7 +92,7 @@ pub struct Attachment {
     pub image_url: String,
     pub thumb_url: String,
 }
-#[derive(Clone, Debug, Default, FromRow)]
+#[derive(Clone, Debug, Default, Deserialize)]
 pub struct Loadout {
     pub id: i64,
     pub weapon_id: i64,
@@ -100,7 +100,7 @@ pub struct Loadout {
     pub weapon_name: String,
     pub votes: i64,
     pub author: String,
-    #[sqlx(skip)]
+    #[serde(default)]
     pub attachments: Vec<Attachment>,
 }
 impl Loadout {
@@ -137,13 +137,13 @@ pub struct AttachmentGroup {
     pub slot: String,
     pub attachments: Vec<Attachment>,
 }
-#[derive(Debug, FromRow)]
+#[derive(Debug, Deserialize)]
 pub struct Stats {
     pub game: String,
     pub votes: i64,
     pub loadouts: i64,
 }
-#[derive(Debug, FromRow)]
+#[derive(Debug, Deserialize)]
 pub struct Day {
     pub game: String,
     pub date: String,

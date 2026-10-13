@@ -1,0 +1,6 @@
+**
+!Dockerfile.rust-sync
+!rust-app/
+!rust-app/migration/
+!rust-app/migration/**
+**/__pycache__/**

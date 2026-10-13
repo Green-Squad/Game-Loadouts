@@ -1,10 +1,8 @@
 use game_loadouts::account::Accounts;
+use game_loadouts::remote::Pool;
 use game_loadouts::web::{AppState, app};
-use sqlx::ConnectOptions;
-use sqlx::mysql::{MySqlConnectOptions, MySqlPoolOptions, MySqlSslMode};
 use std::{
     env,
-    str::FromStr,
     sync::Arc,
     time::{Duration, Instant},
 };
@@ -32,99 +30,24 @@ async fn main() {
 }
 async fn run() -> Result<(), Box<dyn std::error::Error>> {
     let start = Instant::now();
-    let mut options = if let Ok(url) = env::var("DATABASE_URL") {
-        MySqlConnectOptions::from_str(&url).map_err(|_| "Invalid DATABASE_URL")?
-    } else {
-        MySqlConnectOptions::new()
-            .host(&env::var("DB_HOST").unwrap_or_else(|_| "127.0.0.1".into()))
-            .port(u16::try_from(number("DB_PORT", 3306)?)?)
-            .database(&env::var("DB_DATABASE").map_err(|_| "DB_DATABASE required")?)
-            .username(&env::var("DB_USERNAME").map_err(|_| "DB_USERNAME required")?)
-    };
-    if env::var("DATABASE_URL").is_err()
-        && let Ok(password) = env::var("DB_PASSWORD")
-        && !password.is_empty()
-    {
-        options = options.password(&password);
-    }
-    if let Ok(socket) = env::var("DB_SOCKET") {
-        options = options.socket(socket);
-    }
-    if let Ok(mode) = env::var("DB_SSL_MODE") {
-        options =
-            options.ssl_mode(MySqlSslMode::from_str(&mode).map_err(|_| "Invalid DB_SSL_MODE")?);
-    }
-    if let Ok(ca) = env::var("DB_SSL_CA") {
-        options = options.ssl_ca(ca);
-    }
-    let connect_timeout = Duration::from_millis(number("DB_CONNECT_TIMEOUT_MS", 5000)?);
+    let pool = Pool::from_env(false).await?;
     let command = env::args().nth(1);
     if let Some(command) = command {
         if command != "--check-public-schema" {
             return Err("Unknown command".into());
         }
-        let operator_pool = MySqlPoolOptions::new()
-            .max_connections(2)
-            .acquire_timeout(connect_timeout)
-            .connect_lazy_with(options.clone().disable_statement_logging());
-        tokio::time::timeout(connect_timeout, operator_pool.acquire()).await??;
-        game_loadouts::schema::validate(&operator_pool).await?;
-        tracing::info!("Existing public account schema verified");
-        operator_pool.close().await;
+        game_loadouts::schema::validate(&pool).await?;
+        tracing::info!("Migrated public account schema verified");
         return Ok(());
     }
-    let max = number("DB_POOL_MAX", 10)?;
-    if !(1..=100).contains(&max) {
-        return Err("DB_POOL_MAX must be 1..100".into());
-    }
-    // Browse queries always retain the read-only guard. Public writes are opt-in
-    // and use a separate pool with the existing credentials or an optional writer override.
     let accounts = if env::var("INTERACTIVE_ENABLED").as_deref() == Ok("1") {
-        let write_options = options.clone().disable_statement_logging();
-        let write_options = match (env::var("DB_WRITE_USERNAME"), env::var("DB_WRITE_PASSWORD")) {
-            (Ok(user), Ok(password)) => write_options.username(&user).password(&password),
-            (Err(_), Err(_)) => write_options,
-            _ => return Err(
-                "Set both DB_WRITE_USERNAME and DB_WRITE_PASSWORD, or use existing DB credentials"
-                    .into(),
-            ),
-        };
-        let write_pool = MySqlPoolOptions::new()
-            .max_connections(max as u32)
-            .acquire_timeout(connect_timeout)
-            .idle_timeout(Duration::from_secs(300))
-            .max_lifetime(Duration::from_secs(1800))
-            .connect_lazy_with(write_options);
-        tokio::time::timeout(
-            connect_timeout,
-            game_loadouts::schema::validate(&write_pool),
-        )
-        .await??;
+        let write_pool = Pool::from_env(true).await?;
+        game_loadouts::schema::validate(&write_pool).await?;
         Some(Arc::new(Accounts::from_env(write_pool)?))
     } else {
         None
     };
-    let pool = MySqlPoolOptions::new()
-        .max_connections(max as u32)
-        .min_connections(0)
-        .acquire_timeout(Duration::from_millis(number(
-            "DB_ACQUIRE_TIMEOUT_MS",
-            5000,
-        )?))
-        .idle_timeout(Duration::from_secs(300))
-        .max_lifetime(Duration::from_secs(1800))
-        .after_connect(|c, _| {
-            Box::pin(async move {
-                sqlx::query("SET SESSION TRANSACTION READ ONLY")
-                    .execute(c)
-                    .await?;
-                Ok(())
-            })
-        })
-        .connect_lazy_with(options.disable_statement_logging());
-    tokio::time::timeout(connect_timeout, pool.acquire())
-        .await
-        .map_err(|_| "DB connect timeout")??;
+    pool.acquire().await?;
     let port = u16::try_from(number("PORT", 8080)?)?;
     let state = Arc::new(AppState {
         pool: pool.clone(),

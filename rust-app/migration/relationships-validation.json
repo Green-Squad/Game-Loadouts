@@ -1,0 +1,62 @@
+[
+  {
+    "relationship": "weapons.game_id -> games.id",
+    "source_orphan_count": 0,
+    "destination_orphan_count": 0,
+    "evidence": "source snapshot checked; direct destination join checked; full normalized checksums matched"
+  },
+  {
+    "relationship": "attachments.game_id -> games.id",
+    "source_orphan_count": 0,
+    "destination_orphan_count": 0,
+    "evidence": "source snapshot checked; direct destination join checked; full normalized checksums matched"
+  },
+  {
+    "relationship": "loadouts.weapon_id -> weapons.id",
+    "source_orphan_count": 0,
+    "destination_orphan_count": 0,
+    "evidence": "source snapshot checked; direct destination join checked; full normalized checksums matched"
+  },
+  {
+    "relationship": "loadouts.user_id -> users.email",
+    "source_orphan_count": 0,
+    "destination_orphan_count": 0,
+    "evidence": "source snapshot checked; direct destination join checked; full normalized checksums matched"
+  },
+  {
+    "relationship": "loadout_user.loadout_id -> loadouts.id",
+    "source_orphan_count": 0,
+    "destination_orphan_count": 0,
+    "evidence": "source snapshot checked; direct destination join checked; full normalized checksums matched"
+  },
+  {
+    "relationship": "loadout_user.user_id -> users.email",
+    "source_orphan_count": 0,
+    "destination_orphan_count": 0,
+    "evidence": "source snapshot checked; direct destination join checked; full normalized checksums matched"
+  },
+  {
+    "relationship": "attachment_loadout.loadout_id -> loadouts.id",
+    "source_orphan_count": 0,
+    "destination_orphan_count": 0,
+    "evidence": "source snapshot checked; direct destination join checked; full normalized checksums matched"
+  },
+  {
+    "relationship": "attachment_loadout.attachment_id -> attachments.id",
+    "source_orphan_count": 0,
+    "destination_orphan_count": 0,
+    "evidence": "source snapshot checked; direct destination join checked; full normalized checksums matched"
+  },
+  {
+    "relationship": "attachment_weapon.weapon_id -> weapons.id",
+    "source_orphan_count": 0,
+    "destination_orphan_count": 0,
+    "evidence": "source snapshot checked; direct destination join checked; full normalized checksums matched"
+  },
+  {
+    "relationship": "attachment_weapon.attachment_id -> attachments.id",
+    "source_orphan_count": 0,
+    "destination_orphan_count": 0,
+    "evidence": "source snapshot checked; direct destination join checked; full normalized checksums matched"
+  }
+]

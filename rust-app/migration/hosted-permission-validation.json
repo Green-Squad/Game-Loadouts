@@ -1,0 +1,14 @@
+[
+  {
+    "check": "catalog-write",
+    "rejected": true
+  },
+  {
+    "check": "schema-write",
+    "rejected": true
+  },
+  {
+    "check": "authorized-guest-cascade",
+    "passed": true
+  }
+]

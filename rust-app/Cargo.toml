@@ -8,7 +8,6 @@ rust-version = "1.88"
 askama = "0.14"
 axum = "0.8"
 tokio = { version = "1", features = ["macros", "rt-multi-thread", "signal", "time", "net", "io-util"] }
-sqlx = { version = "0.8", default-features = false, features = ["runtime-tokio", "tls-rustls-ring", "mysql", "derive"] }
 serde = { version = "1", features = ["derive"] }
 serde_json = "1"
 reqwest = { version = "0.12", default-features = false, features = ["rustls-tls", "json"] }
@@ -27,8 +26,14 @@ tracing = "0.1"
 tracing-subscriber = { version = "0.3", features = ["env-filter", "json"] }
 
 tower = { version = "0.5", features = ["util"] }
+libsql = { version = "0.10.0", default-features = false, features = ["remote", "tls"] }
+regex = "1.13.1"
+
+[features]
+fixture-tests = []
 
 [dev-dependencies]
+sqlx_source = { package = "sqlx", version = "0.8", default-features = false, features = ["runtime-tokio", "tls-rustls-ring", "mysql", "derive"] }
 http-body-util = "0.1"
 
 [profile.release]

@@ -1,0 +1,81 @@
+{
+  "generation": 2,
+  "engine": "mysql",
+  "schema_sha256": "c33332fe313fa3d4f471e6f8a9f09766c3d1063c368207b481bb00ed416ceb8a",
+  "tables": [
+    {
+      "table": "betas",
+      "source_rows": 36,
+      "destination_rows": 36,
+      "normalized_checksums_match": true
+    },
+    {
+      "table": "migrations",
+      "source_rows": 3,
+      "destination_rows": 3,
+      "normalized_checksums_match": true
+    },
+    {
+      "table": "password_reminders",
+      "source_rows": 72,
+      "destination_rows": 72,
+      "normalized_checksums_match": true
+    },
+    {
+      "table": "attachment_loadout",
+      "source_rows": 4894,
+      "destination_rows": 4894,
+      "normalized_checksums_match": true
+    },
+    {
+      "table": "attachment_weapon",
+      "source_rows": 28269,
+      "destination_rows": 28269,
+      "normalized_checksums_match": true
+    },
+    {
+      "table": "attachments",
+      "source_rows": 5933,
+      "destination_rows": 5933,
+      "normalized_checksums_match": true
+    },
+    {
+      "table": "games",
+      "source_rows": 11,
+      "destination_rows": 11,
+      "normalized_checksums_match": true
+    },
+    {
+      "table": "loadout_user",
+      "source_rows": 1771,
+      "destination_rows": 1771,
+      "normalized_checksums_match": true
+    },
+    {
+      "table": "loadouts",
+      "source_rows": 1365,
+      "destination_rows": 1365,
+      "normalized_checksums_match": true
+    },
+    {
+      "table": "users",
+      "source_rows": 17531,
+      "destination_rows": 17531,
+      "normalized_checksums_match": true
+    },
+    {
+      "table": "weapons",
+      "source_rows": 843,
+      "destination_rows": 843,
+      "normalized_checksums_match": true
+    }
+  ],
+  "relationships": "passed",
+  "integrity": "passed",
+  "duration_seconds": 116.361,
+  "http_requests": 496,
+  "rows_read": 1968370,
+  "rows_written": 246774,
+  "source_snapshot_utc": "2026-10-13T21:37:42.880147+00:00",
+  "published": true
+}

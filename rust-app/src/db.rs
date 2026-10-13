@@ -1,11 +1,12 @@
 use crate::model::*;
-use sqlx::{FromRow, MySql, MySqlPool, mysql::MySqlRow};
+use crate::remote::{self as sqlx, Connection, Pool};
+use serde::de::DeserializeOwned;
 use std::time::{Duration, Instant};
 
-pub const GAME_COLUMNS: &str = "id, CAST(live AS SIGNED) live, COALESCE(short_name,'') short_name, COALESCE(theme_color,'green') theme_color, COALESCE(thumb_url,'') thumb_url, COALESCE(header_url,'') header_url";
-pub const WEAPON_COLUMNS: &str = "CAST(id AS SIGNED) id, name, game_id, COALESCE(type,'') kind, COALESCE(image_url,'') image_url, COALESCE(thumb_url,'') thumb_url, CAST(min_attachments AS SIGNED) min_attachments, CAST(max_attachments AS SIGNED) max_attachments";
+pub const GAME_COLUMNS: &str = "id, CAST(live AS INTEGER) live, COALESCE(short_name,'') short_name, COALESCE(theme_color,'green') theme_color, COALESCE(thumb_url,'') thumb_url, COALESCE(header_url,'') header_url";
+pub const WEAPON_COLUMNS: &str = "CAST(id AS INTEGER) id, name, game_id, COALESCE(type,'') kind, COALESCE(image_url,'') image_url, COALESCE(thumb_url,'') thumb_url, CAST(min_attachments AS INTEGER) min_attachments, CAST(max_attachments AS INTEGER) max_attachments";
 // Aggregate votes BEFORE joining attachments. No attachment/vote multiplication.
-pub const LOADOUT_COLUMNS: &str = "CAST(l.id AS SIGNED) id, CAST(l.weapon_id AS SIGNED) weapon_id, w.game_id, w.name weapon_name, CAST(COALESCE(v.votes,0) AS SIGNED) votes, CASE WHEN u.role = 'Guest' OR u.username IS NULL THEN 'Guest' ELSE u.username END author";
+pub const LOADOUT_COLUMNS: &str = "CAST(l.id AS INTEGER) id, CAST(l.weapon_id AS INTEGER) weapon_id, w.game_id, w.name weapon_name, CAST(COALESCE(v.votes,0) AS INTEGER) votes, CASE WHEN u.role = 'Guest' OR u.username IS NULL THEN 'Guest' ELSE u.username END author";
 pub fn loadout_sql(predicate: &str, order: &str) -> String {
     // Scope the grouped vote work to this route's selected weapon/game/loadout.
     let vote_filter = predicate
@@ -22,32 +23,42 @@ pub enum DbError {
     Timeout,
 }
 pub struct Db<'a> {
-    pub pool: &'a MySqlPool,
+    pub pool: &'a Pool,
     pub timeout: Duration,
+    connection: Option<Connection>,
     pub count: usize,
     pub millis: f64,
 }
 impl<'a> Db<'a> {
-    pub fn new(pool: &'a MySqlPool, timeout: Duration) -> Self {
+    pub fn new(pool: &'a Pool, timeout: Duration) -> Self {
         Self {
             pool,
             timeout,
+            connection: None,
             count: 0,
             millis: 0.0,
         }
     }
     pub async fn rows<T>(&mut self, sql: &str, binds: &[String]) -> Result<Vec<T>, DbError>
     where
-        for<'r> T: FromRow<'r, MySqlRow> + Send + Unpin,
+        T: DeserializeOwned,
     {
-        let mut conn = self.pool.acquire().await.map_err(|_| DbError::Query)?;
-        let mut q = sqlx::query_as::<MySql, T>(sql);
+        let start = Instant::now();
+        if self.connection.is_none() {
+            self.connection = Some(
+                tokio::time::timeout(self.timeout, self.pool.acquire())
+                    .await
+                    .map_err(|_| DbError::Timeout)?
+                    .map_err(|_| DbError::Query)?,
+            );
+        }
+        let conn = self.connection.as_ref().ok_or(DbError::Query)?;
+        let mut q = sqlx::query_as::<T>(sql);
         for bind in binds {
             q = q.bind(bind);
         }
         self.count += 1;
-        let start = Instant::now();
-        let result = tokio::time::timeout(self.timeout, q.fetch_all(&mut *conn)).await;
+        let result = tokio::time::timeout(self.timeout, q.fetch_all(conn)).await;
         self.millis += start.elapsed().as_secs_f64() * 1000.0;
         match result {
             Ok(Ok(rows)) => {
@@ -62,25 +73,10 @@ impl<'a> Db<'a> {
             Ok(Err(error)) => {
                 // Diagnostic codes/column names only; never log SQL, bind values,
                 // connect options or the database server's raw error message.
-                match &error {
-                    sqlx::Error::Database(e) => tracing::error!(
-                        sqlstate = e.code().as_deref().unwrap_or("unknown"),
-                        mysql_code = e
-                            .try_downcast_ref::<sqlx::mysql::MySqlDatabaseError>()
-                            .map(|e| e.number()),
-                        "SQL query rejected"
-                    ),
-                    sqlx::Error::ColumnDecode { index, .. } => {
-                        tracing::error!(column = index, "SQL column decoding failed")
-                    }
-                    _ => tracing::error!("SQL execution/fetch failed"),
-                }
+                tracing::error!(kind=?error,"SQL execution/fetch failed");
                 Err(DbError::Query)
             }
-            Err(_) => {
-                conn.close_on_drop();
-                Err(DbError::Timeout)
-            }
+            Err(_) => Err(DbError::Timeout),
         }
     }
     pub async fn recent(&mut self) -> Result<Vec<Game>, DbError> {
@@ -101,7 +97,7 @@ impl<'a> Db<'a> {
     }
     pub async fn weapons(&mut self, game: &str) -> Result<Vec<Weapon>, DbError> {
         self.rows(
-            &format!("SELECT {WEAPON_COLUMNS} FROM weapons WHERE game_id=? ORDER BY type,name,id"),
+            &format!("SELECT {WEAPON_COLUMNS} FROM weapons WHERE game_id=? ORDER BY _key_type,_key_name,id"),
             &[game.into()],
         )
         .await
@@ -141,7 +137,7 @@ impl<'a> Db<'a> {
                 ids.iter().map(ToString::to_string).collect(),
             )
         };
-        let rows: Vec<Attachment> = self.rows(&format!("SELECT CAST(a.id AS SIGNED) id, CAST(al.loadout_id AS SIGNED) loadout_id, a.name, COALESCE(a.slot,'') slot, COALESCE(a.image_url,'') image_url, COALESCE(a.thumb_url,'') thumb_url FROM attachment_loadout al JOIN attachments a ON a.id=al.attachment_id WHERE {filter} ORDER BY al.loadout_id,a.id"), &binds).await?;
+        let rows: Vec<Attachment> = self.rows(&format!("SELECT CAST(a.id AS INTEGER) id, CAST(al.loadout_id AS INTEGER) loadout_id, a.name, COALESCE(a.slot,'') slot, COALESCE(a.image_url,'') image_url, COALESCE(a.thumb_url,'') thumb_url FROM attachment_loadout al JOIN attachments a ON a.id=al.attachment_id WHERE {filter} ORDER BY al.loadout_id,a.id"), &binds).await?;
         let mut by_id = std::collections::HashMap::<i64, Vec<Attachment>>::new();
         for row in rows {
             by_id.entry(row.loadout_id).or_default().push(row);

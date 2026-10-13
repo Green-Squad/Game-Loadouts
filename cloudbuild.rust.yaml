@@ -1,0 +1,127 @@
+steps:
+- name: bash
+  args:
+  - -ceu
+  - test "$PROJECT_ID" = "game-loadouts"; test "$BRANCH_NAME" = rust
+- name: gcr.io/cloud-builders/docker
+  entrypoint: bash
+  args:
+  - -ceu
+  - "docker run -d --network cloudbuild --name fixture-mysql -e MYSQL_ALLOW_EMPTY_PASSWORD=yes -e MYSQL_DATABASE=loadouts_fixture -p 3307:3306 mysql:8.4\ndocker run\
+    \ -d --network cloudbuild --name fixture-public -p 8083:8080 ghcr.io/tursodatabase/libsql-server@sha256:6dd3eb276d9d3604e4a48ac4a999a2e267814732d57d7e94c04ba71482333a67\n\
+    docker run -d --network cloudbuild --name fixture-accounts -p 8084:8080 ghcr.io/tursodatabase/libsql-server@sha256:6dd3eb276d9d3604e4a48ac4a999a2e267814732d57d7e94c04ba71482333a67\n\
+    for attempt in $$(seq 1 90); do\n  if docker exec fixture-mysql mysql --protocol=tcp -h 127.0.0.1 -u root -D loadouts_fixture -e \"SELECT 1\" >/dev/null 2>&1;\
+    \ then break; fi\n  sleep 1\ndone\ndocker exec -i fixture-mysql mysql --default-character-set=utf8mb4 -u root < rust-app/fixtures/schema.sql\ndocker exec -i fixture-mysql\
+    \ mysql --default-character-set=utf8mb4 -u root < rust-app/fixtures/data.sql\n\ndocker run -d --network cloudbuild --name fixture-sync ghcr.io/tursodatabase/libsql-server@sha256:6dd3eb276d9d3604e4a48ac4a999a2e267814732d57d7e94c04ba71482333a67\n"
+- name: rust:1.99-slim-trixie
+  entrypoint: bash
+  args:
+  - -ceu
+  - 'apt-get update -qq
+
+    apt-get install -y --no-install-recommends python3 python3-pip ca-certificates nodejs npm
+
+    python3 -m pip install --break-system-packages pymysql requests ''psycopg[binary]''
+
+    rustup component add rustfmt clippy
+
+    export TURSO_TEST_DATABASE=isolated TEST_MYSQL_HOST=fixture-mysql TEST_MYSQL_PORT=3306
+
+    export TEST_DATABASE_URL=mysql://root@fixture-mysql:3306/loadouts_fixture
+
+    export TEST_TURSO_PUBLIC_URL=http://fixture-public:8080
+
+    export TEST_TURSO_ACCOUNTS_URL=http://fixture-accounts:8080
+
+    cd rust-app
+
+    python3 migration/fixture_copy.py --source-database loadouts_fixture --target "$$TEST_TURSO_PUBLIC_URL"
+
+    npm install --no-save --ignore-scripts playwright@1.64.0
+
+    npx playwright install --with-deps chromium
+
+    export RUN_BROWSER_TESTS=1
+
+    cargo fmt --check
+
+    cargo test --locked --features fixture-tests -- --include-ignored --nocapture --test-threads=1
+
+    cargo clippy --locked --features fixture-tests --all-targets -- -D warnings
+
+
+    SYNC_TEST_URL=http://fixture-sync:8080 python3 -m unittest discover -s migration -p "test_*.py" -v
+
+    '
+- name: gcr.io/cloud-builders/docker
+  args:
+  - build
+  - -f
+  - Dockerfile
+  - -t
+  - gcr.io/$PROJECT_ID/game-loadouts-rust:$COMMIT_SHA
+  - .
+- name: gcr.io/cloud-builders/docker
+  args:
+  - push
+  - gcr.io/$PROJECT_ID/game-loadouts-rust:$COMMIT_SHA
+- name: gcr.io/cloud-builders/docker
+  args:
+  - build
+  - -f
+  - Dockerfile.rust-sync
+  - -t
+  - gcr.io/$PROJECT_ID/game-loadouts-rust-sync:$COMMIT_SHA
+  - .
+- name: gcr.io/cloud-builders/docker
+  args:
+  - push
+  - gcr.io/$PROJECT_ID/game-loadouts-rust-sync:$COMMIT_SHA
+- name: gcr.io/google.com/cloudsdktool/cloud-sdk:slim
+  entrypoint: gcloud
+  args:
+  - run
+  - services
+  - update
+  - game-loadouts-rust
+  - --image
+  - gcr.io/$PROJECT_ID/game-loadouts-rust:$COMMIT_SHA
+  - --project
+  - game-loadouts
+  - --region
+  - europe-west1
+  - --quiet
+- name: gcr.io/google.com/cloudsdktool/cloud-sdk:slim
+  entrypoint: gcloud
+  args:
+  - run
+  - services
+  - update-traffic
+  - game-loadouts-rust
+  - --to-latest
+  - --project
+  - game-loadouts
+  - --region
+  - europe-west1
+  - --quiet
+- name: gcr.io/google.com/cloudsdktool/cloud-sdk:slim
+  entrypoint: gcloud
+  args:
+  - run
+  - jobs
+  - update
+  - game-loadouts-rust-sync
+  - --image
+  - gcr.io/$PROJECT_ID/game-loadouts-rust-sync:$COMMIT_SHA
+  - --project
+  - game-loadouts
+  - --region
+  - europe-west1
+  - --quiet
+options:
+  logging: CLOUD_LOGGING_ONLY
+  machineType: E2_HIGHCPU_8
+timeout: 1800s
+images:
+- gcr.io/$PROJECT_ID/game-loadouts-rust:$COMMIT_SHA
+- gcr.io/$PROJECT_ID/game-loadouts-rust-sync:$COMMIT_SHA

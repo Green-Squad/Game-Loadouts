@@ -10,6 +10,10 @@ permissions:
 jobs:
   validate:
     runs-on: ubuntu-24.04
+    env:
+      TURSO_TEST_DATABASE: isolated
+      TEST_TURSO_PUBLIC_URL: http://127.0.0.1:8083
+      TEST_TURSO_ACCOUNTS_URL: http://127.0.0.1:8084
     services:
       mysql:
         image: mysql:8.4
@@ -34,8 +38,14 @@ jobs:
         run: |
           sudo apt-get update
           sudo apt-get install -y mysql-client
-          mysql --protocol=tcp -h 127.0.0.1 -P 3307 -u root < rust-app/fixtures/schema.sql
-          mysql --protocol=tcp -h 127.0.0.1 -P 3307 -u root < rust-app/fixtures/data.sql
+          mysql --default-character-set=utf8mb4 --protocol=tcp -h 127.0.0.1 -P 3307 -u root < rust-app/fixtures/schema.sql
+          mysql --default-character-set=utf8mb4 --protocol=tcp -h 127.0.0.1 -P 3307 -u root < rust-app/fixtures/data.sql
+          pip install -r rust-app/migration/requirements.txt
+          docker run -d --name fixture-public -p 8083:8080 ghcr.io/tursodatabase/libsql-server@sha256:6dd3eb276d9d3604e4a48ac4a999a2e267814732d57d7e94c04ba71482333a67
+          docker run -d --name fixture-accounts -p 8084:8080 ghcr.io/tursodatabase/libsql-server@sha256:6dd3eb276d9d3604e4a48ac4a999a2e267814732d57d7e94c04ba71482333a67
+          docker run -d --name fixture-sync -p 8085:8080 ghcr.io/tursodatabase/libsql-server@sha256:6dd3eb276d9d3604e4a48ac4a999a2e267814732d57d7e94c04ba71482333a67
+          python rust-app/migration/fixture_copy.py --source-database loadouts_fixture --target "$TEST_TURSO_PUBLIC_URL"
+          SYNC_TEST_URL=http://127.0.0.1:8085 python -m unittest discover -s rust-app/migration -p 'test_*.py' -v
       - name: Prepare Chromium for interactive fixture checks
         run: |
           npm install --no-save --ignore-scripts playwright@1.64.0
@@ -46,15 +56,14 @@ jobs:
           TEST_DATABASE_URL: mysql://root@127.0.0.1:3307/loadouts_fixture
         run: |
           cargo fmt --manifest-path rust-app/Cargo.toml -- --check
-          cargo clippy --locked --manifest-path rust-app/Cargo.toml --all-targets -- -D warnings
-          cargo test --locked --manifest-path rust-app/Cargo.toml -- --include-ignored
+          cargo clippy --locked --manifest-path rust-app/Cargo.toml --features fixture-tests --all-targets -- -D warnings
+          cargo test --locked --manifest-path rust-app/Cargo.toml --features fixture-tests -- --include-ignored
       - name: Container build and runtime smoke test
         run: |
           docker build --pull -t game-loadouts-rust:test .
           docker image inspect game-loadouts-rust:test --format '{{.Size}}' > image-size-bytes.txt
           docker run --detach --name rust-smoke --network host --read-only --cap-drop ALL \
-            -e DB_HOST=127.0.0.1 -e DB_PORT=3307 -e DB_DATABASE=loadouts_fixture \
-            -e DB_USERNAME=loadouts_reader -e METRICS_HEADERS=1 -e DISQUS_ENABLED=0 game-loadouts-rust:test
+            -e TURSO_DATABASE_URL="$TEST_TURSO_PUBLIC_URL" -e TURSO_AUTH_TOKEN= -e TURSO_TEST_DATABASE -e METRICS_HEADERS=1 -e DISQUS_ENABLED=0 game-loadouts-rust:test
           for attempt in $(seq 1 30); do curl --fail http://127.0.0.1:8080/healthz && break; sleep 1; done
           curl --fail http://127.0.0.1:8080/ > home.html
           curl --fail http://127.0.0.1:8080/Call+of+Duty+Modern+Warfare/M4A1 > weapon.html
@@ -65,11 +74,9 @@ jobs:
           docker logs rust-smoke > container-log.jsonl
           # Check the unchanged Laravel schema and encrypted-cookie account startup using only fixtures.
           docker run --rm --network host --read-only --cap-drop ALL \
-            -e DB_HOST=127.0.0.1 -e DB_PORT=3307 -e DB_DATABASE=loadouts_fixture \
-            -e DB_USERNAME=root game-loadouts-rust:test --check-public-schema
+            -e TURSO_DATABASE_URL="$TEST_TURSO_PUBLIC_URL" -e TURSO_AUTH_TOKEN= -e TURSO_TEST_DATABASE game-loadouts-rust:test --check-public-schema
           docker run --detach --name rust-account-smoke --network host --read-only --cap-drop ALL \
-            -e PORT=8081 -e DB_HOST=127.0.0.1 -e DB_PORT=3307 -e DB_DATABASE=loadouts_fixture \
-            -e DB_USERNAME=loadouts_reader -e DB_WRITE_USERNAME=root -e DB_WRITE_PASSWORD= \
+            -e PORT=8081 -e TURSO_DATABASE_URL="$TEST_TURSO_PUBLIC_URL" -e TURSO_AUTH_TOKEN= -e TURSO_TEST_DATABASE -e TURSO_WRITE_TOKEN= \
             -e INTERACTIVE_ENABLED=1 -e ACCOUNT_BASE_URL=https://rust.gameloadouts.com \
             -e KEY=synthetic-session-key-32-bytes-long \
             -e MAIL_USERNAME=fixture@example.invalid -e MAIL_PASSWORD=synthetic-fixture-password \
