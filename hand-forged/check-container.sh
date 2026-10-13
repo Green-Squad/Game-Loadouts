@@ -2,6 +2,7 @@
 set -euo pipefail
 mkdir -p hand-forged/test-results
 cleanup() {
+ docker cp hf-web:/var/www/html/app/storage/logs/laravel.log hand-forged/test-results/laravel.log >/dev/null 2>&1 || true
  docker logs hf-web > hand-forged/test-results/application.log 2>&1 || true
  docker logs hf-database > hand-forged/test-results/database.log 2>&1 || true
  docker rm -f hf-web hf-database >/dev/null 2>&1 || true

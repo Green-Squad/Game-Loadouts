@@ -17,6 +17,8 @@ UPDATE weapons SET created_at=TIMESTAMPADD(DAY,@days,created_at),updated_at=TIME
 UPDATE attachments SET created_at=TIMESTAMPADD(DAY,@days,created_at),updated_at=TIMESTAMPADD(DAY,@days,updated_at);
 UPDATE loadouts SET created_at=TIMESTAMPADD(DAY,@days,created_at),updated_at=TIMESTAMPADD(DAY,@days,updated_at);
 UPDATE loadout_user SET created_at=TIMESTAMPADD(DAY,@days,created_at),updated_at=TIMESTAMPADD(DAY,@days,updated_at);
+-- Keep legacy titles outside the original ten-color chart's recent vote window.
+UPDATE loadout_user lu JOIN loadouts l ON l.id=lu.loadout_id JOIN weapons w ON w.id=l.weapon_id SET lu.created_at=DATE_SUB(CURDATE(), INTERVAL 45 DAY),lu.updated_at=DATE_SUB(CURDATE(), INTERVAL 45 DAY) WHERE w.game_id='Titanfall';
 UPDATE users SET disabled_until='2000-01-01 00:00:00',created_at=NOW(),updated_at=NOW();
 SQL
 mysqladmin --socket=/tmp/demo.sock -uroot shutdown
