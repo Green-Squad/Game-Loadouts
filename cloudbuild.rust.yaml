@@ -89,7 +89,7 @@ steps:
   - --project
   - game-loadouts
   - --region
-  - europe-west1
+  - us-east4
   - --quiet
 - name: gcr.io/google.com/cloudsdktool/cloud-sdk:slim
   entrypoint: gcloud
@@ -102,7 +102,7 @@ steps:
   - --project
   - game-loadouts
   - --region
-  - europe-west1
+  - us-east4
   - --quiet
 - name: gcr.io/google.com/cloudsdktool/cloud-sdk:slim
   entrypoint: gcloud
@@ -116,7 +116,7 @@ steps:
   - --project
   - game-loadouts
   - --region
-  - europe-west1
+  - us-east4
   - --quiet
 options:
   logging: CLOUD_LOGGING_ONLY

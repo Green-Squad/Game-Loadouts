@@ -1,14 +1,17 @@
 # Rust Turso migration, synchronization and rollback
 
-Scope: `rust`, `game-loadouts-rust`, project `game-loadouts`, europe-west1,
+Scope: `rust`, `game-loadouts-rust`, project `game-loadouts`, us-east4,
 https://rust.gameloadouts.com. Original `master`, both original `game-loadouts`
 services, root/www routing, VPS/MySQL data and `hand-forged` are protected.
 
-The private `gameloadouts-rust` database uses libSQL and the official Rust
-`libsql` 0.10 remote/TLS client. Group `rust-websites` is in aws-eu-west-1,
-Ireland, near the existing Rust Cloud Run service. It shares the Free account
-with AT's database. Overages remain disabled; the database cap is 1 GB.
-No embedded replica or Cloud Run filesystem is authoritative.
+The private `gameloadouts-rust-us` database uses libSQL and the official Rust
+`libsql` 0.10 remote/TLS client. Group `rust-websites-us` is in aws-us-east-1
+(Virginia), near Cloud Run us-east4 (Northern Virginia), serving the US East Coast.
+It shares the existing Free account with AT. Overages remain disabled; AWS imported
+databases currently reject per-database size limits, so account quotas apply.
+No embedded replica or Cloud Run filesystem is authoritative. The former Ireland
+database and EU service remain frozen/read-only for recovery, with EU sync paused.
+Do not enable their writers or old sync without an explicit recovery plan.
 
 The website runtime identity `rust-turso-web` uses `rust-turso-read` for browsing
 and a separate fine-grained `rust-turso-write` token for existing account,
@@ -31,7 +34,7 @@ measured lock was about 0.6 seconds from the operator workstation. There is no
 global lock, schema mutation, migration, or source DML. A changed nontransactional
 schema or unsupported declarations fail closed for inspection.
 
-`snapshot_sqlite.py --snapshot /protected/snapshot --database gameloadouts-rust
+`snapshot_sqlite.py --snapshot /protected/snapshot --database gameloadouts-rust-us
 --token-file /protected/import.token --generation 1 --report /protected/report.json
 --publish` explicitly converts the inspected live schema, preserves IDs, fields,
 nulls, exact values, timestamps and password hashes, imports bounded batches and
@@ -73,7 +76,7 @@ validation or transport retains the prior active dataset; retries reconcile
 against committed metadata. Import tooling never automatically replays uncertain
 writes. A 15-minute database lease prevents overlapping jobs.
 
-Job `game-loadouts-rust-sync` uses `Dockerfile.rust-sync`, one task, 600-second
+Job `game-loadouts-rust-sync` in us-east4 uses `Dockerfile.rust-sync`, one task, 600-second
 maximum, and two task retries. Scheduler `game-loadouts-rust-sync-schedule`
 runs at minutes 17 and 47 UTC through a dedicated Rust scheduler identity with
 job-only Run Invoker. The 30-minute interval keeps edits reasonably fresh without
@@ -95,12 +98,14 @@ libSQL server. Rust fixture tests preserve account, security, mail, CAPTCHA,
 submission, vote, pagination, search and query-budget assertions. Test source
 hosts and database names are allowlisted disposable fixtures, never production.
 
-Verified Turso baseline revision: `game-loadouts-rust-00011-xxj`.
+Keep the first verified us-east4 Virginia revision as the app rollback baseline.
+The europe-west1 revisions point to the frozen Ireland copy; restoring them with
+writes enabled would fork ownership and must not be a normal rollback.
 
 Pause only the Rust scheduler before data recovery. Keep a verified prior
 Turso-backed Rust revision for application rollback:
 `gcloud run services update-traffic game-loadouts-rust --project game-loadouts
---region europe-west1 --to-revisions=PREVIOUS_TURSO_REVISION=100`.
+--region us-east4 --to-revisions=PREVIOUS_TURSO_REVISION=100`.
 
 Do not route interactive traffic to legacy `game-loadouts-rust-00008-s8x`:
 that preserved old revision uses the original MySQL writer and violates this
@@ -109,3 +114,17 @@ revision/image or redeploy the verified Turso commit with existing Rust secrets.
 For data restoration, use protected recovery snapshots plus preserved Rust-only
 rows/conflicts and baselines. Never overwrite local edits with a raw source import.
 Never change production, original jobs, databases, schemas, DNS or Hand-Forged.
+
+## Virginia relocation recovery and validation
+
+The full Turso export plus WAL was validated against every live physical table,
+schema/index, sequence and normalized checksum before import; the new Virginia
+endpoint passed the same checks. This includes prior generations, source baselines,
+sync reports, conflicts and Rust-owned data, not only original source tables.
+Protected SQLite recovery files remain outside Git in private/virginia-recovery
+in the migration workspace. Frozen Ireland copies remain private and source-independent.
+New read/import tokens are Secret Manager version 2; Game Loadouts' scoped writer
+is version 5. Source secret version 1 is unchanged. Both active sync jobs and
+schedulers are in us-east4; deployment workflows target only that Rust region.
+Hrana BLOB decoding accepts the endpoint's padded and unpadded Base64 forms and has
+a focused regression test. The active website routes and independent writes remain enabled.
