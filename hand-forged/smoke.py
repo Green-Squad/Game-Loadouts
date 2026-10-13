@@ -1,8 +1,13 @@
 """Exercise the original forms against isolated demo containers only."""
-import requests,json,re,time,os,urllib.parse,subprocess
+import requests,json,re,time,os,urllib.parse,subprocess,gzip
 from pathlib import Path
 from bs4 import BeautifulSoup
 base=os.environ.get('DEMO_BASE_URL','http://127.0.0.1:8080');assert base=='http://127.0.0.1:8080'
+catalog=json.loads(gzip.open('hand-forged/catalog.json.gz','rt').read())
+for kind in ['games','weapons','attachments']:
+ for row in catalog[kind]:
+  for field in ['image_url','thumb_url','header_url']:
+   if row.get(field): assert (Path('public')/urllib.parse.unquote(row[field])).is_file(),row[field]
 session=requests.Session()
 def req(path,fields=None,files=None):
  response=session.get(base+path,timeout=30) if fields is None else session.post(base+path,data=fields,files=files,headers={'Referer':base+path},timeout=30)

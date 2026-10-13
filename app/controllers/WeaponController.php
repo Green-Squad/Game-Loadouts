@@ -345,7 +345,7 @@ class WeaponController extends BaseController {
             foreach (Weapon::where('name','LIKE','%'.$query.'%')->orWhere('game_id','LIKE','%'.$query.'%')->take(50)->get() as $weapon) {
                 $items[]=array('title'=>$weapon->name.' / '.$weapon->game_id,'snippet'=>'Explore attachments and sample loadouts.','link'=>URL::route('showLoadouts',array(urlencode($weapon->game_id),urlencode($weapon->name))));
             }
-            $googleRequestDecoded=json_decode(json_encode(array('queries'=>array('request'=>array(array('searchTerms'=>$query))),'items'=>$items)));
+            $googleRequestDecoded=json_decode(json_encode(array('queries'=>array('request'=>array(array('searchTerms'=>$query,'totalResults'=>count($items)))),'items'=>$items)));
             return View::make('search',compact('googleRequestDecoded'));
         }
         try {
