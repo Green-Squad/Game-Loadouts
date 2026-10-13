@@ -26,6 +26,7 @@ docker exec hf-web sh -c 'echo disposable > public/uploads/hand-forged-reset-mar
 docker exec hf-database mysql --socket=/tmp/demo.sock -uroot -e "UPDATE games SET short_name='RESETMARKER' WHERE id='Battlefield 6'" game_loadouts_hand_forged
 docker stop -t 10 hf-web hf-database
 docker inspect --format '{{.Name}} exit={{.State.ExitCode}}' hf-web hf-database >> hand-forged/test-results/measurements.txt
+for name in hf-web hf-database; do test "$(docker inspect --format '{{.State.ExitCode}}' "$name")" = 0; done
 docker logs hf-web > hand-forged/test-results/first-shutdown.log 2>&1
 cleanup
 launch

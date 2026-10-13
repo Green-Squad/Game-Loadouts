@@ -96,7 +96,7 @@ return array(
 	|
 	*/
 
-	'cookie' => 'laravel_session',
+	'cookie' => getenv('HAND_FORGED_DEMO') === 'true' ? 'gameloadouts_hand_forged_session' : 'laravel_session',
 
 	/*
 	|--------------------------------------------------------------------------
@@ -135,6 +135,6 @@ return array(
 	|
 	*/
 
-	'secure' => false,
+	'secure' => getenv('HAND_FORGED_DEMO') === 'true' ? getenv('HAND_FORGED_LOCAL_TEST') !== 'true' : false,
 
 );
