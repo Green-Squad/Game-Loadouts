@@ -334,7 +334,7 @@ Find the best setup for the {{ $game -> id }}@if($game -> short_name) ({{ $game 
     @stop
 
     @section('scripts')
-    @if(Config::get('hand_forged_demo', false))<script src="{{ asset('js/hand-forged-captcha.js') }}"></script>@else<script src="https://www.google.com/recaptcha/api.js?onload=initRecaptcha&render=explicit" async defer></script>@endif
+    <script src="https://www.google.com/recaptcha/api.js?onload=initRecaptcha&render=explicit" async defer></script>
     <script type="text/javascript">
         var modal_type;
 

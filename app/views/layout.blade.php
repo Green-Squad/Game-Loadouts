@@ -15,7 +15,7 @@
         <!-- CSS -->
         <link href="{{ asset('css/bootstrap.min.css') }}" rel="stylesheet" />
         <!-- <link rel="stylesheet" type="text/css" href="{{ asset('rs-plugin/css/settings.min.css') }}" media="screen" /> -->
-        <link href="{{ asset(Config::get('hand_forged_demo', false) ? 'css/hand-forged-styles.min.css' : 'css/styles.min.css') }}" rel="stylesheet" />
+        <link href="{{ asset('css/styles.min.css') }}" rel="stylesheet" />
         <link href="{{ asset('css/media-queries.css') }}" rel="stylesheet" />
 		<link href="{{ asset('font-awesome/css/font-awesome.min.css') }}" rel="stylesheet" type="text/css">
 		@yield('css')
@@ -137,7 +137,6 @@
         <!-- End header -->
 
         <!-- Content -->
-        @if(Config::get('hand_forged_demo', false))<div class="container">@include('hand-forged.banner')</div>@endif
         @yield('sub-header')
         @yield('intro')
         <article class="article-container">
@@ -319,7 +318,7 @@
         </script>
         @yield('scripts')
 		<!-- Google Analytics -->
-        @if(!Config::get('hand_forged_demo', false) && (Auth::guest() || Auth::user() -> role != 'Admin'))
+        @if(Auth::guest() || Auth::user() -> role != 'Admin')
 		<script>
  			(function(i,s,o,g,r,a,m) {
 				i['GoogleAnalyticsObject']=r;i[r]=i[r]||function() {(i[r].q=i[r].q||[]).push(arguments)},

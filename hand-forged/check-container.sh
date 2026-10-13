@@ -32,7 +32,8 @@ cleanup
 launch
 for i in $(seq 1 180); do curl --fail --silent http://127.0.0.1:8080/ >/dev/null && break || sleep 1; done
 curl --fail --silent http://127.0.0.1:8080/ -o hand-forged/test-results/reset-home.html
-grep -q 'Hand-Forged Edition' hand-forged/test-results/reset-home.html
+! grep -q 'Hand-Forged Edition' hand-forged/test-results/reset-home.html
+grep -q 'Game Loadouts' hand-forged/test-results/reset-home.html
 docker exec hf-web test ! -e public/uploads/hand-forged-reset-marker.txt
 count=$(docker exec hf-database mysql --socket=/tmp/demo.sock -uroot -NBe "SELECT COUNT(*) FROM games WHERE short_name='RESETMARKER'" game_loadouts_hand_forged)
 test "$count" = 0

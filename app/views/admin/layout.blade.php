@@ -134,7 +134,6 @@
                 </div>
                 @endif
 
-                @if(Config::get('hand_forged_demo', false))@include('hand-forged.banner')@endif
                 @yield('content')
 
             </div><!-- /#page-wrapper -->
