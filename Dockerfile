@@ -1,4 +1,5 @@
 FROM php:5.6.40-apache@sha256:0a40fd273961b99d8afe69a61a68c73c04bc0caa9de384d3b2dd9e7986eec86d
+COPY --from=ruby:2.7.8-slim-bullseye@sha256:39f68389fd3fe8c04ed896b10cc90ba4553a42e555ae18b37b41ea8c3ce965fd /usr/share/keyrings/debian-archive-keyring.gpg /etc/apt/trusted.gpg.d/debian-archive.gpg
 WORKDIR /var/www/html
 RUN printf "deb http://archive.debian.org/debian stretch main\n deb http://archive.debian.org/debian-security stretch/updates main\n" > /etc/apt/sources.list && apt-get -o Acquire::Check-Valid-Until=false -o Acquire::ForceIPv4=true -o Acquire::http::Timeout=30 -o Acquire::Retries=2 update && apt-get -o Acquire::ForceIPv4=true -o Acquire::http::Timeout=30 -o Acquire::Retries=2 install -y --no-install-recommends libpng-dev libjpeg-dev libfreetype6-dev libmcrypt-dev libxml2-dev zlib1g-dev unzip git openssl && rm -rf /var/lib/apt/lists/*
 RUN docker-php-ext-configure gd --with-freetype-dir=/usr/include/ --with-jpeg-dir=/usr/include/ && docker-php-ext-install -j2 gd pdo_mysql mbstring xml zip mcrypt
