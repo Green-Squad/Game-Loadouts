@@ -313,7 +313,7 @@ The {{ $weapon -> name }} in {{ $game -> id }}@if($game -> short_name) ({{ $game
 @stop
 
 @section('scripts')
-@if(Config::get('hand_forged_demo', false))<script src=\"{{ asset('js/hand-forged-captcha.js') }}\"></script>@else<script src='https://www.google.com/recaptcha/api.js'></script>@endif
+@if(Config::get('hand_forged_demo', false))<script src="{{ asset('js/hand-forged-captcha.js') }}"></script>@else<script src='https://www.google.com/recaptcha/api.js'></script>@endif
 <script type="text/javascript">
     $('.clickable').click(function() {
         var game_id = '<?php echo $game -> id; ?>';
