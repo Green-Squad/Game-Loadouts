@@ -13,3 +13,5 @@ Only the `hand-forged` branch deploys through `hand-forged/cloudbuild.yaml`, gua
 `bash hand-forged/check-container.sh` verifies seeded public pages, original admin login, JSON or supported original forms, resource measurements, clean shutdown, and database/file reset on replacement. Original application limitations are retained. Tests run in isolated Linux containers on GitHub Actions. Registry storage, build minutes, startup/request compute and traffic may incur costs; scale-to-zero does not guarantee zero cost.
 
 Game Loadouts demo runs in `us-east4`; its image packages use the existing `us-central1` registry in the same project. The original production and Rust services are unchanged.
+
+After deployment, the workflow verifies the US service returns its populated catalog before deleting only the old `gameloadouts-hand-forged` service in `europe-west1`. This retirement is idempotent; production and Rust service names cannot be selected.
