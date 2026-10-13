@@ -76,17 +76,21 @@ validation or transport retains the prior active dataset; retries reconcile
 against committed metadata. Import tooling never automatically replays uncertain
 writes. A 15-minute database lease prevents overlapping jobs.
 
-Job `game-loadouts-rust-sync` in us-east4 uses `Dockerfile.rust-sync`, one task, 600-second
-maximum, and two task retries. Scheduler `game-loadouts-rust-sync-schedule`
-runs at minutes 17 and 47 UTC through a dedicated Rust scheduler identity with
-job-only Run Invoker. The 30-minute interval keeps edits reasonably fresh without
-constant live-source scans: a source export measured about six seconds and an
-unchanged run used 23 Turso rows read and 4 written. Full refreshes are reserved
-for changes too large for the bounded delta. Sync logs contain counts, duration,
-freshness and safe error categories; private conflicts never enter logs. The
-last 2,000 run reports remain in Turso. Source schema changes require conversion
-review before publication. Plan usage must be monitored as actual future edit
-rates and public traffic vary; overages remain disabled.
+Job `game-loadouts-rust-sync` in us-east4 uses `Dockerfile.rust-sync`, one task,
+600-second maximum, and two task retries. Refresh is **manual only**, as requested.
+The former europe-west1 Rust scheduler remains PAUSED; there is no active US
+scheduler. Provisioning never creates or enables schedules. Source changes reach
+Rust only when this manual job runs; independent Rust writes continue immediately.
+
+Run and wait for a validated refresh:
+`gcloud run jobs execute game-loadouts-rust-sync --project=game-loadouts --region=us-east4 --wait`.
+Inspect execution/logs for status `validated`, source snapshot time, counts and
+freshness. Source export measured about six seconds. Full staged refreshes are
+reserved for large deltas; retries, leases and ownership rules remain in place.
+Logs contain counts, safe errors, durations and freshness, never records. The last
+2,000 reports remain in Turso. Source schema changes require conversion review.
+Actual manual refresh volume and public traffic determine Free usage; overages
+remain disabled.
 
 ## Validation and safe rollback
 
@@ -124,7 +128,6 @@ sync reports, conflicts and Rust-owned data, not only original source tables.
 Protected SQLite recovery files remain outside Git in private/virginia-recovery
 in the migration workspace. Frozen Ireland copies remain private and source-independent.
 New read/import tokens are Secret Manager version 2; Game Loadouts' scoped writer
-is version 5. Source secret version 1 is unchanged. Both active sync jobs and
-schedulers are in us-east4; deployment workflows target only that Rust region.
+is version 5. Source secret version 1 is unchanged. Both manual sync jobs are in us-east4; deployment workflows target only that Rust region.
 Hrana BLOB decoding accepts the endpoint's padded and unpadded Base64 forms and has
 a focused regression test. The active website routes and independent writes remain enabled.
