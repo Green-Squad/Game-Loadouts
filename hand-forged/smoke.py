@@ -18,6 +18,8 @@ for i in range(180):
   home=req('/');break
  except Exception:time.sleep(1)
 else:raise AssertionError('Startup failed')
+Path('hand-forged/test-results').mkdir(exist_ok=True)
+Path('hand-forged/test-results/startup.json').write_text(json.dumps({'startup_seconds':round(time.time()-float(os.environ.get('HAND_FORGED_STARTED_AT',time.time())),3)}))
 assert 'Hand-Forged Edition' in home.text and 'Handwritten code from before the prompt.' in home.text
 assert query('SELECT COUNT(*) FROM games')=='11'
 assert query('SELECT COUNT(*) FROM weapons')=='843'

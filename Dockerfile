@@ -1,6 +1,6 @@
 FROM php:5.6.40-apache@sha256:0a40fd273961b99d8afe69a61a68c73c04bc0caa9de384d3b2dd9e7986eec86d
 WORKDIR /var/www/html
-RUN printf "deb https://archive.debian.org/debian stretch main\n deb https://archive.debian.org/debian-security stretch/updates main\n" > /etc/apt/sources.list && apt-get -o Acquire::Check-Valid-Until=false update && apt-get install -y --no-install-recommends libpng-dev libjpeg-dev libfreetype6-dev libmcrypt-dev libxml2-dev zlib1g-dev unzip git openssl && rm -rf /var/lib/apt/lists/*
+RUN printf "deb http://archive.debian.org/debian stretch main\n deb http://archive.debian.org/debian-security stretch/updates main\n" > /etc/apt/sources.list && apt-get -o Acquire::Check-Valid-Until=false -o Acquire::ForceIPv4=true -o Acquire::http::Timeout=30 -o Acquire::Retries=2 update && apt-get -o Acquire::ForceIPv4=true -o Acquire::http::Timeout=30 -o Acquire::Retries=2 install -y --no-install-recommends libpng-dev libjpeg-dev libfreetype6-dev libmcrypt-dev libxml2-dev zlib1g-dev unzip git openssl && rm -rf /var/lib/apt/lists/*
 RUN docker-php-ext-configure gd --with-freetype-dir=/usr/include/ --with-jpeg-dir=/usr/include/ && docker-php-ext-install -j2 gd pdo_mysql mbstring xml zip mcrypt
 COPY --from=composer:2.2.25@sha256:be23a9c3f73293f966a981be03896f9aaaade6c2cc9415f4cf828d1f39c5005c /usr/bin/composer /usr/local/bin/composer
 COPY composer.json ./
