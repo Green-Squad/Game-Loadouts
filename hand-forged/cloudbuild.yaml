@@ -5,18 +5,18 @@ steps:
   args: ['-ec', 'test "$BRANCH_NAME" = hand-forged; grep -q "^  name: gameloadouts-hand-forged$" hand-forged/service.yaml']
 - name: gcr.io/cloud-builders/docker
   id: database
-  args: ['build', '-f', 'hand-forged/Database.Dockerfile', '-t', 'europe-west1-docker.pkg.dev/game-loadouts/cloud-run-source-deploy/hand-forged/database:$COMMIT_SHA', '.']
+  args: ['build', '-f', 'hand-forged/Database.Dockerfile', '-t', 'us-central1-docker.pkg.dev/game-loadouts/cloud-run-source-deploy/hand-forged/database:$COMMIT_SHA', '.']
 - name: gcr.io/cloud-builders/docker
   id: application
-  args: ['build', '-t', 'europe-west1-docker.pkg.dev/game-loadouts/cloud-run-source-deploy/hand-forged/application:$COMMIT_SHA', '.']
+  args: ['build', '-t', 'us-central1-docker.pkg.dev/game-loadouts/cloud-run-source-deploy/hand-forged/application:$COMMIT_SHA', '.']
 - name: gcr.io/google.com/cloudsdktool/cloud-sdk:slim
   id: validate-before-publish
   entrypoint: python3
   args: ['hand-forged/require_validation.py', '$COMMIT_SHA']
 - name: gcr.io/cloud-builders/docker
-  args: ['push', 'europe-west1-docker.pkg.dev/game-loadouts/cloud-run-source-deploy/hand-forged/database:$COMMIT_SHA']
+  args: ['push', 'us-central1-docker.pkg.dev/game-loadouts/cloud-run-source-deploy/hand-forged/database:$COMMIT_SHA']
 - name: gcr.io/cloud-builders/docker
-  args: ['push', 'europe-west1-docker.pkg.dev/game-loadouts/cloud-run-source-deploy/hand-forged/application:$COMMIT_SHA']
+  args: ['push', 'us-central1-docker.pkg.dev/game-loadouts/cloud-run-source-deploy/hand-forged/application:$COMMIT_SHA']
 - name: gcr.io/google.com/cloudsdktool/cloud-sdk:slim
   id: deploy-only-demo
   entrypoint: bash
@@ -25,12 +25,12 @@ steps:
   - |
     test "$BRANCH_NAME" = hand-forged
     grep -q '^  name: gameloadouts-hand-forged$' hand-forged/service.yaml
-    sed -e 's|__APP_IMAGE__|europe-west1-docker.pkg.dev/game-loadouts/cloud-run-source-deploy/hand-forged/application:$COMMIT_SHA|' -e 's|__DB_IMAGE__|europe-west1-docker.pkg.dev/game-loadouts/cloud-run-source-deploy/hand-forged/database:$COMMIT_SHA|' hand-forged/service.yaml > /tmp/service.yaml
-    gcloud run services replace /tmp/service.yaml --project=game-loadouts --region=europe-west1 --quiet
-    gcloud run services add-iam-policy-binding gameloadouts-hand-forged --project=game-loadouts --region=europe-west1 --member=allUsers --role=roles/run.invoker --quiet
+    sed -e 's|__APP_IMAGE__|us-central1-docker.pkg.dev/game-loadouts/cloud-run-source-deploy/hand-forged/application:$COMMIT_SHA|' -e 's|__DB_IMAGE__|us-central1-docker.pkg.dev/game-loadouts/cloud-run-source-deploy/hand-forged/database:$COMMIT_SHA|' hand-forged/service.yaml > /tmp/service.yaml
+    gcloud run services replace /tmp/service.yaml --project=game-loadouts --region=us-east4 --quiet
+    gcloud run services add-iam-policy-binding gameloadouts-hand-forged --project=game-loadouts --region=us-east4 --member=allUsers --role=roles/run.invoker --quiet
 images:
-- europe-west1-docker.pkg.dev/game-loadouts/cloud-run-source-deploy/hand-forged/database:$COMMIT_SHA
-- europe-west1-docker.pkg.dev/game-loadouts/cloud-run-source-deploy/hand-forged/application:$COMMIT_SHA
+- us-central1-docker.pkg.dev/game-loadouts/cloud-run-source-deploy/hand-forged/database:$COMMIT_SHA
+- us-central1-docker.pkg.dev/game-loadouts/cloud-run-source-deploy/hand-forged/application:$COMMIT_SHA
 options:
   logging: CLOUD_LOGGING_ONLY
 timeout: 1200s
