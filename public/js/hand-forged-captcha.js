@@ -3,6 +3,7 @@
  var widgets=[];
  window.grecaptcha={render:function(id){
   var node=typeof id==='string'?document.getElementById(id):id;
+  if(!node)return -1;
   if(node.dataset.demoWidget!==undefined)return Number(node.dataset.demoWidget);
   var index=widgets.length;node.dataset.demoWidget=index;
   node.innerHTML='<label><input type="checkbox"> Demo verification (local sample)</label><input type="hidden" name="g-recaptcha-response" value="">';
