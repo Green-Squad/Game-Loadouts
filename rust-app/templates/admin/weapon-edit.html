@@ -1,0 +1,95 @@
+
+
+<div class="row">
+    <div class="col-lg-12">
+        <h1>{{ weapon.field("name") }} <small>Edit</small></h1>
+        <ol class="breadcrumb">
+            <li>
+                <i class="fa fa-dashboard"></i>
+                <a href="{{ self.url("adminDashboard", &game.field("id"), &weapon.field("name"), &attachment.field("id"), &loadout.field("id"), &user.field("email")) }}">
+                    Dashboard
+                </a>
+            </li>
+            <li>
+                <i class="icon-file-alt"></i>
+                <a href="{{ self.url("admin.game.index", &game.field("id"), &weapon.field("name"), &attachment.field("id"), &loadout.field("id"), &user.field("email")) }}">
+                    Games
+                </a>
+            </li>
+            <li>
+                <i class="icon-file-alt"></i>
+                <a href="{{ self.url("GameController@show", &game.field("id"), &weapon.field("name"), &attachment.field("id"), &loadout.field("id"), &user.field("email")) }}">
+                    {{ game.field("id") }}
+                </a>
+            </li>
+            <li>
+                <i class="icon-file-alt"></i> {{ weapon.field("name") }}
+            </li>
+            <li class="active">
+                <i class="icon-file-alt"></i> Edit
+            </li>
+        </ol>
+    </div>
+</div><!-- /.row -->
+
+<div class="row">
+    <div class="col-lg-12">
+        <div class="well">
+            <form method="post" action="{{ form_action }}" class="form-horizontal" enctype="multipart/form-data"><input type="hidden" name="_token" value="{{ session.csrf }}">{% if !form_method.is_empty() %}<input type="hidden" name="_method" value="{{ form_method }}">{% endif %}
+            <fieldset>
+                <div class="form-group">
+                    <div class="col-lg-6">
+                        <label for="name" class="control-label">{{ "Weapon Name:" }}</label>
+                        <input type="text" name="name" id="name" value="{{ weapon.field("name") }}" class="form-control input-lg" placeholder="Name" required="">
+                    </div>
+                    <div class="col-lg-2">
+                        <label for="type" class="control-label">{{ "Weapon Type:" }}</label>
+                        <input type="text" name="type" id="type" value="{{ weapon.field("type") }}" class="form-control input-lg" placeholder="Type" required="">
+                    </div>
+                    <div class="col-lg-2">
+                        <label for="min_attachments" class="control-label">{{ "Min Attachments:" }}</label>
+                        <input type="text" name="min_attachments" id="min_attachments" value="{{ weapon.field("min_attachments") }}" class="form-control input-lg" placeholder="Min" required="">
+                    </div>
+                    <div class="col-lg-2">
+                        <label for="max_attachments" class="control-label">{{ "Max Attachments:" }}</label>
+                        <input type="text" name="max_attachments" id="max_attachments" value="{{ weapon.field("max_attachments") }}" class="form-control input-lg" placeholder="Max" required="">
+                    </div>
+                </div>
+                <div class="form-group">
+                    {% for group in attachment_groups %}
+                    <div class="col-lg-2">
+                        <div>
+                            <label for="" class="control-label">{{ group.label() }}</label>
+                        </div>
+                        <div class="btn-group-vertical" data-toggle="buttons">
+                            {% for attachment in group.items %}
+                            <label class="btn btn-primary {{ attachment.field("checked") }}"> {% if !attachment.field("checked").is_empty() %}
+                                <input type="checkbox" value="{{ attachment.field("id") }}" name="attachments[]" checked>
+                                {% else %}
+                                <input type="checkbox" value="{{ attachment.field("id") }}" name="attachments[]">
+                                {% endif %}
+                                {{ attachment.field("name") }} </label>
+                            {% endfor %}
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+                <div class="form-group">
+                    <div class="col-lg-12">
+                        <label for="image" class="control-label">{{ "Upload Image: " }}</label>
+                        <input type="file" name="image" id="image" class="form-control input-lg">
+                    </div>
+                </div>
+                <div class="form-group">
+                    <div class="col-lg-12">
+                        <button type="submit" class="btn btn-primary">
+                            Save
+                        </button>
+                    </div>
+                </div>
+            </fieldset>
+            </form>
+        </div>
+    </div>
+</div>
+

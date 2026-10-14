@@ -37,4 +37,7 @@ with tempfile.TemporaryDirectory(prefix="isolated-source-") as temp:
     result=import_generation(db,schema,1)
     publish(db,schema,1,result)
     init_tracking(db,schema)
+    if args.engine=="mysql":
+        from admin_schema import initialize
+        initialize(db)
     print(json.dumps({"fixture":args.source_database,"tables":result["tables"],"relationships":result["relationships"]}))

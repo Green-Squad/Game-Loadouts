@@ -29,7 +29,7 @@ INSERT INTO users (email,username,role) VALUES
 ('v7@example.invalid','V7','Standard'),
 ('v8@example.invalid','V8','Standard'),
 ('v9@example.invalid','V9','Standard');
-INSERT INTO attachments VALUES
+INSERT INTO attachments(id,game_id,name,slot,image_url,thumb_url) VALUES
 (1,'Call of Duty Modern Warfare','Scope <script>','Optic',NULL,'img/arrows/small-green.png'),
 (2,'Call of Duty Modern Warfare','Grip','Underbarrel',NULL,'img/arrows/small-green.png'),
 (3,'Call of Duty Modern Warfare','Suppressor','Barrel',NULL,NULL),

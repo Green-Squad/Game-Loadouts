@@ -564,7 +564,7 @@ async fn login(
     }
     // Serialize attempts with account updates. Never verify bcrypt on an async worker thread.
     let tx = a.pool.begin().await?;
-    let user=sqlx::query_as::<LoginUser>("SELECT email,password,confirm_token,CAST(failed_attempts AS INTEGER) failed_attempts,CAST(disabled_until>strftime('%Y-%m-%d %H:%M:%f','now') AS INTEGER) locked FROM users WHERE (email=? OR username=?) AND role<>'Guest' ORDER BY email=? DESC LIMIT 1").bind(name).bind(name).bind(name).fetch_optional(&*tx).await?;
+    let user=sqlx::query_as::<LoginUser>("SELECT email,password,confirm_token,CAST(failed_attempts AS INTEGER) failed_attempts,CAST(julianday(disabled_until)>julianday('now') AS INTEGER) locked FROM users WHERE (email=? OR username=?) AND role<>'Guest' ORDER BY email=? DESC LIMIT 1").bind(name).bind(name).bind(name).fetch_optional(&*tx).await?;
     let Some(user) = user else {
         // Pay the same expensive hash cost for unknown users.
         let _ = hash_password("invalid-login-password".into()).await?;
@@ -901,7 +901,10 @@ pub async fn write_loadout(
         if identity.is_none() {return Err(Error::invalid("Your account changed. Refresh and try again."));}
         // Lock the weapon for all writes, then loadout. This serializes both set deduplication
         // and votes on legacy pivot tables which do not have a UNIQUE constraint.
-        let w=sqlx::query("SELECT CAST(w.id AS INTEGER) id,CAST(w.min_attachments AS INTEGER) min_attachments,CAST(w.max_attachments AS INTEGER) max_attachments FROM weapons w JOIN games g ON g.id=w.game_id WHERE w.game_id=? AND w.name=? AND g.live=1 ORDER BY w.id LIMIT 1").bind(&parts[0]).bind(&parts[1]).fetch_optional(&*tx).await?.ok_or_else(||Error::invalid("Weapon not found."))?;
+        let can_preview:bool=if state.admin.is_some()&&session.role=="Admin" {
+            sqlx::query_scalar::<String>("SELECT role FROM users WHERE email=? AND _credential_hash=?").bind(&session.email).bind(&session.credential_hash).fetch_optional(&*tx).await?.as_deref()==Some("Admin")
+        }else{false};
+        let w=sqlx::query("SELECT CAST(w.id AS INTEGER) id,CAST(w.min_attachments AS INTEGER) min_attachments,CAST(w.max_attachments AS INTEGER) max_attachments FROM weapons w JOIN games g ON g.id=w.game_id WHERE w.game_id=? AND w.name=? AND (g.live=1 OR ?=1) ORDER BY w.id LIMIT 1").bind(&parts[0]).bind(&parts[1]).bind(i64::from(can_preview)).fetch_optional(&*tx).await?.ok_or_else(||Error::invalid("Weapon not found."))?;
         let wid:i64=w.try_get("id")?;
         let id=if let Some(id)=target_id {
             let found:Option<i64>=sqlx::query_scalar("SELECT CAST(id AS INTEGER) FROM loadouts WHERE id=? AND weapon_id=?").bind(id).bind(wid).fetch_optional(&*tx).await?;

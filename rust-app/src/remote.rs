@@ -174,13 +174,22 @@ impl DerefMut for WriteTransaction {
 
 impl Pool {
     pub async fn from_env(writer: bool) -> Result<Self, Error> {
+        Self::configured(
+            writer,
+            if writer {
+                "TURSO_WRITE_TOKEN"
+            } else {
+                "TURSO_AUTH_TOKEN"
+            },
+        )
+        .await
+    }
+    pub async fn admin_from_env() -> Result<Self, Error> {
+        Self::configured(true, "TURSO_ADMIN_TOKEN").await
+    }
+    async fn configured(writer: bool, token_name: &str) -> Result<Self, Error> {
         let url = env::var("TURSO_DATABASE_URL").map_err(|_| Error::Configuration)?;
-        let token = env::var(if writer {
-            "TURSO_WRITE_TOKEN"
-        } else {
-            "TURSO_AUTH_TOKEN"
-        })
-        .map_err(|_| Error::Configuration)?;
+        let token = env::var(token_name).unwrap_or_default();
         let timeout = Duration::from_millis(
             env::var("DB_QUERY_TIMEOUT_MS")
                 .unwrap_or_else(|_| "5000".into())
@@ -375,6 +384,14 @@ fn key_column(column: &str, games: bool) -> Option<String> {
             | "game_id"
             | "user_id"
             | "name"
+            | "role"
+            | "slot"
+            | "type"
+            | "short_name"
+            | "theme_color"
+            | "image_url"
+            | "thumb_url"
+            | "header_url"
     ) || (name == "id" && (prefix == "g" || (prefix.is_empty() && games)));
     keyed.then(|| {
         if prefix.is_empty() {
@@ -389,7 +406,9 @@ fn comparisons(sql: &str, args: &[SqlValue]) -> Result<(String, Vec<SqlValue>), 
     static LITERALS: OnceLock<Regex> = OnceLock::new();
     static PARAMS: OnceLock<Regex> = OnceLock::new();
     static JOINS: OnceLock<Regex> = OnceLock::new();
-    let games = sql.contains("FROM games ");
+    let games = sql.contains("FROM games ")
+        || sql.starts_with("UPDATE games ")
+        || sql.starts_with("DELETE FROM games ");
     let start = if sql.starts_with("UPDATE ") {
         sql.find(" WHERE ").ok_or(Error::Query)?
     } else if sql.starts_with("INSERT ") {
@@ -531,7 +550,18 @@ fn extra_key(column: &str, value: &SqlValue) -> Result<Option<(String, SqlValue)
             | "game_id"
             | "user_id"
             | "name"
+            | "id"
+            | "slot"
+            | "type"
+            | "short_name"
+            | "theme_color"
+            | "image_url"
+            | "thumb_url"
+            | "header_url"
     ) {
+        return Ok(None);
+    }
+    if column == "id" && !matches!(value, SqlValue::Text(_)) {
         return Ok(None);
     }
     let key = match value {
@@ -543,6 +573,104 @@ fn extra_key(column: &str, value: &SqlValue) -> Result<Option<(String, SqlValue)
 }
 
 impl Connection {
+    pub async fn insert_rows(
+        &self,
+        table: &str,
+        columns: &[&str],
+        rows: &[Vec<SqlValue>],
+    ) -> Result<Vec<i64>, Error> {
+        tokio::time::timeout(self.timeout, self.insert_rows_inner(table, columns, rows))
+            .await
+            .map_err(|_| Error::Timeout)?
+    }
+    async fn insert_rows_inner(
+        &self,
+        table: &str,
+        columns: &[&str],
+        rows: &[Vec<SqlValue>],
+    ) -> Result<Vec<i64>, Error> {
+        if !self.writer
+            || !matches!(table, "weapons" | "attachments" | "attachment_weapon")
+            || rows.len() > 50
+            || rows.iter().any(|r| r.len() != columns.len())
+        {
+            return Err(Error::Configuration);
+        }
+        if rows.is_empty() {
+            return Ok(vec![]);
+        }
+        let mut has_id = table != "attachment_weapon";
+        if table == "attachment_weapon" {
+            let mut info = self
+                .inner
+                .query(
+                    &format!("PRAGMA table_info(_g{}_{table})", self.generation),
+                    (),
+                )
+                .await?;
+            while let Some(row) = info.next().await? {
+                has_id |= row.get::<String>(1)? == "id";
+            }
+        }
+        let first = if has_id {
+            let mut result=self.inner.query("UPDATE _rust_sequences SET next_id=next_id+? WHERE table_name=? RETURNING next_id-?",(rows.len() as i64,table,rows.len() as i64)).await?;
+            result.next().await?.ok_or(Error::Missing)?.get::<i64>(0)?
+        } else {
+            0
+        };
+        let mut names: Vec<String> = columns.iter().map(|x| (*x).into()).collect();
+        let extras: Vec<_> = columns
+            .iter()
+            .enumerate()
+            .filter(|(_, name)| {
+                matches!(
+                    **name,
+                    "name" | "slot" | "type" | "game_id" | "image_url" | "thumb_url"
+                )
+            })
+            .map(|(i, name)| (i, format!("_key_{name}")))
+            .collect();
+        names.extend(extras.iter().map(|(_, n)| n.clone()));
+        if has_id {
+            names.push("id".into());
+        }
+        let mut args = Vec::new();
+        let mut values = Vec::new();
+        for (index, row) in rows.iter().enumerate() {
+            args.extend(row.iter().cloned());
+            for (column, _) in &extras {
+                args.push(match &row[*column] {
+                    SqlValue::Text(v) => SqlValue::Blob(unicode_key(v)?),
+                    SqlValue::Null => SqlValue::Null,
+                    _ => return Err(Error::Query),
+                });
+            }
+            if has_id {
+                args.push(SqlValue::Integer(first + index as i64));
+            }
+            values.push(format!("({})", vec!["?"; names.len()].join(",")));
+        }
+        let sql = format!(
+            "INSERT INTO _g{}_{table} ({}) VALUES {}",
+            self.generation,
+            names.join(","),
+            values.join(",")
+        );
+        tokio::time::timeout(self.timeout, self.inner.execute(&sql, args))
+            .await
+            .map_err(|_| Error::Timeout)??;
+        Ok(if has_id {
+            (first..first + rows.len() as i64).collect()
+        } else {
+            vec![]
+        })
+    }
+    pub async fn media_chunks(&self, path: &str, offset: i64) -> Result<Vec<Vec<u8>>, Error> {
+        tokio::time::timeout(self.timeout,async{
+            let mut rows=self.inner.query("SELECT data FROM _rust_media_chunks WHERE path=? AND part>=? ORDER BY part LIMIT 2",(path,offset)).await?;let mut out=Vec::new();
+            while let Some(row)=rows.next().await?{out.push(row.get::<Vec<u8>>(0)?);}Ok(out)
+        }).await.map_err(|_|Error::Timeout)?
+    }
     pub fn generation(&self) -> i64 {
         self.generation
     }
@@ -629,6 +757,11 @@ impl Connection {
     }
 
     async fn execute(&self, sql: &str, original: &[SqlValue]) -> Result<Outcome, Error> {
+        tokio::time::timeout(self.timeout, self.execute_inner(sql, original))
+            .await
+            .map_err(|_| Error::Timeout)?
+    }
+    async fn execute_inner(&self, sql: &str, original: &[SqlValue]) -> Result<Outcome, Error> {
         if !self.writer {
             return Err(Error::Configuration);
         }
@@ -680,12 +813,35 @@ impl Connection {
             }
             if matches!(
                 table.as_str(),
-                "loadouts" | "loadout_user" | "attachment_loadout"
+                "loadouts"
+                    | "loadout_user"
+                    | "attachment_loadout"
+                    | "weapons"
+                    | "attachments"
+                    | "attachment_weapon"
             ) && !columns.contains(&"id")
             {
-                let mut result=self.inner.query("UPDATE _rust_sequences SET next_id=next_id+1 WHERE table_name=? RETURNING next_id-1",[table.clone()]).await?;
-                let id: i64 = result.next().await?.ok_or(Error::Missing)?.get(0)?;
-                extras.push(("id".into(), SqlValue::Integer(id)));
+                let has_id = if table == "attachment_weapon" {
+                    let mut rows = self
+                        .inner
+                        .query(
+                            &format!("PRAGMA table_info(_g{}_{table})", self.generation),
+                            (),
+                        )
+                        .await?;
+                    let mut found = false;
+                    while let Some(row) = rows.next().await? {
+                        found |= row.get::<String>(1)? == "id";
+                    }
+                    found
+                } else {
+                    true
+                };
+                if has_id {
+                    let mut result=self.inner.query("UPDATE _rust_sequences SET next_id=next_id+1 WHERE table_name=? RETURNING next_id-1",[table.clone()]).await?;
+                    let id: i64 = result.next().await?.ok_or(Error::Missing)?.get(0)?;
+                    extras.push(("id".into(), SqlValue::Integer(id)));
+                }
             }
             let mut new_columns = sql[open + 1..end].to_owned();
             let mut new_expressions = sql[values_start..values_end].to_owned();
@@ -832,6 +988,10 @@ impl<T> Query<T> {
             error: false,
             _output: std::marker::PhantomData,
         }
+    }
+    pub fn bind_blob(mut self, value: Vec<u8>) -> Self {
+        self.args.push(SqlValue::Blob(value));
+        self
     }
     pub fn bind<V: Serialize>(mut self, v: V) -> Self {
         let value = serde_json::to_value(v).ok().and_then(|v| match v {

@@ -1,0 +1,190 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <meta name="description" content="">
+        <meta name="author" content="">
+        <meta name="ROBOTS" content="NOINDEX, NOFOLLOW">
+
+        <title>Admin - {{ title }}</title>
+
+        <!-- Bootstrap core CSS -->
+        <link href="{{ self.asset("css/bootstrap.min.css") }}" rel="stylesheet">
+
+        <!-- Add custom CSS here -->
+        <link href="{{ self.asset("css/sb-admin.css") }}" rel="stylesheet">
+        <link href="{{ self.asset("font-awesome/css/font-awesome.min.css") }}" rel="stylesheet">
+    </head>
+    <body>
+        <div id="wrapper">
+
+            <!-- Sidebar -->
+            <nav class="navbar navbar-inverse navbar-fixed-top" role="navigation">
+                <!-- Brand and toggle get grouped for better mobile display -->
+                <div class="navbar-header">
+                    <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-ex1-collapse">
+                        <span class="sr-only">Toggle navigation</span>
+                        <span class="icon-bar"></span>
+                        <span class="icon-bar"></span>
+                        <span class="icon-bar"></span>
+                    </button>
+                    <a class="navbar-brand" href="{{ self.url("adminDashboard", &game.field("id"), &weapon.field("name"), &attachment.field("id"), &loadout.field("id"), &user.field("email")) }}">
+                        Admin Dashboard
+                    </a>
+                </div>
+
+                <!-- Collect the nav links, forms, and other content for toggling -->
+                <div class="collapse navbar-collapse navbar-ex1-collapse">
+                    <ul class="nav navbar-nav side-nav">
+                        <li>
+                            <a href="{{ self.url("adminDashboard", &game.field("id"), &weapon.field("name"), &attachment.field("id"), &loadout.field("id"), &user.field("email")) }}"><i class="fa fa-dashboard"></i> Dashboard</a>
+                        </li>
+                        <li class="dropdown open">
+                            <a href="#" class="dropdown-toggle" data-toggle=""><i class="fa fa-caret-square-o-down"></i> Users <b class="caret"></b></a>
+                            <ul class="dropdown-menu">
+                                <li>
+                                    <a href="{{ self.url("createUser", &game.field("id"), &weapon.field("name"), &attachment.field("id"), &loadout.field("id"), &user.field("email")) }}">
+                                        Create New
+                                    </a>
+                                </li>
+                                <li>
+                                    <a href="{{ self.url("modUsers", &game.field("id"), &weapon.field("name"), &attachment.field("id"), &loadout.field("id"), &user.field("email")) }}">
+                                        Users List
+                                    </a>
+                                </li>
+                                <li>
+                                    <a href="{{ self.url("modGuests", &game.field("id"), &weapon.field("name"), &attachment.field("id"), &loadout.field("id"), &user.field("email")) }}">
+                                        Guests List
+                                    </a>
+                                </li>
+                                <li>
+                                    <a href="{{ self.url("modConverted", &game.field("id"), &weapon.field("name"), &attachment.field("id"), &loadout.field("id"), &user.field("email")) }}">
+                                        Converted Guests List
+                                    </a>
+                                </li>
+                            </ul>
+                        </li>
+                        <li class="dropdown open">
+                            <a href="#" class="dropdown-toggle" data-toggle=""><i class="fa fa-caret-square-o-down"></i> Games <b class="caret"></b></a>
+                            <ul class="dropdown-menu">
+                                <li>
+                                    <a href="{{ self.url("GameController@create", &game.field("id"), &weapon.field("name"), &attachment.field("id"), &loadout.field("id"), &user.field("email")) }}">
+                                        Create New
+                                    </a>
+                                </li>
+                                <li>
+                                    <a href="{{ self.url("GameController@index", &game.field("id"), &weapon.field("name"), &attachment.field("id"), &loadout.field("id"), &user.field("email")) }}">
+                                        Games List
+                                    </a>
+                                </li>
+                            </ul>
+                        </li>
+                        <li class="dropdown open">
+                            <a href="#" class="dropdown-toggle" data-toggle=""><i class="fa fa-caret-square-o-down"></i> Loadouts <b class="caret"></b></a>
+                            <ul class="dropdown-menu">
+                                <li>
+                                    <a href="{{ self.url("LoadoutController@listLoadouts", &game.field("id"), &weapon.field("name"), &attachment.field("id"), &loadout.field("id"), &user.field("email")) }}">
+                                        View Loadouts
+                                    </a>
+                                </li>
+                                <li>
+                                    <a href="{{ self.url("LoadoutController@listVotes", &game.field("id"), &weapon.field("name"), &attachment.field("id"), &loadout.field("id"), &user.field("email")) }}">
+                                        View Votes
+                                    </a>
+                                </li>
+                            </ul>
+                        </li>
+                    </ul>
+
+                    <ul class="nav navbar-nav navbar-right navbar-user">
+                        <li>
+                            <a href="/">Home</a>
+                        </li>
+                        <li class="dropdown user-dropdown">
+                            <a href="#" class="dropdown-toggle" data-toggle="dropdown"><i class="fa fa-user"></i> {{ session.username }} <b class="caret"></b></a>
+                            <ul class="dropdown-menu">
+                                <li>
+                                    <a href="#"><i class="fa fa-user"></i> Profile</a>
+                                </li>
+                                <li>
+                                    <a href="#"><i class="fa fa-envelope"></i> Inbox <span class="badge">7</span></a>
+                                </li>
+                                <li>
+                                    <a href="#"><i class="fa fa-gear"></i> Settings</a>
+                                </li>
+                                <li class="divider"></li>
+                                <li>
+                                    <a href="{{ self.url("logout", &game.field("id"), &weapon.field("name"), &attachment.field("id"), &loadout.field("id"), &user.field("email")) }}"><i class="fa fa-power-off"></i> Logout</a>
+                                </li>
+                            </ul>
+                        </li>
+                    </ul>
+                </div><!-- /.navbar-collapse -->
+            </nav>
+
+            <div id="page-wrapper">
+
+                {% if !alert.is_empty() %}
+                <div class="alert alert-dismissable {{ alert_class }}">
+                    <button type="button" class="close" data-dismiss="alert">
+                        ×
+                    </button>
+                    {{ alert }}
+                </div>
+                {% endif %}
+
+                {% if kind == "attachment/create" %}{% include "admin/attachment-create.html" %}
+{% else if kind == "attachment/delete" %}{% include "admin/attachment-delete.html" %}
+{% else if kind == "attachment/edit" %}{% include "admin/attachment-edit.html" %}
+{% else if kind == "game/create" %}{% include "admin/game-create.html" %}
+{% else if kind == "game/delete" %}{% include "admin/game-delete.html" %}
+{% else if kind == "game/edit" %}{% include "admin/game-edit.html" %}
+{% else if kind == "game/show" %}{% include "admin/game-show.html" %}
+{% else if kind == "games" %}{% include "admin/games.html" %}
+{% else if kind == "home" %}{% include "admin/home.html" %}
+{% else if kind == "import/import" %}{% include "admin/import-import.html" %}
+{% else if kind == "loadout/delete" %}{% include "admin/loadout-delete.html" %}
+{% else if kind == "user/create" %}{% include "admin/user-create.html" %}
+{% else if kind == "user/delete" %}{% include "admin/user-delete.html" %}
+{% else if kind == "user/edit" %}{% include "admin/user-edit.html" %}
+{% else if kind == "user/submissions" %}{% include "admin/user-submissions.html" %}
+{% else if kind == "users" %}{% include "admin/users.html" %}
+{% else if kind == "votes" %}{% include "admin/votes.html" %}
+{% else if kind == "weapon/create" %}{% include "admin/weapon-create.html" %}
+{% else if kind == "weapon/delete" %}{% include "admin/weapon-delete.html" %}
+{% else if kind == "weapon/edit" %}{% include "admin/weapon-edit.html" %}
+{% else if kind == "weapon/show" %}{% include "admin/weapon-show.html" %}{% endif %}
+
+            </div><!-- /#page-wrapper -->
+
+        </div><!-- /#wrapper -->
+
+        <!-- JavaScript -->
+        <script src="{{ self.asset("js/jquery-1.10.2.js") }}"></script>
+        <script src="{{ self.asset("js/bootstrap.min.js") }}"></script>
+
+        {% if kind == "attachment/create" %}{% include "admin/attachment-create-scripts.html" %}
+{% else if kind == "attachment/delete" %}{% include "admin/attachment-delete-scripts.html" %}
+{% else if kind == "attachment/edit" %}{% include "admin/attachment-edit-scripts.html" %}
+{% else if kind == "game/create" %}{% include "admin/game-create-scripts.html" %}
+{% else if kind == "game/delete" %}{% include "admin/game-delete-scripts.html" %}
+{% else if kind == "game/edit" %}{% include "admin/game-edit-scripts.html" %}
+{% else if kind == "game/show" %}{% include "admin/game-show-scripts.html" %}
+{% else if kind == "games" %}{% include "admin/games-scripts.html" %}
+{% else if kind == "home" %}{% include "admin/home-scripts.html" %}
+{% else if kind == "import/import" %}{% include "admin/import-import-scripts.html" %}
+{% else if kind == "loadout/delete" %}{% include "admin/loadout-delete-scripts.html" %}
+{% else if kind == "user/create" %}{% include "admin/user-create-scripts.html" %}
+{% else if kind == "user/delete" %}{% include "admin/user-delete-scripts.html" %}
+{% else if kind == "user/edit" %}{% include "admin/user-edit-scripts.html" %}
+{% else if kind == "user/submissions" %}{% include "admin/user-submissions-scripts.html" %}
+{% else if kind == "users" %}{% include "admin/users-scripts.html" %}
+{% else if kind == "votes" %}{% include "admin/votes-scripts.html" %}
+{% else if kind == "weapon/create" %}{% include "admin/weapon-create-scripts.html" %}
+{% else if kind == "weapon/delete" %}{% include "admin/weapon-delete-scripts.html" %}
+{% else if kind == "weapon/edit" %}{% include "admin/weapon-edit-scripts.html" %}
+{% else if kind == "weapon/show" %}{% include "admin/weapon-show-scripts.html" %}{% endif %}
+
+    </body>
+</html>

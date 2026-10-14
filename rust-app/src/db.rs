@@ -28,6 +28,8 @@ pub struct Db<'a> {
     connection: Option<Connection>,
     pub count: usize,
     pub millis: f64,
+    pub admin_preview: bool,
+    pub settings: bool,
 }
 impl<'a> Db<'a> {
     pub fn new(pool: &'a Pool, timeout: Duration) -> Self {
@@ -37,6 +39,8 @@ impl<'a> Db<'a> {
             connection: None,
             count: 0,
             millis: 0.0,
+            admin_preview: false,
+            settings: false,
         }
     }
     pub async fn rows<T>(&mut self, sql: &str, binds: &[String]) -> Result<Vec<T>, DbError>
@@ -80,8 +84,13 @@ impl<'a> Db<'a> {
         }
     }
     pub async fn recent(&mut self) -> Result<Vec<Game>, DbError> {
+        let override_sql = if self.settings {
+            ",CAST((SELECT value FROM _rust_settings WHERE key='ads') AS INTEGER) ads_override"
+        } else {
+            ""
+        };
         self.rows(
-            &format!("SELECT {GAME_COLUMNS} FROM games ORDER BY created_at DESC, id LIMIT 5"),
+            &format!("SELECT {GAME_COLUMNS}{override_sql} FROM games ORDER BY created_at DESC, id LIMIT 5"),
             &[],
         )
         .await
@@ -89,7 +98,14 @@ impl<'a> Db<'a> {
     pub async fn game(&mut self, id: &str) -> Result<Option<Game>, DbError> {
         Ok(self
             .rows(
-                &format!("SELECT {GAME_COLUMNS} FROM games WHERE id=? AND live=1"),
+                &format!(
+                    "SELECT {GAME_COLUMNS} FROM games WHERE id=?{}",
+                    if self.admin_preview {
+                        ""
+                    } else {
+                        " AND live=1"
+                    }
+                ),
                 &[id.into()],
             )
             .await?

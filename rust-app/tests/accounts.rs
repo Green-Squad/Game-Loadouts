@@ -195,6 +195,7 @@ async fn fixture() -> (
         .unwrap()
         .replace("$2b$", "$2y$");
     sqlx_source::query("INSERT INTO users(email,username,role,password,confirm_token) VALUES('tester@example.invalid','SecurityTester','Standard',?,'1')").bind(hash).execute(&pool).await.unwrap();
+    sqlx_source::query("INSERT INTO users(email,username,role,password,confirm_token) VALUES('admin@example.invalid','AdminFixture','Admin',?,'1')").bind(bcrypt::hash("legacy-password",4).unwrap()).execute(&pool).await.unwrap();
     let target = std::env::var("TEST_TURSO_ACCOUNTS_URL").unwrap();
     assert!(
         std::process::Command::new("python3")
@@ -212,6 +213,7 @@ async fn fixture() -> (
     let (port, messages, mail_task) = smtp().await;
     let (captcha_url, captcha_task) = captcha().await;
     let state = Arc::new(AppState {
+        admin: Some(pool.clone()),
         ads: false,
         analytics_id: String::new(),
         accounts: Some(Arc::new(Accounts {
@@ -997,7 +999,8 @@ async fn public_write_flows_and_security() {
         assert!(status.success(), "interactive browser smoke failed");
     }
     // Public and admin boundaries.
-    assert_eq!(member.get(&app, "/admin").await.status, 404);
+    assert_eq!(member.get(&app, "/admin").await.status, 303);
+    admin_flows(&app, &pool).await;
     assert_eq!(member.get(&app, "/robots.txt").await.status, 200);
     for task in tasks {
         task.abort();
@@ -1008,4 +1011,510 @@ async fn public_write_flows_and_security() {
         .await
         .unwrap();
     owner.close().await;
+}
+
+async fn multipart_post(
+    app: &Router,
+    browser: &mut Browser,
+    path: &str,
+    fields: &[(&str, &str)],
+    files: &[(&str, &str, &str, &[u8])],
+) -> Reply {
+    let boundary = "RustAdminFixtureBoundary";
+    let mut body = Vec::new();
+    for (name, value) in fields
+        .iter()
+        .copied()
+        .chain(std::iter::once(("_token", browser.csrf.as_str())))
+    {
+        body.extend(
+            format!(
+                "--{boundary}\r\nContent-Disposition: form-data; name=\"{name}\"\r\n\r\n{value}\r\n"
+            )
+            .as_bytes(),
+        );
+    }
+    for (name, filename, mime, bytes) in files {
+        body.extend(format!("--{boundary}\r\nContent-Disposition: form-data; name=\"{name}\"; filename=\"{filename}\"\r\nContent-Type: {mime}\r\n\r\n").as_bytes());
+        body.extend(*bytes);
+        body.extend(b"\r\n");
+    }
+    body.extend(format!("--{boundary}--\r\n").as_bytes());
+    let r = app
+        .clone()
+        .oneshot(
+            Request::builder()
+                .uri(path)
+                .method("POST")
+                .header("cookie", &browser.cookie)
+                .header(
+                    "content-type",
+                    format!("multipart/form-data; boundary={boundary}"),
+                )
+                .body(Body::from(body))
+                .unwrap(),
+        )
+        .await
+        .unwrap();
+    let status = r.status().as_u16();
+    let headers = r.headers().clone();
+    let body =
+        String::from_utf8(r.into_body().collect().await.unwrap().to_bytes().to_vec()).unwrap();
+    let reply = Reply {
+        status,
+        headers,
+        body,
+    };
+    browser.accept(&reply);
+    reply
+}
+async fn admin_flows(app: &Router, pool: &Pool) {
+    let mut admin = Browser::default();
+    assert_eq!(admin.get(app, "/admin").await.status, 303);
+    admin.get(app, "/login").await;
+    assert_eq!(
+        admin
+            .post(
+                app,
+                "/login",
+                &[
+                    ("emailOrUsername", "AdminFixture"),
+                    ("password", "legacy-password")
+                ]
+            )
+            .await
+            .status,
+        303
+    );
+    let home = admin.get(app, "/admin").await;
+    assert_eq!(home.status, 200, "{}", home.body);
+    assert!(home.body.contains("Administration") || home.body.contains("Dashboard"));
+    assert_eq!(home.headers["cache-control"], "no-store");
+    let game = "Call+of+Duty+Modern+Warfare";
+    for route in [
+        "/admin/",
+        "/admin/users",
+        "/admin/guests",
+        "/admin/converted",
+        "/admin/game",
+        "/admin/game/create",
+        "/admin/user/create",
+        "/admin/votes",
+        "/admin/loadouts",
+        "/admin/toggleAds",
+        "/admin/compile-css",
+        "/admin/game/Call+of+Duty+Modern+Warfare",
+        "/admin/game/Call+of+Duty+Modern+Warfare/edit",
+        "/admin/Call+of+Duty+Modern+Warfare/weapon/create",
+        "/admin/Call+of+Duty+Modern+Warfare/attachment/create",
+        "/admin/Call+of+Duty+Modern+Warfare/import",
+        "/admin/Call+of+Duty+Modern+Warfare/M4A1",
+        "/admin/Call+of+Duty+Modern+Warfare/M4A1/edit",
+        "/admin/user/edit/admin%40example.invalid",
+    ] {
+        let r = admin.get(app, route).await;
+        assert_eq!(r.status, 200, "{route}: {}", r.body);
+    }
+    assert_eq!(
+        request(app, &admin.cookie, "/admin/toggleAds", "POST", &[])
+            .await
+            .status,
+        403
+    );
+    let initial: Option<String> =
+        sqlx::query_scalar("SELECT value FROM _rust_settings WHERE key='ads'")
+            .fetch_optional(pool)
+            .await
+            .unwrap();
+    admin.get(app, "/admin/toggleAds").await;
+    assert_eq!(
+        sqlx::query_scalar::<String>("SELECT value FROM _rust_settings WHERE key='ads'")
+            .fetch_optional(pool)
+            .await
+            .unwrap(),
+        initial
+    );
+    assert_eq!(admin.post(app, "/admin/toggleAds", &[]).await.status, 303);
+    assert_eq!(admin.post(app, "/admin/compile-css", &[]).await.status, 303);
+    assert_eq!(
+        request(app, "", "/css/styles.min.css", "GET", &[])
+            .await
+            .status,
+        200
+    );
+    assert_eq!(admin.get(app, "/Hidden+New+Game").await.status, 200);
+    assert_eq!(
+        request(app, "", "/Hidden+New+Game", "GET", &[])
+            .await
+            .status,
+        404
+    );
+    assert_eq!(
+        admin
+            .post(
+                app,
+                "/admin/user/create",
+                &[
+                    ("email", "admin-created@example.invalid"),
+                    ("username", "CreatedFixture"),
+                    ("password", "created-password"),
+                    ("role", "Standard")
+                ]
+            )
+            .await
+            .status,
+        303
+    );
+    let stored: String = sqlx::query_scalar(
+        "SELECT password FROM users WHERE email='admin-created@example.invalid'",
+    )
+    .fetch_one(pool)
+    .await
+    .unwrap();
+    assert!(bcrypt::verify("created-password", &stored).unwrap());
+    assert_eq!(
+        admin
+            .post(
+                app,
+                "/admin/user/edit/admin-created%40example.invalid",
+                &[
+                    ("email", "admin-renamed@example.invalid"),
+                    ("username", "RenamedFixture"),
+                    ("password", ""),
+                    ("role", "Standard"),
+                    ("disabled_until", "0")
+                ]
+            )
+            .await
+            .status,
+        303
+    );
+    assert_eq!(
+        sqlx::query_scalar::<String>(
+            "SELECT password FROM users WHERE email='admin-renamed@example.invalid'"
+        )
+        .fetch_one(pool)
+        .await
+        .unwrap(),
+        stored
+    );
+    assert_eq!(
+        admin
+            .post(
+                app,
+                "/admin/user/delete/admin-renamed%40example.invalid",
+                &[]
+            )
+            .await
+            .status,
+        303
+    );
+    let mut png = std::io::Cursor::new(Vec::new());
+    image::DynamicImage::new_rgb8(16, 8)
+        .write_to(&mut png, image::ImageFormat::Png)
+        .unwrap();
+    let png = png.into_inner();
+    let r = multipart_post(
+        app,
+        &mut admin,
+        "/admin/game",
+        &[
+            ("id", "Admin Fixture Game"),
+            ("short_name", "AFG"),
+            ("live", "0"),
+            ("theme_color", "green"),
+        ],
+        &[
+            ("image", "fixture.png", "image/png", &png),
+            ("header_image", "header.png", "image/png", &png),
+        ],
+    )
+    .await;
+    assert_eq!(r.status, 303, "{}", r.body);
+    let media: String =
+        sqlx::query_scalar("SELECT image_url FROM games WHERE id='Admin Fixture Game'")
+            .fetch_one(pool)
+            .await
+            .unwrap();
+    assert!(media.starts_with("rust-media/"));
+    let response = app
+        .clone()
+        .oneshot(
+            Request::builder()
+                .uri(format!("/{media}"))
+                .body(Body::empty())
+                .unwrap(),
+        )
+        .await
+        .unwrap();
+    assert_eq!(response.status(), 200);
+    assert_eq!(response.headers()["content-type"], "image/png");
+    assert_eq!(
+        response
+            .into_body()
+            .collect()
+            .await
+            .unwrap()
+            .to_bytes()
+            .as_ref(),
+        png.as_slice()
+    );
+    let r = admin
+        .post(
+            app,
+            "/admin/Call+of+Duty+Modern+Warfare/attachment/create",
+            &[("name", "Admin attachment"), ("slot", "Optic")],
+        )
+        .await;
+    assert_eq!(r.status, 303, "{}", r.body);
+    let attachment: i64 =
+        sqlx::query_scalar("SELECT id FROM attachments WHERE name='Admin attachment'")
+            .fetch_one(pool)
+            .await
+            .unwrap();
+    assert!(attachment >= 4294967296);
+    let r = multipart_post(
+        app,
+        &mut admin,
+        &format!("/admin/{game}/weapon/create"),
+        &[
+            ("name", "Admin weapon"),
+            ("type", "Rifle"),
+            ("min_attachments", "0"),
+            ("max_attachments", "3"),
+            ("attachments[]", &attachment.to_string()),
+        ],
+        &[("image", "fixture.png", "image/png", &png)],
+    )
+    .await;
+    assert_eq!(r.status, 303, "{}", r.body);
+    let weapon: i64 = sqlx::query_scalar("SELECT id FROM weapons WHERE name='Admin weapon'")
+        .fetch_one(pool)
+        .await
+        .unwrap();
+    assert!(weapon >= 4294967296);
+    assert_eq!(
+        sqlx::query_scalar::<i64>(
+            "SELECT COUNT(*) FROM attachment_weapon WHERE weapon_id=? AND attachment_id=?"
+        )
+        .bind(weapon)
+        .bind(attachment)
+        .fetch_one(pool)
+        .await
+        .unwrap(),
+        1
+    );
+    assert_eq!(
+        admin
+            .post(
+                app,
+                &format!("/admin/{game}/{weapon}/edit"),
+                &[
+                    ("name", "Edited weapon"),
+                    ("type", "Rifle"),
+                    ("min_attachments", "0"),
+                    ("max_attachments", "2")
+                ]
+            )
+            .await
+            .status,
+        303
+    );
+    assert_eq!(
+        sqlx::query_scalar::<i64>("SELECT COUNT(*) FROM attachment_weapon WHERE weapon_id=?")
+            .bind(weapon)
+            .fetch_one(pool)
+            .await
+            .unwrap(),
+        0
+    );
+    assert_eq!(
+        admin
+            .post(
+                app,
+                &format!("/admin/{game}/attachment/{attachment}/edit"),
+                &[("name", "Edited attachment"), ("slot", "Barrel")]
+            )
+            .await
+            .status,
+        303
+    );
+    let csv = b",,CSV weapon\n,,Rifle\n,,0\n,,2\n,,\nCSV attachment,Optic,1\n";
+    for _ in 0..2 {
+        let r = multipart_post(
+            app,
+            &mut admin,
+            &format!("/admin/{game}/import"),
+            &[],
+            &[("spreadsheet", "fixture.csv", "text/csv", csv)],
+        )
+        .await;
+        assert_eq!(r.status, 303, "{}", r.body);
+    }
+    assert_eq!(
+        sqlx::query_scalar::<i64>("SELECT COUNT(*) FROM weapons WHERE name='CSV weapon'")
+            .fetch_one(pool)
+            .await
+            .unwrap(),
+        1
+    );
+    let before: i64 = sqlx::query_scalar("SELECT COUNT(*) FROM weapons")
+        .fetch_one(pool)
+        .await
+        .unwrap();
+    let bad = b",,Should not persist\n,,Rifle\n,,0\n,,2\n,,\nBroken,,1\n";
+    assert_eq!(
+        multipart_post(
+            app,
+            &mut admin,
+            &format!("/admin/{game}/import"),
+            &[],
+            &[("spreadsheet", "bad.csv", "text/csv", bad)]
+        )
+        .await
+        .status,
+        422
+    );
+    assert_eq!(
+        sqlx::query_scalar::<i64>("SELECT COUNT(*) FROM weapons")
+            .fetch_one(pool)
+            .await
+            .unwrap(),
+        before
+    );
+    // A server-side failure after creating an attachment must roll back the entire import.
+    sqlx::query("CREATE TRIGGER fixture_admin_failure BEFORE INSERT ON _g1_weapons WHEN NEW.name='CSV failure' BEGIN SELECT RAISE(ABORT,'controlled fixture failure'); END").execute(pool).await.unwrap();
+    let failed_csv = b",,CSV failure\n,,Rifle\n,,0\n,,2\n,,\nFailure attachment,Optic,1\n";
+    let r = multipart_post(
+        app,
+        &mut admin,
+        &format!("/admin/{game}/import"),
+        &[],
+        &[("spreadsheet", "failure.csv", "text/csv", failed_csv)],
+    )
+    .await;
+    assert_eq!(r.status, 503);
+    assert_eq!(
+        sqlx::query_scalar::<i64>(
+            "SELECT COUNT(*) FROM attachments WHERE name='Failure attachment'"
+        )
+        .fetch_one(pool)
+        .await
+        .unwrap(),
+        0
+    );
+    sqlx::query("DROP TRIGGER fixture_admin_failure")
+        .execute(pool)
+        .await
+        .unwrap();
+    assert_eq!(
+        multipart_post(
+            app,
+            &mut admin,
+            &format!("/admin/{game}/import"),
+            &[],
+            &[("spreadsheet", "failure.csv", "text/csv", failed_csv)]
+        )
+        .await
+        .status,
+        303
+    );
+    // Invalid uploads and cross-game compatibility never alter the edited record.
+    assert!(
+        game_loadouts::media::store(pool, b"<svg></svg>", Some(64))
+            .await
+            .is_err()
+    );
+    assert_eq!(
+        admin
+            .post(
+                app,
+                &format!("/admin/{game}/{weapon}/edit"),
+                &[
+                    ("name", "Should not persist"),
+                    ("type", "Rifle"),
+                    ("min_attachments", "0"),
+                    ("max_attachments", "2"),
+                    ("attachments[]", "4")
+                ]
+            )
+            .await
+            .status,
+        422
+    );
+    assert_eq!(
+        sqlx::query_scalar::<String>("SELECT name FROM weapons WHERE id=?")
+            .bind(weapon)
+            .fetch_one(pool)
+            .await
+            .unwrap(),
+        "Edited weapon"
+    );
+    assert_eq!(
+        admin
+            .post(
+                app,
+                "/admin/game/Call+of+Duty+Modern+Warfare",
+                &[
+                    ("_method", "PUT"),
+                    ("id", "Renamed Game"),
+                    ("short_name", "RG"),
+                    ("live", "1"),
+                    ("theme_color", "green")
+                ]
+            )
+            .await
+            .status,
+        303
+    );
+    assert_eq!(
+        sqlx::query_scalar::<String>("SELECT game_id FROM weapons WHERE id=?")
+            .bind(weapon)
+            .fetch_one(pool)
+            .await
+            .unwrap(),
+        "Renamed Game"
+    );
+    assert_eq!(
+        admin
+            .post(app, &format!("/admin/Renamed+Game/{weapon}/delete"), &[])
+            .await
+            .status,
+        303
+    );
+    assert_eq!(
+        admin
+            .post(
+                app,
+                &format!("/admin/Renamed+Game/attachment/{attachment}/delete"),
+                &[]
+            )
+            .await
+            .status,
+        303
+    );
+    assert_eq!(
+        admin
+            .post(
+                app,
+                "/admin/game/Admin+Fixture+Game",
+                &[("_method", "DELETE")]
+            )
+            .await
+            .status,
+        303
+    );
+    assert_eq!(
+        sqlx::query_scalar::<i64>("SELECT COUNT(*) FROM games WHERE id='Admin Fixture Game'")
+            .fetch_one(pool)
+            .await
+            .unwrap(),
+        0
+    );
+    sqlx::query("UPDATE users SET role='Standard' WHERE email='admin@example.invalid'")
+        .execute(pool)
+        .await
+        .unwrap();
+    assert_eq!(admin.get(app, "/admin").await.status, 303);
+    assert_eq!(admin.post(app, "/admin/toggleAds", &[]).await.status, 303);
 }

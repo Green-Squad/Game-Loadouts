@@ -15,3 +15,5 @@ Thumbs.db
 /.env
 
 /rust-app/tools/__pycache__/
+
+/rust-app/migration/__pycache__/

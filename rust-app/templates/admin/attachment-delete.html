@@ -1,0 +1,63 @@
+
+
+<div class="row">
+    <div class="col-lg-12">
+        <h1>{{ attachment.field("name") }} <small>Delete</small></h1>
+        <ol class="breadcrumb">
+            <li>
+                <i class="fa fa-dashboard"></i>
+                <a href="{{ self.url("adminDashboard", &game.field("id"), &weapon.field("name"), &attachment.field("id"), &loadout.field("id"), &user.field("email")) }}">
+                    Dashboard
+                </a>
+            </li>
+            <li>
+                <i class="icon-file-alt"></i>
+                <a href="{{ self.url("admin.game.index", &game.field("id"), &weapon.field("name"), &attachment.field("id"), &loadout.field("id"), &user.field("email")) }}">
+                    Games
+                </a>
+            </li>
+            <li>
+                <i class="icon-file-alt"></i>
+                <a href="{{ self.url("GameController@show", &game.field("id"), &weapon.field("name"), &attachment.field("id"), &loadout.field("id"), &user.field("email")) }}">
+                    {{ game.field("id") }}
+                </a>
+            </li>
+            <li>
+                <i class="icon-file-alt"></i>
+                <a href="#">
+                    {{ attachment.field("name") }}
+                </a>
+            </li>
+            <li class="active">
+                <i class="icon-file-alt"></i> Delete
+            </li>
+        </ol>
+    </div>
+</div><!-- /.row -->
+
+<div class="row">
+    <div class="col-lg-7">
+        <div class="well">
+            <form method="post" action="{{ form_action }}" class="form-horizontal"><input type="hidden" name="_token" value="{{ session.csrf }}">{% if !form_method.is_empty() %}<input type="hidden" name="_method" value="{{ form_method }}">{% endif %}
+            <fieldset>
+                <legend>
+                    <p>
+                        Are you sure you want to delete the attachment {{ attachment.field("name") }}? This process is irreversible.
+                    </p>
+                </legend>
+                <div class="form-group">
+                    <div class="col-lg-6">
+                        <a class="btn btn-default" href="{{ self.url("GameController@index", &game.field("id"), &weapon.field("name"), &attachment.field("id"), &loadout.field("id"), &user.field("email")) }}">
+                            Cancel
+                        </a>
+                        <button type="submit" class="btn btn-danger">
+                            Delete
+                        </button>
+                    </div>
+                </div>
+            </fieldset>
+            </form>
+        </div>
+    </div>
+</div>
+

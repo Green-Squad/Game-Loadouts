@@ -86,7 +86,7 @@ def init_tracking(db, schema, generation=1):
     db.batch([
         ("INSERT INTO _source_schema(id,fingerprint) VALUES(1,?)",(schema.fingerprint,)),
         ("UPDATE _migration_state SET schema_sha256=? WHERE id=1",(schema.fingerprint,)),
-        *[("INSERT INTO _rust_sequences(table_name,next_id) VALUES(?,4294967296) ON CONFLICT DO NOTHING",(t,)) for t in ("loadouts","loadout_user","attachment_loadout") if t in schema.tables],
+        *[("INSERT INTO _rust_sequences(table_name,next_id) VALUES(?,4294967296) ON CONFLICT DO NOTHING",(t,)) for t in ("loadouts","loadout_user","attachment_loadout","weapons","attachments","attachment_weapon") if t in schema.tables],
     ])
 
 

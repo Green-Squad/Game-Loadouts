@@ -14,6 +14,7 @@ async fn fixture() -> (axum::Router, Pool) {
     let pool = Pool::connect_isolated(&target, true).await.unwrap();
     let read = Pool::connect_isolated(&target, false).await.unwrap();
     let state = Arc::new(AppState {
+        admin: None,
         ads: false,
         analytics_id: String::new(),
         accounts: None,
@@ -257,6 +258,7 @@ async fn google_search_fallback_and_provider() {
         .unwrap();
     let make_state = |api: String| {
         Arc::new(AppState {
+            admin: None,
             ads: false,
             analytics_id: String::new(),
             accounts: None,

@@ -6,3 +6,6 @@ pub mod session;
 pub mod web;
 
 pub mod remote;
+
+pub mod admin;
+pub mod media;

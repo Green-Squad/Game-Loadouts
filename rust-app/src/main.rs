@@ -52,6 +52,11 @@ async fn run() -> Result<(), Box<dyn std::error::Error>> {
     let state = Arc::new(AppState {
         pool: pool.clone(),
         accounts,
+        admin: if env::var("ADMIN_ENABLED").as_deref() == Ok("1") {
+            Some(Pool::admin_from_env().await?)
+        } else {
+            None
+        },
         ads: env::var("ADS_ENABLED").as_deref() == Ok("1"),
         analytics_id: env::var("GA4_MEASUREMENT_ID")
             .unwrap_or_default()

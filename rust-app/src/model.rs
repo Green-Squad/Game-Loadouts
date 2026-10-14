@@ -41,6 +41,8 @@ pub fn pretty(names: &[String]) -> String {
 }
 #[derive(Clone, Debug, Default, Deserialize)]
 pub struct Game {
+    #[serde(default)]
+    pub ads_override: Option<i64>,
     pub id: String,
     pub live: i64,
     pub short_name: String,

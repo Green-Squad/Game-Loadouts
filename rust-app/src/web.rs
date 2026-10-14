@@ -27,6 +27,7 @@ use tower_http::{
 
 pub struct AppState {
     pub accounts: Option<Arc<Accounts>>,
+    pub admin: Option<Pool>,
     pub ads: bool,
     pub analytics_id: String,
     pub pool: Pool,
@@ -44,6 +45,7 @@ pub struct AppState {
 struct Page {
     session: Session,
     interactive: bool,
+    admin_enabled: bool,
     screen: String,
     token: String,
     site_key: String,
@@ -90,6 +92,7 @@ impl Page {
             ads: state.ads,
             analytics_id: state.analytics_id.clone(),
             interactive: state.accounts.is_some(),
+            admin_enabled: state.admin.is_some(),
             screen: String::new(),
             token: String::new(),
             site_key: state
@@ -125,6 +128,9 @@ impl Page {
         }
     }
     fn recent_links(&mut self, recent: &[Game]) {
+        if let Some(value) = recent.first().and_then(|g| g.ads_override) {
+            self.ads = value != 0;
+        }
         self.nav = recent
             .iter()
             .take(5)
@@ -146,6 +152,9 @@ impl Page {
             return path.into();
         }
         let path = path.trim_start_matches('/');
+        if path.starts_with("uploads/rust/") || path.starts_with("uploads/thumb/rust/") {
+            return format!("/{path}");
+        }
         if path.starts_with("uploads/") && !self.media_origin.is_empty() {
             format!("{}/{}", self.media_origin, path)
         } else {
@@ -183,6 +192,7 @@ pub fn app(state: Arc<AppState>, assets: &str) -> Router {
     ] {
         router = router.route(path, get(account::get_account).post(account::post_account));
     }
+    router = router.merge(crate::admin::routes());
     router = router
         .route("/password/reset/{token}", get(account::get_account))
         .route("/user/confirm/{token}", get(account::confirm))
@@ -219,6 +229,8 @@ pub fn app(state: Arc<AppState>, assets: &str) -> Router {
         );
     }
     router
+        .route("/rust-media/{*path}", get(crate::media::serve))
+        .route("/css/styles.min.css", get(crate::media::stylesheet))
         .route_service(
             "/favicon.ico",
             cache.layer(ServeFile::new(format!("{assets}/favicon.ico"))),
@@ -283,7 +295,11 @@ pub(crate) async fn account_page(
     p.message = message.into();
     p.token = token.into();
     if state.accounts.is_some()
-        && let Ok(recent) = Db::new(&state.pool, state.query_timeout).recent().await
+        && let Ok(recent) = {
+            let mut db = Db::new(&state.pool, state.query_timeout);
+            db.settings = state.admin.is_some();
+            db.recent().await
+        }
     {
         p.recent_links(&recent);
     }
@@ -303,6 +319,8 @@ async fn page(
 ) -> Response {
     let start = Instant::now();
     let mut db = Db::new(&state.pool, state.query_timeout);
+    db.settings = state.admin.is_some();
+    db.admin_preview = state.admin.is_some() && session.role == "Admin";
     let parts: Result<Vec<_>, _> = uri
         .path()
         .trim_matches('/')

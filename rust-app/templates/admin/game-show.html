@@ -1,0 +1,166 @@
+
+
+<div class="row">
+    <div class="col-lg-12">
+        <h1>{{ game.field("id") }} <small>Administration</small></h1>
+        <ol class="breadcrumb">
+            <li>
+                <i class="fa fa-dashboard"></i>
+                <a href="{{ self.url("adminDashboard", &game.field("id"), &weapon.field("name"), &attachment.field("id"), &loadout.field("id"), &user.field("email")) }}">
+                    Dashboard
+                </a>
+            </li>
+            <li>
+                <i class="icon-file-alt"></i>
+                <a href="{{ self.url("admin.game.index", &game.field("id"), &weapon.field("name"), &attachment.field("id"), &loadout.field("id"), &user.field("email")) }}">
+                    Games
+                </a>
+            </li>
+            <li class="active">
+                <i class="icon-file-alt"></i> {{ game.field("id") }}
+            </li>
+        </ol>
+    </div>
+</div><!-- /.row -->
+
+<div>
+<div class="row">
+    <div class="col-lg-12">
+        <h3> Import <a href="{{ self.url("ImportController@import", &game.field("id"), &weapon.field("name"), &attachment.field("id"), &loadout.field("id"), &user.field("email")) }}" class="btn btn-sm btn-success"><span class="glyphicon glyphicon-plus"></span></a></h3>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-lg-12">
+        <h3> Weapons <a href="{{ self.url("WeaponController@create", &game.field("id"), &weapon.field("name"), &attachment.field("id"), &loadout.field("id"), &user.field("email")) }}" class="btn btn-sm btn-success"><span class="glyphicon glyphicon-plus"></span></a></h3>
+        <table class="table tablesorter">
+            <thead>
+                <tr>
+                    <th> ID <i class="fa fa-sort"></i></th>
+                    <th> Name <i class="fa fa-sort"></i></th>
+                    <th> Attachments <i class="fa fa-sort"></i></th>
+                    <th> Loadouts <i class="fa fa-sort"></i></th>
+                    <th> Image_URL <i class="fa fa-sort"></i></th>
+                    <th> Min Attachments </th>
+                    <th> Max Attachments </th>
+                    <th> Type </th>
+                    <th> Created at <i class="fa fa-sort"></i></th>
+                    <th> Updated at <i class="fa fa-sort"></i></th>
+                    <th> Actions </th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for weapon in weapons %}
+                <tr>
+                    <td>
+                        {{ weapon.field("id") }}
+                    </td>
+                    <td>
+                        <a href="{{ self.url("weaponLoadouts", &game.field("id"), &weapon.field("name"), &attachment.field("id"), &loadout.field("id"), &user.field("email")) }}">
+                            {{ weapon.field("name") }}
+                        </a>
+                    </td>
+                    <td>
+                        {{ weapon.field("attachment_count") }}
+                    </td>
+                    <td>
+                        {{ weapon.field("loadout_count") }}
+                    </td>
+                    <td>
+                        {% if !weapon.field("thumb_url").is_empty() %}
+                        <a href="{{ self.asset(&weapon.field("image_url")) }}">
+                            <img src="{{ self.asset(&weapon.field("thumb_url")) }}" alt="thumb URL" class="thumbnail" />
+                        </a>
+                        {% else %}
+                        No Image
+                        {% endif %}
+                    </td>
+                    <td>
+                        {{ weapon.field("min_attachments") }}
+                    </td>
+                    <td>
+                        {{ weapon.field("max_attachments") }}
+                    </td>
+                    <td>
+                        {{ weapon.field("type") }}
+                    </td>
+                    <td>
+                        {{ weapon.date("created_at") }}
+                    </td>
+                    <td>
+                        {{ weapon.date("updated_at") }}
+                    </td>
+                    <td>
+                        <a href="{{ self.url("weaponEdit", &game.field("id"), &weapon.field("name"), &attachment.field("id"), &loadout.field("id"), &user.field("email")) }}" class="btn btn-default">
+                            <span class="glyphicon glyphicon-pencil"></span>
+                        </a>
+                        &nbsp;
+                        <a href="{{ self.url("weaponDelete", &game.field("id"), &weapon.field("name"), &attachment.field("id"), &loadout.field("id"), &user.field("email")) }}" class="btn btn-danger">
+                            <span class="glyphicon glyphicon-trash"></span>
+                        </a>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div><!-- /.row -->
+
+<div class="row">
+    <div class="col-lg-12">
+        <h3> Attachments <a href="{{ self.url("AttachmentController@create", &game.field("id"), &weapon.field("name"), &attachment.field("id"), &loadout.field("id"), &user.field("email")) }}" class="btn btn-sm btn-success"><span class="glyphicon glyphicon-plus"></span></a></h3>
+        <table class="table tablesorter">
+            <thead>
+                <tr>
+                    <th> ID <i class="fa fa-sort"></i></th>
+                    <th> Name <i class="fa fa-sort"></i></th>
+                    <th> Slot <i class="fa fa-sort"></i></th>
+                    <th> Image_URL <i class="fa fa-sort"></i></th>
+                    <th> Created at <i class="fa fa-sort"></i></th>
+                    <th> Updated at <i class="fa fa-sort"></i></th>
+                    <th> Actions </th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for attachment in attachments %}
+                <tr>
+                    <td>
+                        {{ attachment.field("id") }}
+                    </td>
+                    <td>
+                        {{ attachment.field("name") }}
+                    </td>
+                    <td>
+                        {{ attachment.field("slot") }}
+                    </td>
+                    <td>
+                        {% if !attachment.field("image_url").is_empty() %}
+                        <a href="{{ self.asset(&attachment.field("image_url")) }}">
+                            <img src="{{ self.asset(&attachment.field("thumb_url")) }}" alt="Image URL" class="thumbnail" />
+                        </a>
+                        {% else %}
+                        No Image
+                        {% endif %}
+                    </td>
+                    <td>
+                        {{ attachment.date("created_at") }}
+                    </td>
+                    <td>
+                        {{ attachment.date("updated_at") }}
+                    </td>
+                    <td>
+                        <a href="{{ self.url("attachmentEdit", &game.field("id"), &weapon.field("name"), &attachment.field("id"), &loadout.field("id"), &user.field("email")) }}" class="btn btn-default">
+                            <span class="glyphicon glyphicon-pencil"></span>
+                        </a>
+                        &nbsp;
+                        <a href="{{ self.url("attachmentDelete", &game.field("id"), &weapon.field("name"), &attachment.field("id"), &loadout.field("id"), &user.field("email")) }}" class="btn btn-danger">
+                            <span class="glyphicon glyphicon-trash"></span>
+                        </a>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div><!-- /.row -->
+

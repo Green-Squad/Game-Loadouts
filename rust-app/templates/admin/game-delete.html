@@ -1,0 +1,25 @@
+
+
+<div class="well">
+    <form method="post" action="{{ form_action }}" class="form-horizontal"><input type="hidden" name="_token" value="{{ session.csrf }}">{% if !form_method.is_empty() %}<input type="hidden" name="_method" value="{{ form_method }}">{% endif %}
+    <fieldset>
+        <legend>
+            <h2>Delete Game</h2>
+            <p>
+                Are you sure you want to delete game {{ game.field("id") }}? This process is irreversible.
+            </p>
+        </legend>
+        <div class="form-group">
+            <div class="col-lg-6">
+                <a class="btn btn-default" href="{{ self.url("GameController@index", &game.field("id"), &weapon.field("name"), &attachment.field("id"), &loadout.field("id"), &user.field("email")) }}">
+                    Cancel
+                </a>
+                <button type="submit" class="btn btn-danger">
+                    Delete
+                </button>
+            </div>
+        </div>
+    </fieldset>
+    </form>
+</div>
+

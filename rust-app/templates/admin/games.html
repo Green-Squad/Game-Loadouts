@@ -1,0 +1,69 @@
+
+
+<div class="row">
+    <div class="col-lg-12">
+        <h1>Game <small>Administration</small></h1>
+        <ol class="breadcrumb">
+            <li>
+                <i class="fa fa-dashboard"></i> Dashboard
+            </li>
+            <li class="active">
+                <i class="icon-file-alt"></i> Games
+            </li>
+        </ol>
+    </div>
+</div><!-- /.row -->
+
+<div class="row">
+    <div class="col-lg-12">
+        <table class="table tablesorter">
+            <thead>
+                <tr>
+                    <th> ID <i class="fa fa-sort"></i></th>
+                    <th> Live </th>
+                    <th> Thumb URL </th>
+                    <th> Short Name <i class="fa fa-sort"></i></th>
+                    <th> Created at <i class="fa fa-sort"></i></th>
+                    <th> Updated at <i class="fa fa-sort"></i></th>
+                    <th> Actions </th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for game in games %}
+                <tr>
+                    <td>
+                        <a href="{{ self.url("GameController@show", &game.field("id"), &weapon.field("name"), &attachment.field("id"), &loadout.field("id"), &user.field("email")) }}">
+                            {{ game.field("id") }}
+                        </a>
+                    </td>
+                    <td>
+                        {{ game.field("live") }}
+                    </td>
+                    <td style="width: 10%">
+                        <a href="{{ self.asset(&game.field("thumb_url")) }}"><img style="width: 100%" src="{{ self.asset(&game.field("thumb_url")) }}" alt="" /></a>
+                    </td>
+                    <td>
+                        {{ game.field("short_name") }}
+                    </td>
+                    <td>
+                        {{ game.date("created_at") }}
+                    </td>
+                    <td>
+                        {{ game.date("updated_at") }}
+                    </td>
+                    <td>
+                        <a href="{{ self.url("GameController@edit", &game.field("id"), &weapon.field("name"), &attachment.field("id"), &loadout.field("id"), &user.field("email")) }}" class="btn btn-default">
+                            <span class="glyphicon glyphicon-pencil"></span>
+                        </a>
+                        &nbsp;
+                        <a href="{{ self.url("gameDelete", &game.field("id"), &weapon.field("name"), &attachment.field("id"), &loadout.field("id"), &user.field("email")) }}" class="btn btn-danger">
+                            <span class="glyphicon glyphicon-trash"></span>
+                        </a>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div><!-- /.row -->
+

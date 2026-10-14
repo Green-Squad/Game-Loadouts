@@ -53,7 +53,7 @@
 {% endfor %}
 </ul>
 </li>
-{% if interactive %}{% if session.member() %}<li><a href="/submissions">My submissions</a></li><li><a href="/account">{{ session.username }}</a></li><li><a href="/logout">Log out</a></li>{% else %}<li><a href="/login">Log in</a></li><li><a href="/join">Join</a></li>{% endif %}{% endif %}
+{% if interactive %}{% if session.member() %}{% if admin_enabled && session.role == "Admin" %}<li><a href="/admin">Admin Dashboard</a></li>{% endif %}<li><a href="/submissions">My submissions</a></li><li><a href="/account">{{ session.username }}</a></li><li><a href="/logout">Log out</a></li>{% else %}<li><a href="/login">Log in</a></li><li><a href="/join">Join</a></li>{% endif %}{% endif %}
 </ul>
 </div>
 <form action="/search" method="get" id="navbar-search" class="navbar-form" role="search">
