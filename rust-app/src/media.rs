@@ -49,6 +49,9 @@ pub async fn store(
         let small = if let Some(width) = thumb {
             let height = ((u64::from(image.height()) * u64::from(width)) / u64::from(image.width()))
                 .max(1) as u32;
+            if height > 4096 {
+                return Err("The image is too tall to generate a thumbnail.");
+            }
             let thumbnail =
                 image.resize_exact(width, height, image::imageops::FilterType::Triangle);
             let mut encoded = Cursor::new(Vec::new());

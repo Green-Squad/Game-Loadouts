@@ -1420,6 +1420,15 @@ async fn admin_flows(app: &Router, pool: &Pool) {
         303
     );
     // Invalid uploads and cross-game compatibility never alter the edited record.
+    let mut tall = std::io::Cursor::new(Vec::new());
+    image::DynamicImage::new_rgb8(1, 100)
+        .write_to(&mut tall, image::ImageFormat::Png)
+        .unwrap();
+    assert!(
+        game_loadouts::media::store(pool, &tall.into_inner(), Some(525))
+            .await
+            .is_err()
+    );
     assert!(
         game_loadouts::media::store(pool, b"<svg></svg>", Some(64))
             .await
