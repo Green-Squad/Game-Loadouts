@@ -180,18 +180,20 @@ impl Accounts {
             .json()
             .await
             .map_err(|_| Error::internal())?;
-        let hostname_matches = if self.captcha_hostname == "gameloadouts.com" {
-            matches!(
-                result.hostname.as_str(),
-                "gameloadouts.com" | "www.gameloadouts.com" | "rust.gameloadouts.com"
-            )
-        } else {
-            result.hostname == self.captcha_hostname
-        };
-        if !result.success || !hostname_matches {
+        if !result.success || !captcha_hostname_matches(&self.captcha_hostname, &result.hostname) {
             return Err(Error::invalid("Incorrect CAPTCHA. Please try again."));
         }
         Ok(())
+    }
+}
+fn captcha_hostname_matches(configured: &str, actual: &str) -> bool {
+    if configured == "gameloadouts.com" {
+        matches!(
+            actual,
+            "gameloadouts.com" | "www.gameloadouts.com" | "rust.gameloadouts.com"
+        )
+    } else {
+        actual == configured
     }
 }
 #[derive(Debug)]
@@ -944,6 +946,34 @@ pub async fn write_loadout(
 
 #[cfg(test)]
 mod tests {
+    #[test]
+    fn production_captcha_accepts_only_owned_aliases() {
+        for hostname in [
+            "gameloadouts.com",
+            "www.gameloadouts.com",
+            "rust.gameloadouts.com",
+        ] {
+            assert!(super::captcha_hostname_matches(
+                "gameloadouts.com",
+                hostname
+            ));
+        }
+        for hostname in [
+            "",
+            "other.invalid",
+            "evil.gameloadouts.com",
+            "gameloadouts.com.evil.invalid",
+        ] {
+            assert!(!super::captcha_hostname_matches(
+                "gameloadouts.com",
+                hostname
+            ));
+        }
+        assert!(!super::captcha_hostname_matches(
+            "rust.gameloadouts.com",
+            "gameloadouts.com"
+        ));
+    }
     use super::*;
     #[test]
     fn slot_validation() {

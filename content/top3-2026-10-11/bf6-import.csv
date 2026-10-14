@@ -1,0 +1,387 @@
+Weapon name,,18.5KS-K,M87A1,KORD 6P67,NVO-228E,AK-205,SCW-10,SL9,LMR27,BROD3,Interdictor,DB-12,EF88,ES 5.7,GGH-22,B36A4,AK4D,M417 A2,M433,L115,L85A3,M1014,M16A4,P18,M2010 ESR,M240L,M250,DRS-IAR,M39 EMR,M45A1,M4A1,M/60,M123K,M121 A2,Mini Scout,L110,PW5A3,PW7A2,SGX,PSR,GRT-BC,GRT-CPS,USG-90,PP-19,QBZ-192,M44,RPK-74M,RPKM,SOR-556 Mk2,SOR-300SC,CZ3A1,SG 553R,vz. 61,SV-98,SVK-8.6,SVDM,TR-7,M357 Trait,KTS100 MK8,UMG-40,KV9,VCR-2,VSSM,M277
+Weapon type,,Shotgun,Shotgun,AR,AR,AR,SMG,SMG,DMR,AR,Sniper,Shotgun,AR,Sidearm,Sidearm,AR,AR,AR,AR,Sniper,AR,Shotgun,AR,Sidearm,Sniper,LMG,LMG,LMG,DMR,Sidearm,AR,LMG,LMG,LMG,Sniper,LMG,SMG,SMG,SMG,Sniper,AR,DMR,SMG,SMG,AR,Sidearm,LMG,LMG,AR,AR,SMG,AR,Sidearm,Sniper,DMR,DMR,AR,Sidearm,LMG,SMG,SMG,AR,DMR,AR
+Minimum attachments,,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
+Maximum attachments,,10,9,9,10,10,10,9,11,10,11,9,10,7,7,10,10,10,10,10,10,10,10,7,10,10,9,10,10,7,10,9,9,9,10,10,10,10,10,11,9,10,9,10,10,5,10,10,10,10,10,10,7,11,9,10,10,6,9,10,10,10,9,10
+Attachment,Slot,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,
+Osa-7 1.00x,Optic,X,X,X,X,X,X,X,X,X,X,X,X,,,X,X,X,X,X,X,X,X,,X,X,X,X,X,,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,,X,X,X,X,X,X,X,X,X,X,X
+#01 Buckshot,Ammunition,X,X,,,,,,,,,X,,,,,,,,,,X,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,
+Flash Hider,Muzzle,X,,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,,X,,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,,X,X,X,X,X,X,,,X,X,X,,X,X,X,X,,X
+430mm Cut,Barrel,X,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,
+"20"" Factory",Barrel,,X,,,,,,,,,,,,,,,,,,,,X,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,
+415mm Factory,Barrel,,,X,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,
+409mm Factory,Barrel,,,,X,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,
+314mm Factory,Barrel,,,,,X,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,
+"6.8"" Factory",Barrel,,,,,,X,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,
+"9"" Factory",Barrel,,,,,,,X,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,X,,,,,,,,,,,,,,
+"21.5"" Factory",Barrel,,,,,,,,X,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,
+Basic Barrel,Barrel,,,,,,,,,X,X,,X,,,,,,,,,,,,,,,,,,,,,,,,,,,,,X,,,,,,,,,X,,X,,,,,,,,,X,,
+"18.9"" Factory",Barrel,,,,,,,,,,,X,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,
+122mm Factory,Barrel,,,,,,,,,,,,,X,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,
+114mm Factory,Barrel,,,,,,,,,,,,,,X,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,
+480mm Factory,Barrel,,,,,,,,,,,,,,,X,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,
+450mm Factory,Barrel,,,,,,,,,,,,,,,,X,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,
+"13"" Standard",Barrel,,,,,,,,,,,,,,,,,X,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,
+"16.5"" Rifle",Barrel,,,,,,,,,,,,,,,,,X,X,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,
+"27"" Full",Barrel,,,,,,,,,,,,,,,,,,,X,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,
+518mm Factory,Barrel,,,,,,,,,,,,,,,,,,,,X,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,
+"18.5"" Factory",Barrel,,,,,,,,,,,,,,,,,,,,,X,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,
+"18"" Govt",Barrel,,,,,,,,,,,,,,,,,,,,,,X,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,
+"3.9"" Factory",Barrel,,,,,,,,,,,,,,,,,,,,,,,X,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,
+"24"" Full",Barrel,,,,,,,,,,,,,,,,,,,,,,,,X,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,
+"16.5"" Basic",Barrel,,,,,,,,,,,,,,,,,,,,,,,,,,,X,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,
+"18"" EBR",Barrel,,,,,,,,,,,,,,,,,,,,,,,,,,,,X,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,
+"5"" Factory",Barrel,,,,,,,,,,,,,,,,,,,,,,,,,,,,,X,,,,,,,,,,,,,,,,,,,,,,,,,,,,X,,,,,,
+"12.5"" Mid",Barrel,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,X,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,
+"16"" Factory",Barrel,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,X,,,,,,,,,,,,,,,,,,,,,,,,,,,,,
+225mm Factory,Barrel,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,X,,,,,,,,,,,,,,,,,,,,,,,,,,,
+180mm Standard,Barrel,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,X,,,,,,,,,,,,,,,,,,,,,,,,,,
+"6"" Standard",Barrel,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,X,,,,,,,,,,,,,,,,,,,,,,,,,
+"26"" Factory",Barrel,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,X,,,,,,,,,,,,,,,,,,,,,,,,
+"10"" Full",Barrel,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,X,,,,,,,,,,,,,,,,,,,,,,,
+264mm Factory,Barrel,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,X,,,,,,,,,,,,,,,,,,,,,
+238mm Factory,Barrel,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,X,,,,,,,,,,,,,,,,,,,,
+"10.5"" Factory",Barrel,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,X,,,,,,,,,,,,,,,,,,,
+521mm Boar-F,Barrel,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,X,X,,,,,,,,,,,,,,,,
+"16"" US",Barrel,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,X,,,,,,,,,,,,,,,
+240mm SB,Barrel,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,X,,,,,,,,,,,,
+650mm Factory,Barrel,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,X,,,,,,,,,,
+560mm Cut,Barrel,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,X,,,,,,,,,
+565mm Para,Barrel,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,X,,,,,,,,
+"17"" Factory",Barrel,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,X,,,,,,,,,,,,,,,,,,,,,,,,,X,,,,,,,
+200mm Factory,Barrel,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,X,,,,
+"5.5"" Factory",Barrel,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,X,,,
+"13"" Factory",Barrel,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,X
+8rnd Magazine,Magazine,X,,,,,,,,,,,,,,,,,,,,,,,X,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,
+7 Shell Tube,Magazine,,X,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,
+30rnd Magazine,Magazine,,,X,X,X,,X,,X,,,X,X,,X,X,,X,,X,,X,,,,,X,,,X,,,,,,X,X,X,,X,X,,X,X,,X,X,X,X,X,X,,,,,X,,,X,,X,X,X
+15rnd Magazine,Magazine,,,,,,X,,X,,,,,,X,,X,,,,,,,,,,,,X,,,,,,X,,,,,,,X,,,,,,,,,,,,,,,X,,,,,,,X
+10rnd Magazine,Magazine,,,,,,,,X,,,,,,,,,X,,,,,,,,,,,,,,,,,X,,,,,X,,,,,,,,,,,,,X,X,X,X,,,,,,,X,
+5rnd Magazine,Magazine,,,,,,,,,,X,,,,,,,,,X,,,,,X,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,X,,,,,,,,
+7 Shell Dual Tubes,Magazine,,,,,,,,,,,X,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,
+20rnd Magazine,Magazine,,,,X,,X,,X,X,,,,X,X,X,X,X,X,,X,,X,,,,,,X,,X,,,,X,,X,X,,,,X,,,,,,,X,X,X,X,X,,,X,X,,,,,X,X,X
+6 Shell Tube,Magazine,,X,,,,,,,,,,,,,,,,,,,X,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,
+17rnd Magazine,Magazine,,,,,,,,,,,,,,,,,,,,,,,X,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,X,,,
+50rnd Loose Belt,Magazine,,,,,,,,,,,,,,,,,,,,,,,,,X,,,,,,X,,X,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,
+50rnd Belt Pouch,Magazine,,,,,,,,,,,,,,,,,,,,,,,,,,X,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,
+7rnd Magazine,Magazine,,,,,,,,,,X,,,,,,,,,X,,,,,,,,,,X,,,,,,,,,,X,,,,,,,,,,,,,,,,,,,,,,,,
+100rnd Belt Pouch,Magazine,,,,,,,,,,,,,,,,,,,,,,,,,,X,,,,,X,X,,,X,,,,,,,,,,,,,,,,,,,,,,,,,,,,
+50rnd Magazine,Magazine,,,,,X,,,,,,,,,,,,,,,,,,,,,,X,,,,,,,,,,,,,,,X,,,,X,,,,,,,,,,,,X,,,,,
+6rnd Speedloader,Magazine,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,X,,,,,,,,,,,,,,,,,,
+45rnd Magazine,Magazine,,,X,,X,,,,,,,,,,X,,,,,X,,,,,,,X,,,,,,,,,,,,,X,,,,,,X,,X,,,,,,,,,,X,,,,,
+40rnd Magazine,Magazine,,,X,X,X,,,,X,,,,,,X,,,X,,X,,X,,,,,X,,,X,,,,,,X,X,,,,,,,X,,,X,X,X,,X,,,,,,,,,,X,,
+8rnd Speedloader,Magazine,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,X,,,,,,
+60rnd Drum Mag,Magazine,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,X,,,,,
+Basic Sight,Optic,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X
+Mini Flex 1.00x,Optic,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X
+R-MR 1.00x,Optic,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X
+RO-S 1.25x,Optic,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X
+CQ RDS 1.25x,Optic,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X
+A-P2 1.75x,Optic,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X
+2Pro 1.25x,Optic,X,X,X,X,X,X,X,X,X,X,X,X,,,X,X,X,X,X,X,X,X,,X,X,X,X,X,,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,,X,X,X,X,X,X,X,X,X,X,X
+SU-123 1.50x,Optic,X,X,X,X,X,X,X,X,X,X,X,X,,,X,X,X,X,X,X,X,X,,X,X,X,X,X,,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,,X,X,X,X,X,X,X,X,X,X,X
+1p87 1.50x,Optic,X,X,X,X,X,X,X,X,X,X,X,X,,,X,X,X,X,X,X,X,X,,X,X,X,X,X,,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,,X,X,X,X,X,X,X,X,X,X,X
+3VZR 1.75x,Optic,X,X,X,X,X,X,X,X,X,X,X,X,,,X,X,X,X,X,X,X,X,,X,X,X,X,X,,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,,X,X,X,X,X,X,X,X,X,X,X
+RO-M 1.75x,Optic,X,X,X,X,X,X,X,X,X,X,X,X,,,X,X,X,X,X,X,X,X,,X,X,X,X,X,,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,,X,X,X,X,X,X,X,X,X,X,X
+CCO 2.00x,Optic,X,X,X,X,X,X,X,X,X,X,X,X,,,X,X,X,X,X,X,X,X,,X,X,X,X,X,,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,,X,X,X,X,X,X,X,X,X,X,X
+R4T 2.00x,Optic,X,X,X,X,X,X,X,X,X,X,X,X,,,X,X,X,X,X,X,X,X,,X,X,X,X,X,,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,,X,X,X,X,X,X,X,X,X,X,X
+Baker 3.00x,Optic,X,X,X,X,X,X,X,X,X,X,X,X,,,X,X,X,X,X,X,X,X,,X,X,X,X,X,,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,,X,X,X,X,X,X,X,X,X,X,X
+SDO 3.50x,Optic,X,X,X,X,X,X,X,X,X,X,X,X,,,X,X,X,X,X,X,X,X,,X,X,X,X,X,,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,,X,X,X,X,X,X,X,X,X,X,X
+ST Prism 5.00x,Optic,X,X,X,X,X,X,X,X,X,X,X,X,,,X,X,X,X,X,X,X,X,,X,X,X,X,X,,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,,X,X,X,X,X,X,X,X,X,X,X
+PVQ-31 4.00x,Optic,X,X,X,X,X,X,X,X,X,X,X,X,,,X,X,X,X,X,X,X,X,,X,X,X,X,X,,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,,X,X,X,X,X,X,X,X,X,X,X
+LDS 4.50x,Optic,X,X,X,X,X,X,X,X,X,X,X,X,,,X,X,X,X,X,X,X,X,,X,X,X,X,X,,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,,X,X,X,X,X,X,X,X,X,X,X
+SF-G2 5.00x,Optic,X,X,X,X,X,X,X,X,X,X,X,X,,,X,X,X,X,X,X,X,X,,X,X,X,X,X,,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,,X,X,X,X,X,X,X,X,X,X,X
+BF-2M 2.50x,Optic,X,X,X,X,X,X,X,X,X,X,X,X,,,X,X,X,X,X,X,X,X,,X,X,X,X,X,,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,,X,X,X,X,X,X,X,X,X,X,X
+GRIM 1.50x,Optic,X,X,X,X,X,X,X,X,X,X,X,X,,,X,X,X,X,X,X,X,X,,X,X,X,X,X,,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,,X,X,X,X,X,X,,X,X,X,X,,X,X,X,X,X,X
+PAS-35 3.00x,Optic,X,X,X,X,X,X,X,X,X,X,X,X,,,X,X,X,X,X,X,X,X,,X,X,X,X,X,,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,,X,X,X,X,X,X,,X,X,X,X,,X,X,X,X,X,X
+Folding Vertical,Underbarrel,X,X,X,X,X,X,X,X,X,,X,X,,,X,X,X,X,,X,X,X,,,X,X,X,X,,X,X,X,X,,X,X,X,X,,X,X,,X,X,,X,X,X,X,X,X,,,X,X,X,,X,X,X,X,X,X
+Alloy Vertical,Underbarrel,X,X,X,X,X,X,X,X,X,,X,X,,,X,X,X,X,,X,X,X,,,X,X,X,X,,X,X,X,X,,X,X,X,X,,X,X,,X,X,,X,X,X,X,X,X,,,X,X,X,,X,X,X,X,X,X
+Ribbed Vertical,Underbarrel,X,X,X,X,X,X,X,X,X,,X,X,,,X,X,X,X,,X,X,X,,,X,X,X,X,,X,X,X,X,,X,X,X,X,,X,X,,X,X,,X,X,X,X,X,X,,,X,X,X,,X,X,X,X,X,X
+6H64 Vertical,Underbarrel,X,X,X,X,X,X,X,X,X,,X,X,,,X,X,X,X,,X,X,X,,,X,X,X,X,,X,X,X,X,,X,X,X,X,,X,X,,X,X,,X,X,X,X,X,X,,,X,X,X,,X,X,X,X,X,X
+Classic Vertical,Underbarrel,X,X,X,X,X,X,X,X,X,,X,X,,,X,X,X,X,,X,X,X,,,X,X,X,X,,X,X,X,X,,X,X,X,X,,X,X,,X,X,,X,X,X,X,X,X,,,X,X,X,,X,X,X,X,X,X
+Ribbed Stubby,Underbarrel,X,X,X,X,X,X,X,X,X,,X,X,,,X,X,X,X,,X,X,X,,,X,X,X,X,,X,X,X,X,,X,X,X,X,,X,X,,X,X,,X,X,X,X,X,X,X,,X,X,X,,X,X,X,X,X,X
+Canted Stubby,Underbarrel,X,X,X,X,X,X,X,X,X,,X,X,,,X,X,X,X,,X,X,X,,,X,X,X,X,,X,X,X,X,,X,X,X,X,,X,X,,X,X,,X,X,X,X,X,X,X,,X,X,X,,X,X,X,X,X,X
+Stippled Stubby,Underbarrel,X,X,X,X,X,X,X,X,X,,X,X,,,X,X,X,X,,X,X,X,,,X,X,X,X,,X,X,X,X,,X,X,X,X,,X,X,,X,X,,X,X,X,X,X,X,X,,X,X,X,,X,X,X,X,X,X
+Low-Profile Stubby,Underbarrel,X,X,X,X,X,X,X,X,X,X,X,X,,,X,X,X,X,X,X,X,X,,X,X,X,X,X,,X,X,X,X,X,X,X,X,X,X,X,X,,X,X,,X,X,X,X,X,X,,X,X,X,X,,X,X,X,X,X,X
+Full Angled,Underbarrel,X,X,X,X,X,,,X,X,X,X,,,,X,X,X,X,X,X,X,X,,X,X,X,X,X,,X,X,,X,X,X,,,,,,X,,,X,,X,X,X,X,,X,,,X,X,,,X,,,X,X,X
+Slim Angled,Underbarrel,X,X,X,X,X,X,,X,X,X,,X,,,X,X,X,X,X,X,X,X,,X,X,X,X,X,,X,X,X,X,X,X,X,X,X,X,,X,,X,X,,X,X,X,X,X,X,,X,X,X,,,X,X,X,X,X,X
+Flashlight,LeftAccessory,X,X,,X,X,,,,,,,,,,,X,,,X,,X,,,X,X,,,X,,,X,X,X,,X,X,X,,,,X,,X,,,,X,,,X,X,,,X,X,,,,X,,,X,
+Taclight - Hip,LeftAccessory,X,X,,X,X,,,,,,,,,,,X,,,X,,X,,,X,X,,,X,,,X,X,X,,X,X,X,,,,X,,X,,,,X,,,X,X,,,X,X,,,,X,,,X,
+5 mW Red,RightAccessory,X,X,X,X,X,,X,,,,,,,,,X,,,X,,X,,,,X,,,X,,,X,X,X,,X,X,X,,,X,,,X,,,,X,,,X,,,,,X,,,X,X,,,X,
+5 mW Green,RightAccessory,X,X,X,X,X,,X,,,,,,,,,X,,,X,,X,,,,X,,,X,,,X,X,X,,X,X,X,,,X,,,X,,,,X,,,X,,,,,X,,,X,X,,,X,
+50 mW Green,RightAccessory,X,X,X,X,X,,X,,,,,,,,,X,,,X,,X,,,,X,,,X,,,X,X,X,,X,X,X,,,X,,,X,,,,X,,,X,,,,,X,,,X,X,,,X,
+50 mW Blue,RightAccessory,X,X,X,X,X,,X,,,,,,,,,X,,,X,,X,,,,X,,,X,,,X,X,X,,X,X,X,,,X,,,X,,,,X,,,X,,,,,X,,,X,X,,,X,
+120 mW Blue,RightAccessory,X,X,X,X,X,,X,,,,,,,,,X,,,X,,X,,,,X,,,X,,,X,X,X,,X,X,X,,,X,,,X,,,,X,,,X,,,,,X,,,X,X,,,X,
+Folding Stubby,Underbarrel,X,X,X,X,X,X,X,X,X,,X,X,,,X,X,X,X,,X,X,X,,,X,X,X,X,,X,X,X,X,,X,X,X,X,,X,X,,X,X,,X,X,X,X,X,X,X,,X,X,X,,X,X,X,X,X,X
+Slim Handstop,Underbarrel,X,X,X,X,X,,,X,X,,X,,,,X,X,X,X,,X,X,X,,,X,X,X,X,,X,X,X,X,,X,,,,,,X,,,X,,X,X,X,X,,X,,,X,X,,,X,,,X,X,X
+Flechette,Ammunition,X,X,,,,,,,,,X,,,,,,,,,,X,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,
+Slugs,Ammunition,X,X,,,,,,,,,X,,,,,,,,,,X,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,
+CQB Suppressor,Muzzle,X,X,X,,X,X,X,,X,,X,X,X,X,X,X,X,X,X,,X,X,X,X,X,,,,X,,,X,X,,,X,X,X,X,,X,,X,,,X,X,,,X,,X,,X,,,,,X,X,X,,
+Lightened Suppressor,Muzzle,X,X,X,X,X,X,X,X,X,,,X,,,X,,,X,X,X,X,X,,X,X,X,X,X,,X,X,X,,X,X,X,X,X,X,X,X,X,,,,X,X,X,X,X,X,,X,X,X,X,,X,X,X,X,,X
+ROX 1.50x,Optic,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X
+Mars-F LPVO,Optic,X,X,X,X,X,X,X,X,X,X,X,X,,,X,X,,X,X,X,X,,,,,,X,X,,,X,X,X,X,X,X,X,X,,X,X,X,X,X,,X,X,,,X,X,,X,X,X,X,,X,X,X,X,X,
+430mm Factory,Barrel,X,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,
+Extended Barrel,Barrel,,X,,,,,,,X,X,X,X,,,,,,,,,X,,,,,,,,,,,,,,,,,,,,X,,,,,,,,,X,,,,,,,,,,,X,,
+458mm Custom,Barrel,,,,X,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,
+200mm Custom,Barrel,,,,,,X,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,
+"11"" Extended",Barrel,,,,,,,X,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,
+"24"" Extended",Barrel,,,,,,,,X,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,
+135mm Long,Barrel,,,,,,,,,,,,,,X,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,
+510mm Fluted,Barrel,,,,,,,,,,,,,,,X,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,
+600mm Fluted,Barrel,,,,,,,,,,,,,,,,X,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,
+"18.9"" Prototype",Barrel,,,,,,,,,,,,,,,,,,X,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,
+"32"" Custom",Barrel,,,,,,,,,,,,,,,,,,,X,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,
+646mm Fluted,Barrel,,,,,,,,,,,,,,,,,,,,X,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,
+"26"" Carbon",Barrel,,,,,,,,,,,,,,,,,,,,,,,,X,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,
+"20"" LE",Barrel,,,,,,,,,,,,,,,,,,,,,,,,,,,X,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,
+"22"" Factory",Barrel,,,,,,,,,,,,,,,,,,,,,,,,,,,,X,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,
+"14.5"" Carbine",Barrel,,,,,,,,,,,,,,,,,,,,,,,,,,,X,,,X,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,
+"18"" Extended",Barrel,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,X,,,,,,,,,,,,,,,,,,,,,,,,,,,,,
+245mm Custom,Barrel,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,X,,,,,,,,,,,,,,,,,,,,,,,,,,,
+"8"" Extended",Barrel,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,X,,,,,,,,,,,,,,,,,,,,,,,,,
+"27"" MK22",Barrel,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,X,,,,,,,,,,,,,,,,,,,,,,,,
+"14.5"" Alt",Barrel,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,X,,,,,,,,,,,,,,,,,,,,,,,
+367mm Civ,Barrel,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,X,,,,,,,,,,,,,,,,,,,,
+"14.5"" Common",Barrel,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,X,,,,,,,,,,,,,,,,,,,
+"8.37"" Long",Barrel,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,X,,,,,,,,,,,,,,,,,,
+600mm Tabuk,Barrel,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,X,,,,,,,,,,,,,,,,
+"18"" US-LB",Barrel,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,X,,,,,,,,,,,,,,,
+"10.5"" Custom",Barrel,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,X,,,,,,,,,,,,,,
+303mm LB,Barrel,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,X,,,,,,,,,,,,
+730mm 3LR,Barrel,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,X,,,,,,,,,,
+560mm Factory,Barrel,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,X,,,,,,,,,
+620mm Classic,Barrel,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,X,,,,,,,,
+"20"" Long",Barrel,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,X,,,,,,,
+305mm Custom,Barrel,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,X,,,,
+"6.5"" Extended",Barrel,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,X,,,
+"16"" Rifle",Barrel,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,X
+8rnd Fast Mag,Magazine,X,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,
+30rnd Fast Mag,Magazine,,,X,X,X,,,,X,,,X,,,X,,,X,,X,,X,,,,,X,,,X,,,,,,X,X,X,,X,,,X,X,,X,X,X,X,X,X,,,,,,,,X,,X,,
+15rnd Fast Mag,Magazine,,,,,,X,,X,,,,,,,,X,,,,,,,,,,,,X,,,,,,X,,,,,,,,,,,,,,,,,,,,,,,,,,,,,
+10rnd Fast Mag,Magazine,,,,,,,,X,,,,,,,,,,,,,,,,,,,,,,,,,,X,,,,,,,,,,,,,,,,,,,,X,X,X,,,,,,,
+5rnd Fast Mag,Magazine,,,,,,,,,,X,,,,,,,,,,,,,,X,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,
+20rnd Fast Mag,Magazine,,,,X,,,,X,,,,,,,X,X,X,X,,X,,X,,,,,,X,,X,,,,X,,,,,,,X,,X,,,,,X,X,,X,,,,,X,,,,,,X,X
+45rnd Fast Mag,Magazine,,,X,,X,,,,,,,,,,X,,,,,X,,,,,,,X,,,,,,,,,,,,,X,,,,,,X,,X,,,,,,,,,,X,,,,,
+40rnd Fast Mag,Magazine,,,X,X,X,,,,X,,,,,,X,,,X,,X,,X,,,,,X,,,X,,,,,,,,,,,,,,,,,X,X,X,,X,,,,,,,,,,X,,
+8rnd Moon Clip,Magazine,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,X,,,,,,
+60rnd Magazine,Magazine,,,,,,,X,,,,,,,,,,,,,,,,,,,,X,,,,,,,,,,,,,,,,,,,X,X,,,,,,,,,,,X,,,,,
+17rnd Fast Mag,Magazine,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,X,,,
+4rnd Magazine,Magazine,X,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,
+5 Shell Tube,Magazine,,X,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,
+3rnd Magazine,Magazine,,,,,,,,,,X,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,
+4 Shell Tube,Magazine,,,,,,,,,,,,,,,,,,,,,X,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,
+25rnd Magazine,Magazine,,,,,,X,,,,,,,,,,,X,,,,,,,,,,,X,,,,,,,,,,,,,,,X,,,,,,,,,,,,,X,,,X,,,,X
+4rnd Fast Mag,Magazine,X,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,
+25rnd Fast Mag,Magazine,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,X,,,X,,,,X
+Double-port Brake,Muzzle,X,,X,X,X,X,X,X,X,,,X,X,X,X,X,X,X,X,X,,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,,,X,X,X,X,X,X,X,X,X,X,X,,X,X,X,X,,X
+SU-230 LPVO,Optic,X,X,X,X,X,X,X,X,X,X,X,X,,,X,X,X,X,X,X,X,X,,X,X,X,X,X,,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,,X,X,X,X,X,X,,X,X,X,X,,X,X,X,X,X,X
+TH-RDS 1.00x,Optic,X,X,X,X,X,X,X,X,X,X,X,X,,,X,X,X,X,X,X,X,X,,X,X,X,X,X,,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,,X,X,X,X,X,X,,X,X,X,X,,X,X,X,X,X,X
+50 mW Violet,RightAccessory,X,X,X,X,X,,X,X,,,,,,,,X,,,X,,X,,,,X,,,X,,,X,X,X,X,X,X,X,,,X,,,X,,,,X,,,X,X,,X,,X,,,X,X,,,X,
+Taclight - Aimed,LeftAccessory,X,X,,X,X,,,X,,,,,,,,X,,,X,,X,,,X,X,,,X,,,X,X,X,X,X,X,X,,X,,X,,X,,,,X,,,X,X,,X,X,X,,,,X,,,X,
+Aftermarket Buffer,Ergonomics,X,,,X,X,,,,X,,,X,,,X,X,X,,,,X,X,,,,,X,X,,X,,,,,X,X,,X,,X,X,X,X,,,X,X,X,X,X,X,,,,X,,,,X,,X,,
+Single-port Brake,Muzzle,X,X,X,X,,X,X,X,X,,,X,X,X,X,X,X,X,X,X,X,X,X,X,,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,,,,,X,X,X,X,X,,X,X,X,,X,X,X,X,,X
+#00 Buckshot,Ammunition,X,X,,,,,,,,,X,,,,,,,,,,X,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,
+M145 MGO 3.50x,Optic,X,X,X,X,X,X,X,X,X,X,X,X,,,X,X,X,X,X,X,X,X,,X,X,X,X,X,,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,,X,X,X,X,X,X,,X,X,X,X,,X,X,X,X,X,X
+QMK-171A 3.00x,Optic,X,X,X,X,X,X,X,X,X,X,X,X,,,X,X,X,X,X,X,X,X,,X,X,X,X,X,,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,,X,X,X,X,X,X,,X,X,X,X,,X,X,X,X,X,X
+1P86 LPVO,Optic,X,,X,X,X,X,X,X,X,X,X,X,,,X,X,X,X,X,X,X,X,,X,X,X,X,X,,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,,X,X,X,X,X,X,,X,X,X,X,,X,X,X,X,X,X
+Basic Sight,OpticAccessory,X,X,X,X,X,X,X,X,X,X,X,X,,,X,X,X,X,X,X,X,X,,X,X,X,X,X,,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,,X,X,X,X,X,X,,X,X,X,X,,X,X,X,X,X,X
+Sight 1.00x,OpticAccessory,X,X,X,X,X,X,X,X,X,X,X,X,,,X,X,X,X,X,X,X,X,,X,X,X,X,X,,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,,X,X,X,X,X,X,,X,X,X,X,,X,X,X,X,X,X
+Magnifier,OpticAccessory,X,X,X,X,X,X,X,X,X,X,X,X,,,X,X,X,X,,X,X,X,,X,X,X,X,X,,X,X,X,X,X,X,X,X,X,,X,X,X,X,X,,X,X,X,X,X,X,,,X,X,X,,X,X,X,X,X,X
+Adjustable Angled,Underbarrel,,X,,,,,,X,,,X,,,,X,X,X,X,,X,X,X,,,,X,X,X,,X,X,,,,,,,,,,,,,X,,X,X,X,X,,,,,,X,,,,,,X,,X
+36rnd Magazine,Magazine,,,X,X,X,,,,X,,,X,,,X,,,X,,X,,X,,,,,X,,,X,,,,,,,,X,,X,,,,X,,X,X,X,X,,X,,,,,,,,X,,X,,
+Standard,Ammunition,,,X,X,X,X,X,X,X,X,,X,X,X,X,X,X,X,X,X,,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,,X
+DVO LPVO,Optic,,,X,X,,,,X,,X,,X,,,X,X,,X,X,X,,X,,X,X,X,X,X,,,X,X,X,X,X,,,,X,,X,,,,,X,X,X,,,,,X,X,X,X,,X,,,X,X,X
+MC-CO LPVO,Optic,,,X,X,,,,X,,X,,X,,,X,X,,X,X,X,,X,,X,X,X,X,X,,,X,X,X,X,X,,,,X,,X,,,,,X,X,X,,,,,X,X,X,X,,X,,,X,X,
+PTT Grip Pod,Underbarrel,,,X,X,,,,X,X,,,X,,,X,X,X,X,,X,,X,,,X,X,X,X,,X,X,X,X,,X,,,,,,X,,,X,,X,X,X,,,,,,X,X,X,,X,,,X,X,X
+Classic Grip Pod,Underbarrel,,,X,X,,,,X,X,X,,X,,,X,X,X,X,X,X,,X,,X,X,X,X,X,,X,X,X,X,X,X,,,,X,,X,,,X,,X,X,X,,,,,X,X,X,X,,X,,,X,X,X
+QD Grip Pod,Underbarrel,,,X,X,,,,X,X,X,,X,,,X,X,X,X,X,X,,X,,X,X,X,X,X,,X,X,X,X,X,X,,,,X,,X,,,X,,X,X,X,,,,,X,X,X,X,,X,,,X,X,X
+Penetration,Ammunition,,,X,X,X,X,X,X,X,X,,X,X,X,X,X,X,X,X,X,,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X
+Frangible,Ammunition,,,X,X,X,X,X,X,X,X,,X,X,X,X,X,X,X,X,X,,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X
+Lightweight,Ammunition,,,X,X,X,,,,X,,,X,,,X,X,X,X,,X,,X,,,,,X,X,,X,,,,,,,,,,X,X,X,,X,,X,X,X,X,,X,,,,,X,,X,,,X,,
+Hollow Point,Ammunition,,,X,X,X,X,X,X,X,,,X,X,X,X,X,X,X,,X,,X,X,,X,X,X,X,X,X,X,X,X,,X,X,X,X,,X,X,X,X,X,X,X,X,X,X,X,X,X,,X,X,X,X,X,X,X,X,,X
+Flashlight,RightAccessory,,,X,,,X,X,X,X,X,X,X,,,X,,X,X,,X,,X,,,,X,X,,,X,,,,X,,,,X,X,X,,X,,X,,X,,X,X,,,,X,,,X,,X,,X,X,,X
+Taclight - Hip,RightAccessory,,,X,,,X,X,X,X,X,X,X,,,X,,X,X,,X,,X,,,,X,X,,,X,,,,X,,,,X,X,X,,X,,X,,X,,X,X,,,,X,,,X,,X,,X,X,,X
+Standard Suppressor,Muzzle,,,X,X,X,X,X,X,X,,,X,X,X,X,X,X,X,X,X,,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,,X,X,X,X,X,,X,,X,X,X,X,X,X,X,,X,X,X,,X,X,X,X,,X
+21rnd Magazine,Magazine,,,,,,,,,,,,,,,,,,,,,,,X,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,
+75rnd Belt Box,Magazine,,,,,,,,,,,,,,,,,,,,,,,,,X,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,
+11rnd Magazine,Magazine,,,,,,,,,,,,,,,,,,,,,,,,,,,,,X,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,
+200rnd Belt Box,Magazine,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,X,,,X,,,,,,,,,,,,,,,,,,,,,,,,,,,,
+100rnd Belt Box,Magazine,,,,,,,,,,,,,,,,,,,,,,,,,X,,,,,,,,X,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,
+35rnd Magazine,Magazine,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,X,,,,,,,X,,,,,,,,,,,,,
+100rnd Drum Mag,Magazine,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,X,,,,,
+23rnd Magazine,Magazine,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,X,,,
+42rnd Magazine,Magazine,,,,,,,,,,,,X,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,
+22rnd Magazine,Magazine,,,,,,,,,,,,,,X,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,
+41rnd Magazine,Magazine,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,X,,,,,,,,,,,,,,,,,,,,,,,,,
+75rnd Drum,Magazine,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,X,,,,,,,,,,,,,,,,
+27rnd Magazine,Magazine,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,X,,,
+42rnd Fast Mag,Magazine,,,,,,,,,,,,X,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,
+95rnd Drum,Magazine,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,X,,,,,,,,,,,,,,,,,
+Long Suppressor,Muzzle,,,X,X,X,X,X,X,X,X,,X,,,X,X,X,X,X,X,,X,,X,X,X,X,X,,X,X,X,X,X,X,X,X,X,X,X,X,X,,,,X,X,X,X,X,X,,,X,X,X,,X,X,X,X,,X
+Compensated Brake,Muzzle,,,X,X,X,X,X,X,X,,,X,,,X,X,X,X,X,X,,X,,X,X,X,X,X,,X,X,X,X,X,X,X,X,X,X,X,X,X,X,,,X,X,X,X,X,X,,X,X,X,X,,X,X,X,X,,X
+Linear Comp,Muzzle,,,X,X,X,X,X,X,X,,,X,,,X,X,X,X,,X,,X,,,X,X,X,X,,X,X,X,X,,X,X,X,X,,X,X,X,X,X,,X,X,X,X,X,X,,,X,X,X,,X,X,X,X,,X
+Bipod,Underbarrel,,,X,X,,,,X,,X,,X,,,X,X,X,X,X,X,,X,,X,X,X,X,X,,X,X,X,X,X,X,,,,X,,X,,,,,X,X,X,,,,,X,X,X,X,,X,,,X,X,X
+Match Trigger,Ergonomics,,,X,X,X,,,,X,,,X,,,X,X,X,X,,X,,X,,,,,X,,,X,,,,,,,,,,X,,,,X,X,X,X,X,X,,X,,,,,X,,X,,,X,,X
+Laser/Light Combo Green,RightAccessory,,,X,,,,X,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,X,,,,,,,,,,,,,,,,,,X,,,,,
+415mm Prototype,Barrel,,,X,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,
+314mm Prototype,Barrel,,,,,X,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,
+"9"" Heavy",Barrel,,,,,,,X,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,
+480mm MG,Barrel,,,,,,,,,,,,,,,X,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,
+600mm Cut,Barrel,,,,,,,,,,,,,,,,X,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,
+646mm Cut,Barrel,,,,,,,,,,,,,,,,,,,,X,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,
+"18"" SPR",Barrel,,,,,,,,,,,,,,,,,,,,,,X,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,
+"20"" Lima",Barrel,,,,,,,,,,,,,,,,,,,,,,,,,X,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,
+406mm Standard,Barrel,,,,,,,,,,,,,,,,,,,,,,,,,,X,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,
+450mm Standard,Barrel,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,X,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,
+"16.5"" LSW",Barrel,,,,,,,,,,,,,,,,,,,,,,,,,,,X,,,,,,X,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,
+349mm SB,Barrel,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,X,,,,,,,,,,,,,,,,,,,,,,,,,,,,
+180mm Prototype,Barrel,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,X,,,,,,,,,,,,,,,,,,,,,,,,,,
+264mm Prototype,Barrel,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,X,,,,,,,,,,,,,,,,,,,,,
+521mm Boar,Barrel,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,X,X,,,,,,,,,,,,,,,,
+IAR Heavy,Barrel,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,X,,,,,,,,,,,,,,,
+457mm Mk9,Barrel,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,X,,,,,
+200mm Custom-H,Barrel,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,X,,,,
+"13"" Prototype",Barrel,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,X
+415mm Fluted,Barrel,,,X,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,
+314mm Fluted,Barrel,,,,,X,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,
+"6.8"" Fluted",Barrel,,,,,,X,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,
+"9"" Fluted",Barrel,,,,,,,X,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,X,,,,,,,,,,,,,,
+"21.5"" Fluted",Barrel,,,,,,,,X,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,
+Light Barrel,Barrel,,,,,,,,,X,X,,X,,,,,,,,,,,,,,,,,,,,,,,,,,,,,X,,,,,,,,,X,,,,,,,,,,,X,,
+122mm Pencil,Barrel,,,,,,,,,,,,,X,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,
+114mm Pencil,Barrel,,,,,,,,,,,,,,X,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,
+480mm Fluted,Barrel,,,,,,,,,,,,,,,X,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,
+"16.5"" Fluted",Barrel,,,,,,,,,,,,,,,,,,X,,,,,,,,,X,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,
+"27"" Factory",Barrel,,,,,,,,,,,,,,,,,,,X,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,
+518mm Fluted,Barrel,,,,,,,,,,,,,,,,,,,,X,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,
+"18"" Pencil",Barrel,,,,,,,,,,,,,,,,,,,,,,X,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,
+"3.9"" Pencil",Barrel,,,,,,,,,,,,,,,,,,,,,,,X,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,
+"24"" Fluted",Barrel,,,,,,,,,,,,,,,,,,,,,,,,X,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,
+"20"" OH",Barrel,,,,,,,,,,,,,,,,,,,,,,,,,X,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,
+"5"" Pencil",Barrel,,,,,,,,,,,,,,,,,,,,,,,,,,,,,X,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,
+"17"" Fluted",Barrel,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,X,,,,,,,,,,,,,,,,,,,,,,,,,X,,,,,,,
+"16"" Pencil",Barrel,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,X,,,,,,,,,,,,,,,,,,,,,,,,,,,,,
+349mm Fluted,Barrel,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,X,,,,,,,,,,,,,,,,,,,,,,,,,,,,
+"10"" Factory",Barrel,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,X,,,,,,,,,,,,,,,,,,,,,,,
+264mm Fluted,Barrel,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,X,,,,,,,,,,,,,,,,,,,,,
+238mm Pencil,Barrel,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,X,,,,,,,,,,,,,,,,,,,,
+240mm Fluted,Barrel,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,X,,,,,,,,,,,,
+650mm Fluted,Barrel,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,X,,,,,,,,,,
+565mm Fluted,Barrel,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,X,,,,,,,,
+200mm Fluted,Barrel,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,X,,,,
+"5.5"" Fluted",Barrel,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,X,,,
+"13"" Fluted",Barrel,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,X
+Flash Comp,Muzzle,,,X,X,X,X,,X,X,,,X,,,X,X,X,X,,X,,X,,X,,X,X,X,,X,X,X,X,X,X,X,X,,,X,X,X,X,,,X,X,X,X,,X,,X,,,X,,X,X,,X,,X
+Taclight - Aimed,RightAccessory,,,X,,,X,X,,X,X,X,X,,,X,,X,X,,X,,X,,,,X,X,,,X,,,,,,,,X,,X,,X,,X,,X,,X,X,,,,,,,X,,X,,X,X,,X
+Burst Fire,Ergonomics,,,X,,,,X,,,,,,,,,,,,,,,,,,,,,,,,,,,,,X,,,,X,X,,,,,,,,,X,X,,,,,,,,X,X,,,
+Treated Barrel,Barrel,,,X,X,X,,X,,X,,,X,,,X,X,X,,,X,,,,,,,,,,,,,,,,X,X,,,,,X,,X,,,,X,X,,,,,,,,,,X,,,,X
+"18"" Cryogenic",Barrel,,,,,,,,,,,,,,,,,,,,,,X,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,
+238mm Cryogenic,Barrel,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,X,,,,,,,,,,,,,,,,,,,,
+409mm Fluted,Barrel,,,,X,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,
+"12.5"" Fluted",Barrel,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,X,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,
+"6"" Fluted",Barrel,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,X,,,,,,,,,,,,,,,,,,,,,,,,,
+409mm Cut,Barrel,,,,X,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,
+Short Barrel,Barrel,,,,,,,,,X,,,X,,X,,,,,,,,,,,,,,,,,,,X,,,,,,,,X,,,,,,,,,,,,,,,,,,,,X,,
+391mm CQB,Barrel,,,,,,,,,,,,,,,X,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,
+409mm US,Barrel,,,,,,,,,,,,,,,,X,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,
+"12"" Assaulter",Barrel,,,,,,,,,,,,,,,,,X,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,
+"14.5"" Standard",Barrel,,,,,,,,,,,,,,,,,,X,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,
+"20"" Custom Covert",Barrel,,,,,,,,,,,,,,,,,,,X,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,
+442mm CQB,Barrel,,,,,,,,,,,,,,,,,,,,X,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,
+"16"" Dissipator",Barrel,,,,,,,,,,,,,,,,,,,,,,X,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,
+"16"" Short",Barrel,,,,,,,,,,,,,,,,,,,,,,,,,,,,X,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,
+"11.5"" Commando",Barrel,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,X,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,
+370mm Compact,Barrel,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,X,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,
+"12"" SBR",Barrel,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,X,,,,,,,,,,,,,,,,,,,,,,,,,,,,,
+"4.5"" Compact",Barrel,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,X,,,,,,,,,,,,,,,,,,,,,,,,,
+"5.12"" Compact",Barrel,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,X,,,,,,,,,,,,,,,,,,
+419mm Boar-F,Barrel,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,X,X,,,,,,,,,,,,,,,,
+"14.5"" Factory",Barrel,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,X,,,,,,,,,,,,,,,
+"7.5"" Compact",Barrel,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,X,,,,,,,,,,,,,,
+514mm Carbine,Barrel,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,X,,,,,,,,,,
+457mm Urban,Barrel,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,X,,,,,,,,,
+550mm Factory,Barrel,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,X,,,,,,,,
+"17"" Cut",Barrel,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,X,,,,,,,
+330mm Mk3,Barrel,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,X,,,,,
+Hybrid Suppressor (K),Muzzle,,,,X,,,,X,X,,,X,,,X,X,X,X,X,X,,X,,X,X,X,X,X,,X,X,X,X,X,X,,,,X,X,X,X,,X,,X,X,X,X,,X,,X,X,X,X,,X,,,X,,X
+Hybrid Suppressor (S),Muzzle,,,,X,,,,X,X,,,X,,,X,X,X,X,X,X,,X,,X,X,X,X,X,,X,X,X,X,X,X,,,,X,X,X,X,,X,,X,X,X,X,,X,,X,X,X,X,,X,,,X,,X
+Hybrid Suppressor (L),Muzzle,,,,X,,,,X,X,,,X,,,X,X,X,X,X,X,,X,,X,X,X,X,X,,X,X,X,X,X,X,,,,X,X,X,X,,X,,X,X,X,X,,X,,X,X,X,X,,X,,,X,,X
+Synthetic Tip,Ammunition,,,,,X,,X,X,,,,X,,,X,,,,,X,,,,,,,X,,,,,,,,,X,X,,,,X,,X,X,,X,X,X,,,,X,,,,,,X,X,,,,
+53rnd Drum,Magazine,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,X,,,,,,,,,,,,,,,,,,,,
+Magwell Flare,Ergonomics,,,,,X,,,,,,,,,,,,X,X,,,,X,,,,,X,,,X,,,,,,,,,,,,,,,,X,X,X,X,,,,,,,,,,,,,,X
+Improved Mag Catch,Ergonomics,,,,,X,X,X,X,X,X,,X,X,X,,,,,X,,,,X,,,,,X,X,X,,,,,,X,X,,X,X,,X,X,,,,,,,X,X,X,X,,X,X,,,,,,X,X
+Compact Handstop,Underbarrel,,,,,,X,X,,,,,,,,,,,,,,,,,,,,,,,,,,,,,X,X,X,,X,,,X,,,,,,X,X,,X,,,,,,,X,X,,,
+5 mW Red,TopAccessory,,,,,,X,,X,X,X,X,X,,,X,,X,X,,X,,X,,X,,X,X,,,X,,,,X,,,,X,X,,X,,,X,,X,,X,X,,,,X,X,,X,,,,X,X,,X
+5 mW Green,TopAccessory,,,,,,X,,X,X,X,X,X,,,X,,X,X,,X,,X,,X,,X,X,,,X,,,,X,,,,X,X,,X,,,X,,X,,X,X,,,,X,X,,X,,,,X,X,,X
+50 mW Green,TopAccessory,,,,,,X,,X,X,X,X,X,,,X,,X,X,,X,,X,,X,,X,X,,,X,,,,X,,,,X,X,,X,,,X,,X,,X,X,,,,X,X,,X,,,,X,X,,X
+50 mW Blue,TopAccessory,,,,,,X,,X,X,X,X,X,,,X,,X,X,,X,,X,,X,,X,X,,,X,,,,X,,,,X,X,,X,,,X,,X,,X,X,,,,X,X,,X,,,,X,X,,X
+120 mW Blue,TopAccessory,,,,,,X,,X,X,X,X,X,,,X,,X,X,,X,,X,,X,,X,X,,,X,,,,X,,,,X,X,,X,,,X,,X,,X,X,,,,X,X,,X,,,,X,X,,X
+50 mW Violet,TopAccessory,,,,,,X,,,X,X,X,X,,,X,,X,X,,X,,X,,X,,X,X,,,X,,,,,,,,X,X,,X,,,X,,X,,X,X,,,,,X,,X,,,,X,X,,X
+Subsonic,Ammunition,,,,,,X,X,,,,,,X,X,,,X,,,,,,X,,,,,,,,,,,,,X,X,X,,,,X,X,,,,,,X,X,X,,,,,,,,X,X,,,
+"11"" Heavy",Barrel,,,,,,,X,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,
+Heavy Extended Barrel,Barrel,,,,,,,,,,,,X,,,,,,,,,,,,,,,,,,,,,X,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,
+510mm DMR,Barrel,,,,,,,,,,,,,,,X,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,
+600mm DMR,Barrel,,,,,,,,,,,,,,,,X,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,
+646mm LSW,Barrel,,,,,,,,,,,,,,,,,,,,X,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,
+"20"" HBAR",Barrel,,,,,,,,,,,,,,,,,,,,,,X,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,
+"24"" Bravo",Barrel,,,,,,,,,,,,,,,,,,,,,,,,,X,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,
+556mm Prototype,Barrel,,,,,,,,,,,,,,,,,,,,,,,,,,X,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,
+"20"" SDM-R",Barrel,,,,,,,,,,,,,,,,,,,,,,,,,,,X,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,
+"22"" E3 Long",Barrel,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,X,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,
+612mm VMW,Barrel,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,X,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,
+465mm LB,Barrel,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,X,,,,,,,,,,,,,,,,,,,,,,,,,,,,
+407mm Civ-S,Barrel,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,X,,,,,,,,,,,,,,,,,,,,,
+590mm Factory,Barrel,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,X,X,,,,,,,,,,,,,,,,
+"18"" Custom",Barrel,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,X,,,,,,,,,,,,,,,
+305mm Custom-H,Barrel,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,X,,,,
+"16"" Custom",Barrel,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,X
+Laser/Light Combo Red,RightAccessory,,,,,,,X,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,X,,,,,,,,,,,,,,,,,,X,,,,,
+Range Finder,RightAccessory,,,,,,,,X,,,,,,,,,,,,,,,,,,,,,,,,,,X,,,,,X,,,,,,,,,,,,,,X,,,,,,,,,,
+S-VPS 6.00x,Optic,,,,,,,,X,,X,,,,,,,,,X,,,,,X,,,,X,,,,,,X,,,,,X,,X,,,,,,,,,,,,X,X,X,,,,,,,X,
+Scope 8.00x,Optic,,,,,,,,X,,,,,,,,,,,X,,,,,X,,,,,,,,,,X,,,,,X,,,,,,,,,,,,,,X,X,X,,,,,,,,
+NX 8 4,Optic,,,,,,,,,,X,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,X,,,,,,,,,,,,,,,,,,,,,X,
+SSDS 6.00x,Optic,,,,,,,,X,,X,,,,,,,,,X,,,,,X,,,,X,,,,,,X,,,,,X,,X,,,,,,,,,,,,X,X,X,,,,,,,X,
+LERT 8.00x,Optic,,,,,,,,X,,X,,,,,,,,,X,,,,,X,,,,X,,,,,,X,,,,,X,,X,,,,,,,,,,,,X,X,X,,,,,,,X,
+R-VPS 10.00x,Optic,,,,,,,,X,,X,,,,,,,,,X,,,,,X,,,,X,,,,,,X,,,,,X,,X,,,,,,,,,,,,X,X,X,,,,,,,X,
+TS-HD 6.00x,Optic,,,,,,,,X,,X,,,,,,,,,X,,,,,X,,,,X,,,,,,X,,,,,X,,X,,,,,,,,,,,,X,X,X,,,,,,,,
+1p88 Variable,Optic,,,,,,,,X,,X,,,,,,,,,X,,,,,X,,,,X,,,,,,X,,,,,X,,X,,,,,,,,,,,,X,X,X,,,,,,,X,
+SM Rifle Variable,Optic,,,,,,,,X,,X,,,,,,,,,X,,,,,X,,,,X,,,,,,X,,,,,X,,X,,,,,,,,,,,,X,X,X,,,,,,,X,
+7rnd Fast Mag,Magazine,,,,,,,,,,,,,,,,,,,X,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,
+35rnd Fast Mag,Magazine,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,X,,,,,,,,,,,,,
+Adjustable Magnification 3.00x,OpticAccessory,,,,,,,,X,,X,,,,,,,,,X,,,,,X,,,,X,,,,,,X,,,,,X,,X,,,,,,,,,,,,X,X,X,,,,,,,X,
+Adjustable Magnification 4.00x,OpticAccessory,,,,,,,,X,,X,,,,,,,,,X,,,,,X,,,,X,,,,,,X,,,,,X,,X,,,,,,,,,,,,X,X,X,,,,,,,X,
+Adjustable Magnification 2.00x,OpticAccessory,,,,,,,,X,,X,,,,,,,,,X,,,,,X,,,,X,,,,,,X,,,,,X,,X,,,,,,,,,,,,X,X,X,,,,,,,X,
+NGFC LPVO,Optic,,,,,,,,,X,,,,,,,,X,,,,,X,,X,X,X,,,,X,,,,,,,,,X,,,,,,,X,,X,X,,,,,,,,,,,,,,X
+Rail Cover,Ergonomics,,,,,,,,,X,,,,,,,,,,,,,X,,,X,,X,,,X,,,,,,,,,,,,,,X,,,,X,X,,,,,,,,,X,,,,,
+Multi-port Brake,Muzzle,,,,,,,,,,X,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,
+Magpulafg 2 BOLT,Underbarrel,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,X,,,,,,,,,,,,,,X,,,,,,,,,,
+Match Grade,Ammunition,,,,,,,,,,X,,,,,,,,,X,,,,,X,,,,X,,,,,,,,,,,X,,,,,,,,,,,,,,X,X,X,,,,,,,X,
+Range Finder,LeftAccessory,,,,,,,,,,X,,,,,,,,,X,,,,,X,,,,X,,,,,,,,,,,,,X,,,,,,,,,,,,,X,X,,,,,,,,
+Anti-Glare Coating,OpticAccessory,,,,,,,,,,X,,,,,,,,,X,,,,,X,,,,,,,,,,X,,,,,X,,,,,,,,,,,,,,X,,,,,,,,,,
+Light Extended Barrel,Barrel,,,,,,,,,,,,X,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,
+Light Short Barrel,Barrel,,,,,,,,,,,,X,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,
+5 mW Red,Underbarrel,,,,,,,,,,,,,X,X,,,,,,,,,X,,,,,,X,,,,,,,,,,,,,,,,,,,,,,,X,,,,,X,,,,,,
+5 mW Green,Underbarrel,,,,,,,,,,,,,X,X,,,,,,,,,X,,,,,,X,,,,,,,,,,,,,,,,,,,,,,,X,,,,,X,,,,,,
+50 mW Green,Underbarrel,,,,,,,,,,,,,X,X,,,,,,,,,X,,,,,,X,,,,,,,,,,,,,,,,,,,,,,,X,,,,,X,,,,,,
+Flashlight,Underbarrel,,,,,,,,,,,,,X,X,,,,,,,,,X,,,,,,X,,,,,,,,,,,,,,,,,,,,,,,X,,,,,X,,,,,,
+Taclight - Aimed,Underbarrel,,,,,,,,,,,,,X,X,,,,,,,,,X,,,,,,X,,,,,,,,,,,,,,,,,,,,,,,X,,,,,X,,,,,,
+Laser/Light Combo Red,Underbarrel,,,,,,,,,,,,,X,X,,,,,,,,,X,,,,,,X,,,,,,,,,,,,,,,,,,,,,,,X,,,,,X,,,,,,
+Laser/Light Combo Green,Underbarrel,,,,,,,,,,,,,X,X,,,,,,,,,X,,,,,,X,,,,,,,,,,,,,,,,,,,,,,,X,,,,,X,,,,,,
+Quickdraw,Ergonomics,,,,,,,,,,,,,X,X,,,,,,,,,X,,,,,,X,,,,,,,,,,,,,,,,X,,,,,,,,,,,,X,,,,,,
+Underslung Mount,Underbarrel,,,,,,,,,,,,,,,X,,X,X,,X,,X,,,,,,,,X,,,,,,,,,,,,,,,,,,X,,,,,,,,,,,,,,,X
+DLC Bolt,Ergonomics,,,,,,,,,,,,,,,,,,,X,,,,,X,,,,,,,,,,,,,,,X,,,,,,,,,,,,,,X,,,,,,,,,,
+A3 Receiver,Ergonomics,,,,,,,,,,,,,,,,,,,,,,X,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,X,
+Canted Vertical,Underbarrel,,,,,,,,,,,,,,,,,,,,,,,,,X,X,,,,,X,X,X,,X,,,,,,,,,,,X,X,,,,,,,,,,,X,,,,,
+Cantedreflexslanted,OpticAccessory,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,X,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,
+5 mW Red,LeftAccessory,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,X,,,,,,,,,X,,,,,,,,,,,,
+5 mW Green,LeftAccessory,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,X,,,,,,,,,X,,,,,,,,,,,,
+50 mW Green,LeftAccessory,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,X,,,,,,,,,X,,,,,,,,,,,,
+50 mW Blue,LeftAccessory,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,X,,,,,,,,,X,,,,,,,,,,,,
+120 mW Blue,LeftAccessory,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,X,,,,,,,,,X,,,,,,,,,,,,
+50 mW Violet,LeftAccessory,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,X,,,,,,,,,,,,,,,,,,,,,
+"6.75"" Factory",Barrel,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,X,,,,,,,,,,,,,,,,,,
+Slant Brake,Muzzle,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,X,X,,,,,,,,,,,,,,,,
+Thread Protector,Muzzle,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,X,,,,,,,,,,
+508mm Mk8,Barrel,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,X,,,,,
+VSSM Barrel,Barrel,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,X,
+Match Tungsten,Ammunition,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,X,
+Vssmnoport Barrel,Barrel,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,X,
