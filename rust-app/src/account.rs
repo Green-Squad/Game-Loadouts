@@ -180,7 +180,15 @@ impl Accounts {
             .json()
             .await
             .map_err(|_| Error::internal())?;
-        if !result.success || result.hostname != self.captcha_hostname {
+        let hostname_matches = if self.captcha_hostname == "gameloadouts.com" {
+            matches!(
+                result.hostname.as_str(),
+                "gameloadouts.com" | "www.gameloadouts.com" | "rust.gameloadouts.com"
+            )
+        } else {
+            result.hostname == self.captcha_hostname
+        };
+        if !result.success || !hostname_matches {
             return Err(Error::invalid("Incorrect CAPTCHA. Please try again."));
         }
         Ok(())

@@ -1,9 +1,9 @@
 name: Rust public experiment
 on:
   push:
-    branches: [rust]
+    branches: [rust, master]
   pull_request:
-    branches: [rust]
+    branches: [rust, master]
   workflow_dispatch:
 permissions:
   contents: read
