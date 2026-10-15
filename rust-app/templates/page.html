@@ -8,10 +8,10 @@
 <meta name="google-site-verification" content="IcSSxczl-uweXXUf6CZMqlr_zHyqh19xpP2F2vkBZC8">
 {% if kind == "account" || kind == "submissions" %}<meta name="robots" content="noindex,nofollow">{% endif %}
 {% if kind == "game" %}<link rel="canonical" href="{{ public_url }}{{ game.url() }}">{% else if kind == "weapon" %}<link rel="canonical" href="{{ public_url }}{{ weapon.url() }}">{% else if kind == "loadout" %}<link rel="canonical" href="{{ public_url }}{{ loadout.url() }}">{% endif %}
-<link href="/css/bootstrap.min.css?v={{ asset_version }}" rel="stylesheet">
-<link href="/css/styles.min.css?v={{ asset_version }}" rel="stylesheet">
-<link href="/css/media-queries.css?v={{ asset_version }}" rel="stylesheet">
-<link href="/font-awesome/css/font-awesome.min.css?v={{ asset_version }}" rel="stylesheet">
+<link href="/css/bootstrap.min.css?__release={{ asset_version }}" rel="stylesheet">
+<link href="/css/styles.min.css?__release={{ asset_version }}" rel="stylesheet">
+<link href="/css/media-queries.css?__release={{ asset_version }}" rel="stylesheet">
+<link href="/font-awesome/css/font-awesome.min.css?__release={{ asset_version }}" rel="stylesheet">
 </head>
 <body class="{{ theme }}">
 <header>
@@ -272,18 +272,18 @@
 <i class="entypo-up-open">
 </i>
 </a>
-<script src="/js/jquery-1.9.1.min.js?v={{ asset_version }}">
+<script src="/js/jquery-1.9.1.min.js?__release={{ asset_version }}">
 </script>
-<script src="/js/bootstrap.min.js?v={{ asset_version }}">
+<script src="/js/bootstrap.min.js?__release={{ asset_version }}">
 </script>
-<script src="/js/jquery.autocomplete.js?v={{ asset_version }}">
+<script src="/js/jquery.autocomplete.js?__release={{ asset_version }}">
 </script>
 {% if kind == "stats" %}
-<script src="/js/Chart.min.js?v={{ asset_version }}">
+<script src="/js/Chart.min.js?__release={{ asset_version }}">
 </script>
 {% endif %}
-{% if kind == "submissions" %}<script src="/js/tablesorter/jquery.tablesorter.js?v={{ asset_version }}"></script><script>$(function(){$("#submissions-table").tablesorter({headers:{3:{sorter:false}}});});</script>{% endif %}
-<script src="/js/rust-public.js?v={{ asset_version }}">
+{% if kind == "submissions" %}<script src="/js/tablesorter/jquery.tablesorter.js?__release={{ asset_version }}"></script><script>$(function(){$("#submissions-table").tablesorter({headers:{3:{sorter:false}}});});</script>{% endif %}
+<script src="/js/rust-public.js?__release={{ asset_version }}">
 </script>
 {% if disqus %}{% if kind == "loadout" %}
 <script>var thread=document.getElementById('disqus_thread');var disqus_shortname='tryharddev';var disqus_identifier=thread.dataset.disqusIdentifier;var disqus_config=function(){this.page.identifier=disqus_identifier;this.page.url=thread.dataset.disqusUrl;if(thread.dataset.disqusAuth){this.page.remote_auth_s3=thread.dataset.disqusAuth;this.page.api_key="HXGfl9wP4NuXd15qCTPIprKv2rJhzqCp38NlZs5YmA2i3LOlFzTnBAiiWK8MQKI9";this.sso={name:"Game Loadouts",url:thread.dataset.accountOrigin+"/login",logout:thread.dataset.accountOrigin+"/logout",button:thread.dataset.accountOrigin+"/img/login.png",width:800,height:400};}};(function(){var s=document.createElement('script');s.async=true;s.src='https://tryharddev.disqus.com/embed.js';document.body.appendChild(s);})();</script>

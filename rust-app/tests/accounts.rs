@@ -1141,7 +1141,7 @@ async fn admin_flows(app: &Router, pool: &Pool) {
             app,
             "",
             &format!(
-                "/css/styles.min.css?v={}",
+                "/css/styles.min.css?__release={}",
                 game_loadouts::asset_cache::VERSION
             ),
             "GET",
