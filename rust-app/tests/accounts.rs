@@ -1137,9 +1137,18 @@ async fn admin_flows(app: &Router, pool: &Pool) {
     assert_eq!(admin.post(app, "/admin/toggleAds", &[]).await.status, 303);
     assert_eq!(admin.post(app, "/admin/compile-css", &[]).await.status, 303);
     assert_eq!(
-        request(app, "", "/css/styles.min.css", "GET", &[])
-            .await
-            .status,
+        request(
+            app,
+            "",
+            &format!(
+                "/css/styles.min.css?v={}",
+                game_loadouts::asset_cache::VERSION
+            ),
+            "GET",
+            &[]
+        )
+        .await
+        .status,
         200
     );
     assert_eq!(admin.get(app, "/Hidden+New+Game").await.status, 200);

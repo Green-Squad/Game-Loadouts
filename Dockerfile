@@ -5,6 +5,8 @@ COPY rust-app/Cargo.toml rust-app/Cargo.lock ./
 COPY rust-app/src ./src
 COPY rust-app/templates ./templates
 COPY rust-app/data ./data
+ARG ASSET_VERSION=development
+ENV ASSET_VERSION=$ASSET_VERSION
 RUN cargo build --locked --release
 
 FROM debian:trixie-slim AS runtime

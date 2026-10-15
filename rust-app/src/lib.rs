@@ -1,4 +1,5 @@
 pub mod account;
+pub mod asset_cache;
 pub mod db;
 pub mod model;
 pub mod schema;

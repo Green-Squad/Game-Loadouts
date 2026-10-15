@@ -153,7 +153,7 @@ impl Page {
         if value.starts_with("https://") || value.starts_with("http://") {
             value.into()
         } else {
-            format!("/{}", value.trim_start_matches('/'))
+            crate::asset_cache::url(&format!("/{}", value.trim_start_matches('/')))
         }
     }
     fn url(

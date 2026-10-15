@@ -20,10 +20,7 @@ use std::{
     time::{Duration, Instant},
 };
 use tower::Layer;
-use tower_http::{
-    services::{ServeDir, ServeFile},
-    set_header::SetResponseHeaderLayer,
-};
+use tower_http::services::{ServeDir, ServeFile};
 
 pub struct AppState {
     pub accounts: Option<Arc<Accounts>>,
@@ -43,6 +40,7 @@ pub struct AppState {
 #[derive(Template)]
 #[template(path = "page.html")]
 struct Page {
+    asset_version: &'static str,
     session: Session,
     interactive: bool,
     admin_enabled: bool,
@@ -83,6 +81,7 @@ impl Page {
     fn new(state: &AppState) -> Self {
         Self {
             session: Session::default(),
+            asset_version: crate::asset_cache::VERSION,
             disqus_auth: String::new(),
             account_origin: state
                 .accounts
@@ -153,12 +152,12 @@ impl Page {
         }
         let path = path.trim_start_matches('/');
         if path.starts_with("uploads/rust/") || path.starts_with("uploads/thumb/rust/") {
-            return format!("/{path}");
+            return crate::asset_cache::url(&format!("/{path}"));
         }
         if path.starts_with("uploads/") && !self.media_origin.is_empty() {
-            format!("{}/{}", self.media_origin, path)
+            crate::asset_cache::url(&format!("{}/{}", self.media_origin, path))
         } else {
-            format!("/{path}")
+            crate::asset_cache::url(&format!("/{path}"))
         }
     }
 }
@@ -171,10 +170,7 @@ fn error_page(state: &AppState, code: u16, msg: &str) -> Page {
     p
 }
 pub fn app(state: Arc<AppState>, assets: &str) -> Router {
-    let cache = SetResponseHeaderLayer::if_not_present(
-        axum::http::header::CACHE_CONTROL,
-        HeaderValue::from_static("public, max-age=3600"),
-    );
+    let cache = middleware::from_fn(crate::asset_cache::serve);
     let mut router = Router::new()
         .route("/healthz", get(|| async { "ok\n" }))
         .route("/", get(page))
@@ -230,7 +226,10 @@ pub fn app(state: Arc<AppState>, assets: &str) -> Router {
     }
     router
         .route("/rust-media/{*path}", get(crate::media::serve))
-        .route("/css/styles.min.css", get(crate::media::stylesheet))
+        .route(
+            "/css/styles.min.css",
+            get(crate::media::stylesheet).layer(middleware::from_fn(crate::asset_cache::serve)),
+        )
         .route_service(
             "/favicon.ico",
             cache.layer(ServeFile::new(format!("{assets}/favicon.ico"))),
