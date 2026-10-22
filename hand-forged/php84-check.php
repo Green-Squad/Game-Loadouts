@@ -23,6 +23,9 @@ catch (ErrorException $error) { $thrown = true; }
 check($thrown, 'Regular warnings must retain Laravel error handling');
 $home = (new HelperController)->showHome()->render();
 check(strpos($home, 'Game Loadouts') !== false, 'Original home view renders');
+$game = Game::findOrFail('Call of Duty Black Ops 7');
+(new GameController)->listWeapons($game)->render();
+WeaponController::listLoadouts($game, 'AK-27')->render();
 echo "PASS patched PHP runtime, Unicode encryption, password hashing, dates, LESS and error handling\n";
 
 } catch (Throwable $error) {

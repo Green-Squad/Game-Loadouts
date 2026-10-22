@@ -21,3 +21,18 @@
  		if (error_reporting() & $level)
  		{
  			throw new ErrorException($message, 0, $level, $file, $line);
+@@ -142,6 +145,14 @@
+ 	 */
+ 	public function handleException($exception)
+ 	{
++		// PHP 7+ engine errors implement Throwable, but the original displayers require Exception.
++		if ($exception instanceof \Error)
++		{
++			error_log((string) $exception);
++			$exception = new ErrorException($exception->getMessage(), 0, E_ERROR,
++				$exception->getFile(), $exception->getLine(), $exception);
++		}
++
+ 		$response = $this->callCustomHandlers($exception);
+ 
+ 		// If one of the custom error handlers returned a response, we will send that
