@@ -33,7 +33,8 @@ def main():
             assert status['latestReadyRevisionName'] == status['latestCreatedRevisionName']
             policy = json.loads(subprocess.check_output(command + ['get-iam-policy', SERVICE] + flags))
             assert not any(ANONYMOUS.intersection(b['members']) for b in policy.get('bindings', []))
-            urls = {status['url'], 'https://handforged.gameloadouts.com'}
+            urls = {status['url'], 'https://handforged.gameloadouts.com',
+                    'https://gameloadouts-hand-forged-438745124966.us-east4.run.app'}
             urls.update(t['url'] for t in status.get('traffic', []) if t.get('url'))
             for url in urls:
                 parsed = urllib.parse.urlsplit(url)
