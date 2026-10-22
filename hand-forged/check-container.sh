@@ -15,7 +15,8 @@ launch() {
  docker run -d --name hf-web --memory=256m --cpus=1 --network container:hf-database -e HAND_FORGED_LOCAL_TEST=true hand-forged-web
 }
 launch
-docker exec -e KEY=00000000000000000000000000000000 hf-web php hand-forged/php84-check.php
+docker exec -e KEY=00000000000000000000000000000000 -e DB_HOST=127.0.0.1 -e DB_DATABASE=game_loadouts_hand_forged -e DB_USERNAME=handforged -e DB_PASSWORD=HandForgedLocalDatabaseOnly hf-web php hand-forged/wait_for_database.php
+docker exec -e KEY=00000000000000000000000000000000 -e DB_HOST=127.0.0.1 -e DB_DATABASE=game_loadouts_hand_forged -e DB_USERNAME=handforged -e DB_PASSWORD=HandForgedLocalDatabaseOnly hf-web php hand-forged/php84-check.php
 python3 hand-forged/smoke.py
 node hand-forged/browser.mjs
 ready=$(date +%s)

@@ -6,6 +6,8 @@ The Dockerfile uses current GD build options and explicitly installs the origina
 
 `php84.patch` contains the complete vendor compatibility changes and is applied with zero fuzz after installing the exact locked dependencies. A failed patch stops the build. Patchwork must not read mbstring overload constants removed by PHP 8. Laravel must log deprecations through PHP's native logger instead of converting them into HTTP 500s; regular warnings and errors retain the original exception behavior. PHP logs go to stderr and are not displayed in responses. Any further necessary compatibility fixes are included visibly in this patch.
 
+The home controller stops passing two undefined, unused variables to `compact()`, which PHP 8 reports as warnings. Its view data and rendered UI remain the same.
+
 The first-party search existence check uses an explicit null test instead of counting a non-Countable Eloquent model. The normal PHP 5.6 behavior for a found/missing row is preserved.
 
 PR validation builds disposable containers and exercises the original public/admin forms, authentication and remember cookies, uploads/thumbnails, relationships, CSV import, submissions/votes, desktop/mobile rendering, shutdown and replacement reset. Focused PHP regressions cover Unicode encryption, passwords, dates, LESS, and deprecation versus warning handling. PR validation has no deployment step. Only an eventual approved merge into `hand-forged` can invoke its existing release pipeline.

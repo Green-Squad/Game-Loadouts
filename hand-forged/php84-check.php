@@ -1,5 +1,5 @@
 <?php
-// Offline regression checks: no connection to the original database or external integrations.
+// Isolated regressions: only the bundled disposable database; no external integrations.
 function check($condition, $message) {
     if (!$condition) throw new RuntimeException($message);
 }
@@ -21,6 +21,8 @@ $thrown = false;
 try { trigger_error('PHP compatibility test warning: must still throw', E_USER_WARNING); }
 catch (ErrorException $error) { $thrown = true; }
 check($thrown, 'Regular warnings must retain Laravel error handling');
+$home = (new HelperController)->showHome()->render();
+check(strpos($home, 'Game Loadouts') !== false, 'Original home view renders');
 echo "PASS patched PHP runtime, Unicode encryption, password hashing, dates, LESS and error handling\n";
 
 } catch (Throwable $error) {
