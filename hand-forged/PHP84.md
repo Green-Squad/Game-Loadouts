@@ -1,0 +1,13 @@
+# Patched PHP, original application
+
+This proposal replaces PHP 5.6.40 with PHP 8.4.27, which contains the October 2026 PHP2Shell security fixes. It changes the historical runtime and Debian base, while retaining Laravel 4.1.31, the existing Composer lock, controllers, Blade templates, styling, artwork, routes, disposable MySQL 5.7 sidecar and reset behavior. No framework upgrade, new UI or database migration is included.
+
+The Dockerfile uses current GD build options and explicitly installs the original application's extensions. mcrypt 1.0.9 preserves Laravel's existing Rijndael-256 encryption format. This extension and libmcrypt are unmaintained; keeping them is an explicit compatibility compromise, not a modern cryptography design. Replacing the cipher/framework is outside this proposal.
+
+`php84.patch` contains the complete vendor compatibility changes and is applied with zero fuzz after installing the exact locked dependencies. A failed patch stops the build. Patchwork must not read mbstring overload constants removed by PHP 8. Laravel must log deprecations through PHP's native logger instead of converting them into HTTP 500s; regular warnings and errors retain the original exception behavior. PHP logs go to stderr and are not displayed in responses. Any further necessary compatibility fixes are included visibly in this patch.
+
+The first-party search existence check uses an explicit null test instead of counting a non-Countable Eloquent model. The normal PHP 5.6 behavior for a found/missing row is preserved.
+
+PR validation builds disposable containers and exercises the original public/admin forms, authentication and remember cookies, uploads/thumbnails, relationships, CSV import, submissions/votes, desktop/mobile rendering, shutdown and replacement reset. Focused PHP regressions cover Unicode encryption, passwords, dates, LESS, and deprecation versus warning handling. PR validation has no deployment step. Only an eventual approved merge into `hand-forged` can invoke its existing release pipeline.
+
+This does not make the old framework, database version or every dependency current or fully audited. It addresses the PHP runtime vulnerability and the compatibility failures found by the regression suite. The live historical demo is unchanged until this proposal is approved and merged.

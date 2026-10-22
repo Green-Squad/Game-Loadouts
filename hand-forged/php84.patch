@@ -1,0 +1,23 @@
+--- a/vendor/patchwork/utf8/class/Patchwork/Utf8/Bootup.php
++++ b/vendor/patchwork/utf8/class/Patchwork/Utf8/Bootup.php
+@@ -44,7 +44,7 @@
+                 user_error('php.ini settings: Please disable mbstring.encoding_translation or set mbstring.http_input to "pass"',  E_USER_WARNING);
+             }
+ 
+-            if (MB_OVERLOAD_STRING & (int) ini_get('mbstring.func_overload'))
++            if (defined('MB_OVERLOAD_STRING') && (MB_OVERLOAD_STRING & (int) ini_get('mbstring.func_overload')))
+             {
+                 user_error('php.ini settings: Please disable mbstring.func_overload', E_USER_WARNING);
+             }
+--- a/vendor/laravel/framework/src/Illuminate/Exception/Handler.php
++++ b/vendor/laravel/framework/src/Illuminate/Exception/Handler.php
+@@ -128,6 +128,9 @@
+ 	 */
+ 	public function handleError($level, $message, $file = '', $line = 0, $context = array())
+ 	{
++		// Keep PHP 8 deprecations in the native error log, without turning them into HTTP 500s.
++		if ($level === E_DEPRECATED || $level === E_USER_DEPRECATED) return false;
++
+ 		if (error_reporting() & $level)
+ 		{
+ 			throw new ErrorException($message, 0, $level, $file, $line);

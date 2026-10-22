@@ -16,6 +16,7 @@ launch() {
 }
 launch
 python3 hand-forged/smoke.py
+docker exec -e KEY=00000000000000000000000000000000 hf-web php hand-forged/php84-check.php
 node hand-forged/browser.mjs
 ready=$(date +%s)
 echo "startup_and_checks_seconds=$((ready-start))" > hand-forged/test-results/measurements.txt

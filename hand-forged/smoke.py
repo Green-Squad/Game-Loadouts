@@ -35,6 +35,9 @@ for path in ['/games','/stats','/Call+of+Duty+Black+Ops+7','/Call+of+Duty+Black+
 styles=BeautifulSoup(home.text,'html.parser').select('link[rel=stylesheet]')
 for link in styles:
  url=urllib.parse.urlsplit(link['href']);assert url.netloc in ('','127.0.0.1:8080');req(url.path)
+# PHP 8 rejects count() on a single Eloquent model; exercise the original search form.
+searched=req('/search',{'_token':token(home.text),'query':'AK-27 / Call of Duty Black Ops 7'})
+assert urllib.parse.unquote_plus(urllib.parse.urlsplit(searched.url).path)=='/Call of Duty Black Ops 7/AK-27'
 login=req('/login');signed=req('/login',{'_token':token(login.text),'emailOrUsername':'admin@handforged.invalid','password':'HandForgedDemo!','remember':'remember'})
 assert 'successfully logged in' in signed.text
 assert 'Admin' in req('/admin').text

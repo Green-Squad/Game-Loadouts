@@ -333,7 +333,7 @@ class WeaponController extends BaseController {
             
             $weapon = Weapon::where('name', $weaponName) -> where('game_id', $gameName) -> first();
             
-            if (count($weapon) > 0) {
+            if (!is_null($weapon)) {
                 return Redirect::route('showLoadouts', array (
                     urlencode($gameName),
                     urlencode($weaponName) 
