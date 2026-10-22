@@ -36,6 +36,9 @@ assert query('SELECT COUNT(*) FROM attachments')=='5855'
 assert query("SELECT COUNT(*) FROM users WHERE email NOT LIKE '%@handforged.invalid'")=='0'
 for path in ['/games','/stats','/Call+of+Duty+Black+Ops+7','/Call+of+Duty+Black+Ops+7/AK-27']:
  req(path)
+suggestions=req('/search_weapons?query=AK-27').json()
+assert any('AK-27' in row['value'] for row in suggestions['suggestions'])
+assert '<urlset' in req('/sitemap.xml').text
 styles=BeautifulSoup(home.text,'html.parser').select('link[rel=stylesheet]')
 for link in styles:
  url=urllib.parse.urlsplit(link['href']);assert url.netloc in ('','127.0.0.1:8080');req(url.path)
@@ -45,6 +48,7 @@ assert urllib.parse.unquote_plus(urllib.parse.urlsplit(searched.url).path)=='/Ca
 login=req('/login');signed=req('/login',{'_token':token(login.text),'emailOrUsername':'admin@handforged.invalid','password':'HandForgedDemo!','remember':'remember'})
 assert 'successfully logged in' in signed.text
 assert 'Admin' in req('/admin').text
+assert 'compiled' in req('/admin/compile-css').text
 cookies=[c.name for c in session.cookies];assert 'gameloadouts_hand_forged_session' in cookies and 'laravel_session' not in cookies
 assert any(name.startswith('remember_') for name in cookies)
 # Create/update an original game using its image and header upload fields.
