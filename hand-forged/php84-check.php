@@ -16,6 +16,9 @@ check(Carbon\Carbon::create(2026, 10, 22)->format('Y-m-d') === '2026-10-22', 'Da
 $parser = new Less_Parser;
 $parser->parse('a { width: (1px + 2px); }');
 check(strpos($parser->getCss(), '3px') !== false, 'Original LESS compiler');
+$parser = new Less_Parser(array('compress' => true));
+$parser->parseFile(app_path().'/less/styles.less', '/css/');
+check(strlen($parser->getCss()) > 1000, 'Original complete stylesheet and imports');
 trigger_error('PHP compatibility test deprecation: must be logged, not thrown', E_USER_DEPRECATED);
 $thrown = false;
 try { trigger_error('PHP compatibility test warning: must still throw', E_USER_WARNING); }

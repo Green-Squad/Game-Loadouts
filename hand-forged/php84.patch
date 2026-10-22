@@ -84,3 +84,19 @@
          $keys = array_keys($data);
          sort($keys);
  
+--- a/vendor/oyejorge/less.php/lib/Less/Tree/Import.php
++++ b/vendor/oyejorge/less.php/lib/Less/Tree/Import.php
+@@ -214,11 +214,11 @@
+ 
+ 			if( Less_Environment::isPathRelative($evald_path) ){
+ 				//if the path is relative, the file should be in the current directory
+-				$import_dirs[ $this->currentFileInfo['currentDirectory'] ] = $this->currentFileInfo['uri_root'];
++				$import_dirs[ ($this->currentFileInfo['currentDirectory'] ?? '') ] = ($this->currentFileInfo['uri_root'] ?? '');
+ 
+ 			}else{
+ 				//otherwise, the file should be relative to the server root
+-				$import_dirs[ $this->currentFileInfo['entryPath'] ] = $this->currentFileInfo['entryUri'];
++				$import_dirs[ ($this->currentFileInfo['entryPath'] ?? '') ] = ($this->currentFileInfo['entryUri'] ?? '');
+ 
+ 				//if the user supplied entryPath isn't the actual root
+ 				$import_dirs[ $_SERVER['DOCUMENT_ROOT'] ] = '';
