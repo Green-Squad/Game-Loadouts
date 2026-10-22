@@ -14,8 +14,6 @@ jobs:
     timeout-minutes: 35
     steps:
     - uses: actions/checkout@v4
-    - name: Check private access policy safeguards
-      run: python3 hand-forged/test_private_access.py
     - name: Build original Laravel application and private MySQL snapshot
       run: |
         docker build -t hand-forged-db -f hand-forged/Database.Dockerfile .

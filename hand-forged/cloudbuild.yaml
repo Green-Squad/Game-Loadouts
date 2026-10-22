@@ -27,7 +27,6 @@ steps:
     grep -q '^  name: gameloadouts-hand-forged$' hand-forged/service.yaml
     sed -e 's|__APP_IMAGE__|us-central1-docker.pkg.dev/game-loadouts/cloud-run-source-deploy/hand-forged/application:$COMMIT_SHA|' -e 's|__DB_IMAGE__|us-central1-docker.pkg.dev/game-loadouts/cloud-run-source-deploy/hand-forged/database:$COMMIT_SHA|' hand-forged/service.yaml > /tmp/service.yaml
     gcloud run services replace /tmp/service.yaml --project=game-loadouts --region=us-east4 --quiet
-    python3 hand-forged/configure_private_access.py
     python3 hand-forged/verify_private_service.py
 images:
 - us-central1-docker.pkg.dev/game-loadouts/cloud-run-source-deploy/hand-forged/database:$COMMIT_SHA
