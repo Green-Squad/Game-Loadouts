@@ -1,0 +1,124 @@
+--- a/vendor/patchwork/utf8/class/Patchwork/Utf8/Bootup.php
++++ b/vendor/patchwork/utf8/class/Patchwork/Utf8/Bootup.php
+@@ -44,7 +44,7 @@
+                 user_error('php.ini settings: Please disable mbstring.encoding_translation or set mbstring.http_input to "pass"',  E_USER_WARNING);
+             }
+ 
+-            if (MB_OVERLOAD_STRING & (int) ini_get('mbstring.func_overload'))
++            if (defined('MB_OVERLOAD_STRING') && (MB_OVERLOAD_STRING & (int) ini_get('mbstring.func_overload')))
+             {
+                 user_error('php.ini settings: Please disable mbstring.func_overload', E_USER_WARNING);
+             }
+--- a/vendor/laravel/framework/src/Illuminate/Exception/Handler.php
++++ b/vendor/laravel/framework/src/Illuminate/Exception/Handler.php
+@@ -128,6 +128,9 @@
+ 	 */
+ 	public function handleError($level, $message, $file = '', $line = 0, $context = array())
+ 	{
++		// Keep PHP 8 deprecations in the native error log, without turning them into HTTP 500s.
++		if ($level === E_DEPRECATED || $level === E_USER_DEPRECATED) return false;
++
+ 		if (error_reporting() & $level)
+ 		{
+ 			throw new ErrorException($message, 0, $level, $file, $line);
+@@ -142,6 +145,14 @@
+ 	 */
+ 	public function handleException($exception)
+ 	{
++		// PHP 7+ engine errors implement Throwable, but the original displayers require Exception.
++		if ($exception instanceof \Error)
++		{
++			error_log((string) $exception);
++			$exception = new ErrorException($exception->getMessage(), 0, E_ERROR,
++				$exception->getFile(), $exception->getLine(), $exception);
++		}
++
+ 		$response = $this->callCustomHandlers($exception);
+ 
+ 		// If one of the custom error handlers returned a response, we will send that
+--- a/vendor/laravel/framework/src/Illuminate/Routing/Route.php
++++ b/vendor/laravel/framework/src/Illuminate/Routing/Route.php
+@@ -101,7 +101,7 @@
+ 	{
+ 		$parameters = array_filter($this->parameters(), function($p) { return isset($p); });
+ 
+-		return call_user_func_array($this->action['uses'], $parameters);
++		return call_user_func_array($this->action['uses'], array_values($parameters));
+ 	}
+ 
+ 	/**
+--- a/vendor/laravel/framework/src/Illuminate/Routing/Controller.php
++++ b/vendor/laravel/framework/src/Illuminate/Routing/Controller.php
+@@ -228,7 +228,7 @@
+ 	{
+ 		$this->setupLayout();
+ 
+-		$response = call_user_func_array(array($this, $method), $parameters);
++		$response = call_user_func_array(array($this, $method), array_values($parameters));
+ 
+ 		// If no response is returned from the controller action and a layout is being
+ 		// used we will assume we want to just return the layout view as any nested
+--- a/vendor/laravel/framework/src/Illuminate/Html/FormBuilder.php
++++ b/vendor/laravel/framework/src/Illuminate/Html/FormBuilder.php
+@@ -322,6 +322,9 @@
+ 	 */
+ 	public function file($name, $options = array())
+ 	{
++		// Preserve PHP 5's empty-string-to-array behavior used by the original templates.
++		if ($options === '') $options = array();
++
+ 		return $this->input('file', $name, null, $options);
+ 	}
+ 
+--- a/vendor/symfony/http-foundation/Symfony/Component/HttpFoundation/FileBag.php
++++ b/vendor/symfony/http-foundation/Symfony/Component/HttpFoundation/FileBag.php
+@@ -128,6 +128,11 @@
+             return $data;
+         }
+ 
++        // PHP 8.1 adds upload path metadata; preserve the original basename-only behavior.
++        if (array_key_exists('full_path', $data) && isset($data['tmp_name'], $data['error'], $data['name'], $data['type'], $data['size'])) {
++            unset($data['full_path']);
++        }
++
+         $keys = array_keys($data);
+         sort($keys);
+ 
+--- a/vendor/oyejorge/less.php/lib/Less/Tree/Import.php
++++ b/vendor/oyejorge/less.php/lib/Less/Tree/Import.php
+@@ -214,11 +214,11 @@
+ 
+ 			if( Less_Environment::isPathRelative($evald_path) ){
+ 				//if the path is relative, the file should be in the current directory
+-				$import_dirs[ $this->currentFileInfo['currentDirectory'] ] = $this->currentFileInfo['uri_root'];
++				$import_dirs[ ($this->currentFileInfo['currentDirectory'] ?? '') ] = ($this->currentFileInfo['uri_root'] ?? '');
+ 
+ 			}else{
+ 				//otherwise, the file should be relative to the server root
+-				$import_dirs[ $this->currentFileInfo['entryPath'] ] = $this->currentFileInfo['entryUri'];
++				$import_dirs[ ($this->currentFileInfo['entryPath'] ?? '') ] = ($this->currentFileInfo['entryUri'] ?? '');
+ 
+ 				//if the user supplied entryPath isn't the actual root
+ 				$import_dirs[ $_SERVER['DOCUMENT_ROOT'] ] = '';
+--- a/vendor/league/csv/src/Modifier/StreamFilter.php
++++ b/vendor/league/csv/src/Modifier/StreamFilter.php
+@@ -214,7 +214,7 @@
+     /**
+      * @inheritdoc
+      */
+-    abstract public function validateString($str);
++    abstract protected static function validateString($str);
+ 
+     /**
+      * Detect if the stream filter is already present
+--- a/vendor/league/csv/src/Modifier/RowFilter.php
++++ b/vendor/league/csv/src/Modifier/RowFilter.php
+@@ -110,7 +110,7 @@
+     /**
+      * @inheritdoc
+      */
+-    abstract protected function validateString($str);
++    abstract protected static function validateString($str);
+ 
+     /**
+      * Remove a validator from the collection

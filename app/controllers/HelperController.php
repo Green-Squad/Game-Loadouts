@@ -29,7 +29,7 @@ class HelperController extends BaseController {
             }
         }
 		
-        return View::make('home', compact('games', 'items', 'topLoadoutsPerGame', 'recentLoadout'));
+        return View::make('home', compact('topLoadoutsPerGame', 'recentLoadout'));
 	}
 
     public static function adsEnabled() {
