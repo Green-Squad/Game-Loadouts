@@ -4,6 +4,7 @@ function check($condition, $message) {
     if (!$condition) throw new RuntimeException($message);
 }
 check(PHP_VERSION === '8.4.27', 'Unexpected PHP runtime');
+try {
 require __DIR__.'/../bootstrap/autoload.php';
 $app = require __DIR__.'/../bootstrap/start.php';
 $app->boot();
@@ -21,3 +22,8 @@ try { trigger_error('PHP compatibility test warning: must still throw', E_USER_W
 catch (ErrorException $error) { $thrown = true; }
 check($thrown, 'Regular warnings must retain Laravel error handling');
 echo "PASS patched PHP runtime, Unicode encryption, password hashing, dates, LESS and error handling\n";
+
+} catch (Throwable $error) {
+    fwrite(STDERR, (string) $error."\n");
+    exit(1);
+}

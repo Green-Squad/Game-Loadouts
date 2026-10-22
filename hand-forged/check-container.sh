@@ -15,8 +15,8 @@ launch() {
  docker run -d --name hf-web --memory=256m --cpus=1 --network container:hf-database -e HAND_FORGED_LOCAL_TEST=true hand-forged-web
 }
 launch
-python3 hand-forged/smoke.py
 docker exec -e KEY=00000000000000000000000000000000 hf-web php hand-forged/php84-check.php
+python3 hand-forged/smoke.py
 node hand-forged/browser.mjs
 ready=$(date +%s)
 echo "startup_and_checks_seconds=$((ready-start))" > hand-forged/test-results/measurements.txt

@@ -21,7 +21,11 @@ def query(sql):
 for i in range(180):
  try:
   home=req('/');break
- except Exception:time.sleep(1)
+ except requests.HTTPError as error:
+  Path('hand-forged/test-results').mkdir(exist_ok=True)
+  Path('hand-forged/test-results/startup-response.html').write_text(error.response.text)
+  raise
+ except requests.RequestException:time.sleep(1)
 else:raise AssertionError('Startup failed')
 Path('hand-forged/test-results').mkdir(exist_ok=True)
 Path('hand-forged/test-results/startup.json').write_text(json.dumps({'startup_seconds':round(time.time()-float(os.environ.get('HAND_FORGED_STARTED_AT',time.time())),3)}))
