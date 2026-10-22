@@ -21,6 +21,8 @@ $thrown = false;
 try { trigger_error('PHP compatibility test warning: must still throw', E_USER_WARNING); }
 catch (ErrorException $error) { $thrown = true; }
 check($thrown, 'Regular warnings must retain Laravel error handling');
+check(Form::file('image', '', array('class' => 'historically-ignored')) === Form::file('image'), 'Original file-input markup');
+check(strpos(Form::file('image', array('class' => 'kept')), 'class="kept"') !== false, 'Valid file-input options');
 $home = (new HelperController)->showHome()->render();
 check(strpos($home, 'Game Loadouts') !== false, 'Original home view renders');
 $game = Game::findOrFail('Call of Duty Black Ops 7');

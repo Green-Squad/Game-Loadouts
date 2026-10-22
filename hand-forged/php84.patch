@@ -58,3 +58,15 @@
  
  		// If no response is returned from the controller action and a layout is being
  		// used we will assume we want to just return the layout view as any nested
+--- a/vendor/laravel/framework/src/Illuminate/Html/FormBuilder.php
++++ b/vendor/laravel/framework/src/Illuminate/Html/FormBuilder.php
+@@ -322,6 +322,9 @@
+ 	 */
+ 	public function file($name, $options = array())
+ 	{
++		// Preserve PHP 5's empty-string-to-array behavior used by the original templates.
++		if ($options === '') $options = array();
++
+ 		return $this->input('file', $name, null, $options);
+ 	}
+ 
