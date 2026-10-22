@@ -23,6 +23,18 @@ catch (ErrorException $error) { $thrown = true; }
 check($thrown, 'Regular warnings must retain Laravel error handling');
 check(Form::file('image', '', array('class' => 'historically-ignored')) === Form::file('image'), 'Original file-input markup');
 check(strpos(Form::file('image', array('class' => 'kept')), 'class="kept"') !== false, 'Valid file-input options');
+$temporary = tempnam(sys_get_temp_dir(), 'hf-upload-');
+try {
+    $upload = array('name' => 'image.png', 'full_path' => 'untrusted/image.png', 'type' => 'image/png',
+        'tmp_name' => $temporary, 'error' => UPLOAD_ERR_OK, 'size' => 0);
+    $bag = new Symfony\Component\HttpFoundation\FileBag(array('image' => $upload));
+    check($bag->get('image') instanceof Symfony\Component\HttpFoundation\File\UploadedFile, 'PHP 8 upload metadata');
+    check($bag->get('image')->getClientOriginalName() === 'image.png', 'Upload basename preserved');
+    $nested = array();
+    foreach ($upload as $key => $value) $nested[$key] = array('child' => $value);
+    $bag = new Symfony\Component\HttpFoundation\FileBag(array('images' => $nested));
+    check($bag->get('images')['child'] instanceof Symfony\Component\HttpFoundation\File\UploadedFile, 'Nested upload metadata');
+} finally { unlink($temporary); }
 $home = (new HelperController)->showHome()->render();
 check(strpos($home, 'Game Loadouts') !== false, 'Original home view renders');
 $game = Game::findOrFail('Call of Duty Black Ops 7');

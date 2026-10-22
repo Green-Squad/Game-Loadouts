@@ -70,3 +70,17 @@
  		return $this->input('file', $name, null, $options);
  	}
  
+--- a/vendor/symfony/http-foundation/Symfony/Component/HttpFoundation/FileBag.php
++++ b/vendor/symfony/http-foundation/Symfony/Component/HttpFoundation/FileBag.php
+@@ -128,6 +128,11 @@
+             return $data;
+         }
+ 
++        // PHP 8.1 adds upload path metadata; preserve the original basename-only behavior.
++        if (array_key_exists('full_path', $data) && isset($data['tmp_name'], $data['error'], $data['name'], $data['type'], $data['size'])) {
++            unset($data['full_path']);
++        }
++
+         $keys = array_keys($data);
+         sort($keys);
+ 
