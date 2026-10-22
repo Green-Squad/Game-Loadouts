@@ -37,7 +37,7 @@ assert query("SELECT COUNT(*) FROM users WHERE email NOT LIKE '%@handforged.inva
 for path in ['/games','/stats','/Call+of+Duty+Black+Ops+7','/Call+of+Duty+Black+Ops+7/AK-27']:
  req(path)
 suggestions=req('/search_weapons?query=AK-27').json()
-assert any('AK-27' in row['value'] for row in suggestions['suggestions'])
+assert any('AK-27' in row for row in suggestions['suggestions'])
 assert '<urlset' in req('/sitemap.xml').text
 styles=BeautifulSoup(home.text,'html.parser').select('link[rel=stylesheet]')
 for link in styles:
