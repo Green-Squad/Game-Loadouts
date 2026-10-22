@@ -4,7 +4,17 @@ This proposal replaces PHP 5.6.40 with PHP 8.4.27, which contains the October 20
 
 The Dockerfile uses current GD build options and explicitly installs the original application's extensions. mcrypt 1.0.9 preserves Laravel's existing Rijndael-256 encryption format. This extension and libmcrypt are unmaintained; keeping them is an explicit compatibility compromise, not a modern cryptography design. Replacing the cipher/framework is outside this proposal.
 
-`php84.patch` contains the complete vendor compatibility changes and is applied with zero fuzz after installing the exact locked dependencies. A failed patch stops the build. Patchwork must not read mbstring overload constants removed by PHP 8. Laravel must log deprecations through PHP's native logger instead of converting them into HTTP 500s; regular warnings and errors retain the original exception behavior. The file-input helper accepts the original templates’ empty-string options exactly as PHP 5 did, without changing template markup or previously ignored extra arguments. CSV trait declarations match the existing static string-validation implementation, satisfying PHP 8 method-signature rules without changing parsing. The original LESS compiler handles missing import-directory metadata with the empty values PHP 5 used, avoiding PHP 8 null-offset warnings. Symfony ignores the newer `full_path` upload metadata so the original basename-only upload handling continues working, including nested file inputs. Route and controller dispatch explicitly pass positional argument lists, restoring PHP 5 behavior instead of PHP 8 interpreting route keys as named arguments. PHP native Error objects are wrapped as ErrorException for the original exception renderer, retaining the original error as the cause. PHP logs go to stderr and are not displayed in responses. Any further necessary compatibility fixes are included visibly in this patch.
+`php84.patch` contains the complete vendor compatibility changes and is applied with zero fuzz after installing the exact locked dependencies. A failed patch stops the build. The changes are:
+
+- Patchwork checks that the removed mbstring overload constant exists before reading it.
+- Laravel lets PHP log deprecations instead of turning them into HTTP 500s. Regular warnings still become exceptions. Native PHP Error objects are wrapped for the original exception renderer, retaining the cause and original error log.
+- Route and controller dispatch use positional argument lists, preserving PHP 5 behavior instead of treating route keys as PHP 8 named arguments.
+- The file-input helper accepts the original empty-string options, without changing templates or previously ignored extra arguments.
+- Symfony ignores newer `full_path` upload metadata, retaining basename-only handling for normal and nested file inputs.
+- The original LESS compiler uses the empty import-directory values PHP 5 used when metadata is absent.
+- CSV trait declarations match their existing static string-validation implementation; parsing stays unchanged.
+
+PHP logs go to stderr and errors are not displayed in responses. Deprecation notices from the retained dependencies remain visible in logs; this is a compatibility port rather than a dependency modernization.
 
 The home controller stops passing two undefined, unused variables to `compact()`, which PHP 8 reports as warnings. Its view data and rendered UI remain the same.
 

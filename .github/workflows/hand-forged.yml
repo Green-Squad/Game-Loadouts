@@ -5,6 +5,9 @@ on:
   pull_request:
     branches: [hand-forged]
   workflow_dispatch:
+concurrency:
+  group: hand-forged-validation-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
 permissions:
   contents: read
 jobs:
