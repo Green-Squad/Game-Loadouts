@@ -26,6 +26,11 @@ catch (ErrorException $error) { $thrown = true; }
 check($thrown, 'Regular warnings must retain Laravel error handling');
 check(Form::file('image', '', array('class' => 'historically-ignored')) === Form::file('image'), 'Original file-input markup');
 check(strpos(Form::file('image', array('class' => 'kept')), 'class="kept"') !== false, 'Valid file-input options');
+$csv = League\Csv\Reader::createFromString("name,value\n\"café, snow\",42\n");
+check($csv->fetchOne(1) === array('café, snow', '42'), 'Original CSV reader and quoted Unicode');
+$csv = League\Csv\Writer::createFromString('');
+$csv->insertOne(array('café, snow', '42'));
+check(strpos((string) $csv, '"café, snow",42') !== false, 'Original CSV writer');
 $temporary = tempnam(sys_get_temp_dir(), 'hf-upload-');
 try {
     $upload = array('name' => 'image.png', 'full_path' => 'untrusted/image.png', 'type' => 'image/png',

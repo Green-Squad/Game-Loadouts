@@ -100,3 +100,25 @@
  
  				//if the user supplied entryPath isn't the actual root
  				$import_dirs[ $_SERVER['DOCUMENT_ROOT'] ] = '';
+--- a/vendor/league/csv/src/Modifier/StreamFilter.php
++++ b/vendor/league/csv/src/Modifier/StreamFilter.php
+@@ -214,7 +214,7 @@
+     /**
+      * @inheritdoc
+      */
+-    abstract public function validateString($str);
++    abstract protected static function validateString($str);
+ 
+     /**
+      * Detect if the stream filter is already present
+--- a/vendor/league/csv/src/Modifier/RowFilter.php
++++ b/vendor/league/csv/src/Modifier/RowFilter.php
+@@ -110,7 +110,7 @@
+     /**
+      * @inheritdoc
+      */
+-    abstract protected function validateString($str);
++    abstract protected static function validateString($str);
+ 
+     /**
+      * Remove a validator from the collection
